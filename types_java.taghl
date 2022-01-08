@@ -1,0 +1,5 @@
+syn keyword CTagsPackage sscweb
+syn keyword CTagsField UTC_TIME_ZONE DATE_FORMATTER
+syn keyword CTagsMethod getTestFormatOptions getTestOutputOptions getSpaceRegion printResult getTestOrbitOptions printDataResult getTestMapOptions getTracedRegion printStringArray printFileResult print getTestDataRequest main printHeading getTestTimeSeriesOptions
+syn keyword CTagsClass Main WsExample
+

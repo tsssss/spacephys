@@ -1,0 +1,487 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DATE_FORMATTER	default/SSCWeb/java/WsExample.java	/^    private static final SimpleDateFormat DATE_FORMATTER;$/;"	f	class:WsExample	file:
+DATE_FORMATTER	default/SSCWeb/java/src/sscweb/Main.java	/^    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy\/DDD HH:mm:ss");$/;"	f	class:Main	file:
+DATE_FORMATTER	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static final SimpleDateFormat DATE_FORMATTER;$/;"	f	class:WsExample	file:
+DayofYear	aurora/image/routines/DayofYear.pro	/^FUNCTION DayofYear, year, month, day$/;"	f
+GeotoApex	aurora/image/routines/geotoapex.pro	/^pro GeotoApex, geographic_lat, geographic_lon, apexfile, apex_lat, apex_lon$/;"	p
+Get_Local_Time	aurora/image/routines/get_local_time.pro	/^PRO Get_Local_Time, \$$/;"	p
+Get_Test_Data	default/SSCWeb/get_test_data.pro	/^FUNCTION Get_Test_Data, satellite1, satellite2, staTime, endTime$/;"	f
+IMAGE_Scale	aurora/image/routines/image_scale.pro	/^FUNCTION IMAGE_Scale, image$/;"	f
+IMAGE_Set_Value	aurora/image/routines/image_set_value.pro	/^FUNCTION IMAGE_Set_Value, filename, record, instrument, spinphase$/;"	f
+Magnitude	aurora/image/routines/magnitude.pro	/^FUNCTION Magnitude, x, y, z$/;"	f
+Main	default/SSCWeb/java/src/sscweb/Main.java	/^public class Main {$/;"	c
+UTC_TIME_ZONE	default/SSCWeb/java/WsExample.java	/^    private static final SimpleTimeZone UTC_TIME_ZONE =$/;"	f	class:WsExample	file:
+UTC_TIME_ZONE	default/SSCWeb/java/src/sscweb/Main.java	/^    private static final SimpleTimeZone UTC_TIME_ZONE = new SimpleTimeZone(0,"UTC");$/;"	f	class:Main	file:
+UTC_TIME_ZONE	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static final SimpleTimeZone UTC_TIME_ZONE =$/;"	f	class:WsExample	file:
+WsExample	default/SSCWeb/java/WsExample.java	/^public class WsExample {$/;"	c
+WsExample	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^public class WsExample {$/;"	c
+WsExample	default/SSCWeb/WsExample.pro	/^PRO WsExample$/;"	p
+angle_to_bins	topics/rbsp_hope/fast_study/angle_to_bins.pro	/^function angle_to_bins,dat,an,EBIN=ebin2$/;"	f
+atan2d	aurora/image/routines/atan2d.pro	/^FUNCTION atan2d,x1,x2$/;"	f
+atan2d	aurora/image/routines/auxiliary_routines.pro	/^FUNCTION atan2d,x1,x2$/;"	f
+atan2d	aurora/polar/routines/polar_ptg.pro	/^function atan2d,x1,x2$/;"	f
+atan2d	aurora/polar/routines/polar_uvilook.pro	/^FUNCTION atan2d,x1,x2$/;"	f
+atan2d	aurora/polar/routines/ptg.pro	/^FUNCTION atan2d,x1,x2$/;"	f
+bias_param_info	topics/bias/bias_parameter.pro	/^pro bias_param_info, tvar, trange = tr, datarate = dr0$/;"	p
+bias_param_info	topics/bias/test_bias.pro	/^pro bias_param_info, tvar, tr, info$/;"	p
+bias_param_info	topics/bias/test_vi.pro	/^pro bias_param_info, tvar, tr, info$/;"	p
+bias_param_to_step	topics/bias/bias_parameter.pro	/^pro bias_param_to_step, tvar$/;"	p
+bias_param_to_step	topics/bias/test_bias.pro	/^pro bias_param_to_step, tvar, newname = newname$/;"	p
+bias_param_to_step	topics/bias/test_vi.pro	/^pro bias_param_to_step, tvar, newname = newname$/;"	p
+bias_parameter	topics/bias/bias_parameter.pro	/^pro bias_parameter, rbx, probes = probes, trange = tr, erange = er, vrane = vr, \$$/;"	p
+calc_hope_pixel_coef	topics/rbsp_hope/calc_hope_pixel_coef.pro	/^function calc_hope_pixel_coef, ion, probes = probe, tr = utr$/;"	f
+calc_thm_asf_arc_geometry	topics/aurora/calc_thm_asf_arc_geometry.pro	/^pro calc_thm_asf_arc_geometry, t0, site0$/;"	p
+catdata	topics/cusp/plot_polar_omni_summary.pro	/^pro catdata, vname, flag, t0, omni, utr$/;"	p
+cg_figur3	default/cgsystem/cg_figur3.pro	/^pro cg_figur3$/;"	p
+cg_zbuffer_brain3d	sgraph/cg_zbuffer_brain3d.pro	/^pro cg_zbuffer_brain3d$/;"	p
+cg_zbuffer_brain	sgraph/cg_zbuffer_brain.pro	/^pro cg_zbuffer_brain$/;"	p
+cg_zbuffer	sgraph/cg_zbuffer.pro	/^pro cg_zbuffer$/;"	p
+contour2d	topics/rbsp_hope/fast_study/contour2d.pro	/^pro contour2d,tempdat,   \$$/;"	p
+cosd	aurora/polar/routines/polar_uvilook.pro	/^FUNCTION cosd,x$/;"	f
+ctag2syntax	path/ctag2syntax.pro	/^pro ctag2syntax, ctagfn$/;"	p
+cusp_add_fpoint_fig	topics/cusp/cusp_add_fpoint_fig.pro	/^pro cusp_add_fpoint_fig, locroot$/;"	p
+cusp_add_overview_fig	topics/cusp/cusp_add_overview_fig.pro	/^pro cusp_add_overview_fig, locroot$/;"	p
+cusp_aux_max_kei	topics/cusp/cusp_aux_max_kei.pro	/^pro cusp_aux_max_kei$/;"	p
+cusp_aux_modify_all_data	topics/cusp/cusp_aux_modify_all_data.pro	/^pro cusp_aux_modify_all_data$/;"	p
+cusp_backup_poynt_info	topics/cusp/cusp_backup_poynt_info.pro	/^pro cusp_backup_poynt_info$/;"	p
+cusp_calc_id	topics/cusp/cusp_id.pro	/^function cusp_calc_id, id1s, id2s, id3s, id4s, exclude = exids, intersect = inids$/;"	f
+cusp_check_files	topics/cusp/cusp_check_files.pro	/^pro cusp_check_files, locroot$/;"	p
+cusp_check_pflux_limit	topics/cusp/cusp_check_pflux_limit.pro	/^pro cusp_check_pflux_limit, eventid, reload = reload, save_data = save_data, no_plot = no_plot, test = test$/;"	p
+cusp_fast_esa_survey_figure	topics/cusp/cusp_fast_esa_survey_figure.pro	/^pro cusp_fast_esa_survey_figure, fn, trange = tr, id = id, noplot = noplot$/;"	p
+cusp_fig_compare_eflux	topics/cusp/cusp_fig_compare_eflux.pro	/^pro cusp_fig_compare_eflux, type, ids = ids$/;"	p
+cusp_fig_event_distribution	topics/cusp/cusp_fig_event_distribution.pro	/^pro cusp_fig_event_distribution, type, ids = ids$/;"	p
+cusp_fig_polar_eflux	topics/cusp/cusp_fig_polar_eflux.pro	/^pro cusp_fig_polar_eflux, type, ids = ids$/;"	p
+cusp_fix_south_hem	topics/cusp/cusp_fix_south_hem.pro	/^pro cusp_fix_south_hem, rootdir$/;"	p
+cusp_gen_excel_form	topics/cusp/cusp_gen_excel_form.pro	/^pro cusp_gen_excel_form, id, filename = ofn, load = load, test = test$/;"	p
+cusp_id	topics/cusp/cusp_id.pro	/^function cusp_id, type, ids = ids$/;"	f
+cusp_info_struct	topics/cusp/cusp_info_struct.pro	/^function cusp_info_struct$/;"	f
+cusp_int_eflux	topics/cusp/cusp_int_eflux.pro	/^pro cusp_int_eflux, vname, ilatname, tr = tr$/;"	p
+cusp_move_files	topics/cusp/cusp_move_files.pro	/^pro cusp_move_files, ids, indir = idir, outdir = odir, newdir = filetype1, file = filetype2$/;"	p
+cusp_parse_conjun_list	topics/cusp/cusp_read_conjun_list.pro	/^function cusp_parse_conjun_list, str0, colmask$/;"	f
+cusp_plot_all_overview	topics/cusp/cusp_plot_all_overview.pro	/^pro cusp_plot_all_overview, eventid$/;"	p
+cusp_prelim_fig_all_poynting_flux	topics/cusp/cusp_prelim_fig_all_poynting_flux.pro	/^pro cusp_prelim_fig_all_poynting_flux$/;"	p
+cusp_prelim_fig_close_mlt_poynting_flux	topics/cusp/cusp_prelim_fig_close_mlt_poynting_flux.pro	/^pro cusp_prelim_fig_close_mlt_poynting_flux$/;"	p
+cusp_prelim_fig_large_scale_poynting_flux	topics/cusp/cusp_prelim_fig_large_scale_poynting_flux.pro	/^pro cusp_prelim_fig_large_scale_poynting_flux$/;"	p
+cusp_prelim_fig_polar_vs_fast_poynting_flux	topics/cusp/cusp_prelim_fig_polar_vs_fast_poynting_flux.pro	/^pro cusp_prelim_fig_polar_vs_fast_poynting_flux, ids, type$/;"	p
+cusp_prelim_fig_wavepflux	topics/cusp/cusp_prelim_fig_wavepflux.pro	/^pro cusp_prelim_fig_wavepflux, type, ids = ids$/;"	p
+cusp_prelim_good_fac_conjunction_1997_0908_16	topics/cusp/cusp_prelim_good_fac_conjunction_1997_0908_16.pro	/^pro cusp_prelim_good_fac_conjunction_1997_0908_16, reload = reload$/;"	p
+cusp_read_conjun_list	topics/cusp/cusp_read_conjun_list.pro	/^function cusp_read_conjun_list, fn, event = id$/;"	f
+cusp_save_plot_and_data	topics/cusp/cusp_save_plot_and_data.pro	/^pro cusp_save_plot_and_data, eventid, reload = reload, save_data = save_data, no_plot = no_plot, test = test$/;"	p
+cusp_seminar_2014_1021	topics/cusp/cusp_seminar_2014_1021.pro	/^pro cusp_seminar_2014_1021, eventid, lun = lun$/;"	p
+cusp_test_fast_fac_pflux	topics/cusp/cusp_test_fast_fac_pflux.pro	/^pro cusp_test_fast_fac_pflux, type, ids = ids$/;"	p
+cusp_test_fig_facpflux	topics/cusp/cusp_test_fig_facpflux.pro	/^pro cusp_test_fig_facpflux, type, ids = ids$/;"	p
+cusp_tune_eb_spectrogram	topics/cusp/cusp_tune_eb_spectrogram.pro	/^pro cusp_tune_eb_spectrogram, dename, dbname, tr = tr, ctr = ctr$/;"	p
+cusp_update_system	topics/cusp/cusp_update_system.pro	/^pro cusp_update_system, ids, load = load, logxls = logxls, movefile = movefile, combine = combine, \$$/;"	p
+datand	aurora/image/routines/datand.pro	/^FUNCTION datand,x$/;"	f
+datand	aurora/polar/routines/polar_ptg.pro	/^function datand,x$/;"	f
+datand	aurora/polar/routines/ptg.pro	/^FUNCTION datand,x$/;"	f
+dfmag	aurora/image/routines/dfmag.pro	/^FUNCTION dfmag,x1,x2,x3$/;"	f
+dfmag	aurora/polar/routines/polar_ptg.pro	/^function dfmag,x1,x2,x3$/;"	f
+dfmag	aurora/polar/routines/polar_uvilook.pro	/^FUNCTION dfmag,x1,x2,x3$/;"	f
+dfmag	aurora/polar/routines/ptg.pro	/^FUNCTION dfmag,x1,x2,x3$/;"	f
+download_climate	topics/temp/download_climate.pro	/^pro download_climate, yr1$/;"	p
+drtollP	aurora/polar/routines/ptg.pro	/^PRO drtollP,x,y,z,lat,lon,r$/;"	p
+drtoll	aurora/image/routines/drtoll.pro	/^PRO drtoll, x, y, z, latitude, longitude, radius$/;"	p
+drtollp	aurora/polar/routines/polar_ptg.pro	/^pro drtollp,x,y,z,lat,lon,r$/;"	p
+dtand	aurora/image/routines/dtand.pro	/^FUNCTION dtand,x$/;"	f
+dtand	aurora/polar/routines/polar_ptg.pro	/^function dtand,x$/;"	f
+dtand	aurora/polar/routines/ptg.pro	/^FUNCTION dtand,x$/;"	f
+dunit	aurora/polar/routines/polar_uvilook.pro	/^PRO dunit,vector,uvector$/;"	p
+dxjul	aurora/image/routines/ic_conv_matrix.pro	/^FUNCTION dxjul,i$/;"	f
+ephem	aurora/image/routines/ephem.pro	/^PRO ephem,jd,ut,gha,dec,eqtime$/;"	p
+equ2hor	default/test/test_moon_pos.pro	/^pro equ2hor, dec, tau, lat, h, az$/;"	p
+export_idl_routines	misc/export_idl_routines.pro	/^pro export_idl_routines, fn$/;"	p
+fa_cdfsurvey	default/hereonly/fa_cdfsurvey.pro	/^pro fa_cdfsurvey, orbs$/;"	p
+fa_sdt_plot_footpoint	topics/cusp/splot_footprint.pro	/^function fa_sdt_plot_footpoint, fn, trange$/;"	f
+fast_gen_orb_cdf	fast/fast_gen_orb_cdf.pro	/^pro fast_gen_orb_cdf, ets, outdir, overwrite = overwrite$/;"	p
+fast_orb2tr	fast/fast_orb2tr.pro	/^function fast_orb2tr, orb, orbfile = fn$/;"	f
+fast_orbit_index	fast/fast_orbit_index.pro	/^pro fast_orbit_index, orbfn, datadir, outdir = outdir$/;"	p
+fast_sdt_calc_poynting_flux	fast/fast_sdt_calc_poynting_flux.pro	/^pro fast_sdt_calc_poynting_flux, filter = tfilters, method = method, \$$/;"	p
+fast_sdt_prep_poynting_flux	fast/fast_sdt_prep_poynting_flux.pro	/^pro fast_sdt_prep_poynting_flux, fn, facv = facv, trplot = tr$/;"	p
+fast_sdt_save_esa_data	fast/fast_sdt_save_esa_data.pro	/^pro fast_sdt_save_esa_data, filename = fn, t1 = t1, t2 = t2, \$$/;"	p
+fast_sdt_save_field_data	fast/fast_sdt_save_field_data.pro	/^pro fast_sdt_save_field_data, filename = fn, tc = tc, t1 = t1, t2 = t2, \$$/;"	p
+favg3p	aurora/test_interp.pro	/^FUNCTION favg3p,x1,x2,x3,f1,f2,f3$/;"	f
+favg4p	aurora/test_interp.pro	/^FUNCTION favg4p,x1,x2,x3,x4,f1,f2,f3,f4$/;"	f
+favg5p	aurora/test_interp.pro	/^FUNCTION favg5p,x1,x2,x3,x4,x5,f1,f2,f3,f4,f5$/;"	f
+favg6p	aurora/test_interp.pro	/^FUNCTION favg6p,x1,x2,x3,x4,x5,x6,f1,f2,f3,f4,f5,f6$/;"	f
+favg7p	aurora/test_interp.pro	/^FUNCTION favg7p,x1,x2,x3,x4,x5,x6,x7,f1,f2,f3,f4,f5,f6,f7$/;"	f
+fgeodeP	aurora/image/routines/fgeodep.pro	/^FUNCTION fgeodeP,a,b,v1x,v1y,v1z,v2x,v2y,v2z$/;"	f
+fgeodeP	aurora/polar/routines/ptg.pro	/^FUNCTION fgeodeP,a,b,v1x,v1y,v1z,v2x,v2y,v2z$/;"	f
+fgeodep	aurora/polar/routines/polar_ptg.pro	/^function fgeodep,a,b,v1x,v1y,v1z,v2x,v2y,v2z$/;"	f
+fig_eflux	topics/oralcusp/fig_eflux.pro	/^pro fig_eflux, ps = ps, png = png$/;"	p
+fig_esa	topics/oralcusp/fig_esa.pro	/^pro fig_esa, ifn, tr, filename = ofn$/;"	p
+fig_field	topics/oralcusp/fig_field.pro	/^pro fig_field, ifn, tr, filename = ofn, ps = ps, png = png$/;"	p
+fig_fpoint	topics/oralcusp/fig_fpoint.pro	/^pro fig_fpoint, ps = ps, png = png$/;"	p
+fig_mat	topics/oralcusp/fig_mat.pro	/^pro fig_mat, fn0, ps = ps, png = png, reload = reload$/;"	p
+fig_omni	topics/oralcusp/fig_omni.pro	/^pro fig_omni, ifn, tr, filename = ofn$/;"	p
+fig_pflux	topics/oralcusp/fig_pflux.pro	/^pro fig_pflux, fn0, ps = ps, png = png, reload = reload$/;"	p
+fig_poynt	topics/oralcusp/fig_poynt.pro	/^pro fig_poynt, ifn, tr, filename = ofn, ps = ps, png = png$/;"	p
+fig_step_2d3d	topics/mat/fig_step_2d3d.pro	/^pro fig_step_2d3d$/;"	p
+find_arc_height_for_2013_0501_event	topics/wygant/rbsp_thg/find_arc_height_for_2013_0501_event.pro	/^pro find_arc_height_for_2013_0501_event$/;"	p
+footpoint_movie	topics/cusp/footpoint_movie.pro	/^pro footpoint_movie, ets, dt = dt, ps = ps, jpg = jpg$/;"	p
+gen_cusp_list_of_polar	topics/cusp/gen_cusp_list_of_polar.pro	/^pro gen_cusp_list_of_polar, etr, logfile, datadir = datadir, plotdir = plotdir$/;"	p
+gen_list_of_polar_vs_themis	topics/aurora/gen_list_of_polar_vs_themis.pro	/^pro gen_list_of_polar_vs_themis$/;"	p
+geopack_demo	stdas/geopack/geopack_demo.pro	/^pro geopack_demo$/;"	p
+getSpaceRegion	default/SSCWeb/java/WsExample.java	/^    private static String getSpaceRegion(SpaceRegion value) {$/;"	m	class:WsExample	file:
+getSpaceRegion	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static String getSpaceRegion(SpaceRegion value) {$/;"	m	class:WsExample	file:
+getTestDataRequest	default/SSCWeb/WsExample.pro	/^FUNCTION getTestDataRequest, startTime, endTime$/;"	f
+getTestDataRequest	default/SSCWeb/java/WsExample.java	/^    private static DataFileRequest getTestDataRequest($/;"	m	class:WsExample	file:
+getTestDataRequest	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static DataFileRequest getTestDataRequest($/;"	m	class:WsExample	file:
+getTestFormatOptions	default/SSCWeb/WsExample.pro	/^FUNCTION getTestFormatOptions$/;"	f
+getTestFormatOptions	default/SSCWeb/java/WsExample.java	/^    private static FormatOptions getTestFormatOptions() {$/;"	m	class:WsExample	file:
+getTestFormatOptions	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static FormatOptions getTestFormatOptions() {$/;"	m	class:WsExample	file:
+getTestMapOptions	default/SSCWeb/java/WsExample.java	/^    private static MapProjectionGraphOptions getTestMapOptions() {$/;"	m	class:WsExample	file:
+getTestMapOptions	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static MapProjectionGraphOptions getTestMapOptions() {$/;"	m	class:WsExample	file:
+getTestOrbitOptions	default/SSCWeb/java/WsExample.java	/^    private static OrbitGraphOptions getTestOrbitOptions() {$/;"	m	class:WsExample	file:
+getTestOrbitOptions	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static OrbitGraphOptions getTestOrbitOptions() {$/;"	m	class:WsExample	file:
+getTestOutputOptions	default/SSCWeb/WsExample.pro	/^FUNCTION getTestOutputOptions$/;"	f
+getTestOutputOptions	default/SSCWeb/java/WsExample.java	/^    private static OutputOptions getTestOutputOptions() {$/;"	m	class:WsExample	file:
+getTestOutputOptions	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static OutputOptions getTestOutputOptions() {$/;"	m	class:WsExample	file:
+getTestTimeSeriesOptions	default/SSCWeb/java/WsExample.java	/^    private static TimeSeriesGraphOptions getTestTimeSeriesOptions() {$/;"	m	class:WsExample	file:
+getTestTimeSeriesOptions	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static TimeSeriesGraphOptions getTestTimeSeriesOptions() {$/;"	m	class:WsExample	file:
+getTracedRegion	default/SSCWeb/java/WsExample.java	/^    private static String getTracedRegion(FootpointRegion value) {$/;"	m	class:WsExample	file:
+getTracedRegion	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static String getTracedRegion(FootpointRegion value) {$/;"	m	class:WsExample	file:
+get_en_spec	topics/rbsp_hope/fast_study/get_en_spec.pro	/^pro get_en_spec,data_str,  \$$/;"	p
+get_mlt_image	aurora/image/routines/get_mlt_image.pro	/^pro get_mlt_image, \$$/;"	p
+get_pa_spec	topics/rbsp_hope/fast_study/get_pa_spec.pro	/^pro get_pa_spec,data_str,  \$$/;"	p
+get_rotm	aurora/polar/routines/polar_uvilook.pro	/^PRO get_rotm,axis,angle,m$/;"	p
+get_scalarP	aurora/polar/routines/ptg.pro	/^PRO get_scalarP,Ox,Oy,Oz,Lx,Ly,Lz,emis_hgt,ncols,nrows,s,f, \$$/;"	p
+get_scalar	aurora/image/routines/get_scalar.pro	/^PRO get_scalar, \$$/;"	p
+get_scalarp	aurora/polar/routines/polar_ptg.pro	/^pro get_scalarp,ox,oy,oz,lx,ly,lz,emis_hgt,ncols,nrows,s,f, \$$/;"	p
+gov.nasa.gsfc.spdf.ssc.test	default/SSCWeb/java/WsExample.java	/^package gov.nasa.gsfc.spdf.ssc.test;$/;"	p
+gov.nasa.gsfc.spdf.ssc.test	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^package gov.nasa.gsfc.spdf.ssc.test;$/;"	p
+greg_to_jdaynum	aurora/image/routines/greg_to_jdaynum.pro	/^PRO greg_to_jdaynum,y,m,d,jd$/;"	p
+ic_conv_matrix	aurora/image/routines/ic_conv_matrix.pro	/^PRO ic_conv_matrix,orb_pos_time, cmatrix$/;"	p
+ic_gci_to_geo	aurora/image/routines/ic_gci_to_geo.pro	/^PRO ic_gci_to_geo, orb_pos_time, transform_matrix$/;"	p
+ic_get_nut_angles	aurora/image/routines/ic_get_nut_angles.pro	/^PRO ic_get_nut_angles,time,deleps,delpsi,eps$/;"	p
+ic_grnwch_sidereal	aurora/image/routines/ic_grnwch_sidereal.pro	/^PRO ic_grnwch_sidereal,orb_pos_time, gst$/;"	p
+image_get_inst_angles_p	aurora/image/routines/image_get_inst_angles_p.pro	/^pro image_get_inst_angles_p,inst_,year_,day_,angles_,root_dir,no_print=no_print,new=new$/;"	p
+image_ptg	aurora/image/routines/image_ptg.pro	/^PRO image_ptg, \$$/;"	p
+int_eflux	topics/oralcusp/oral_cusp_all_data.pro	/^pro int_eflux, vname, ilatname, eflux_int, tr = tr$/;"	p
+interp2p	aurora/test_interp.pro	/^FUNCTION interp2p,x1,x2,x,f1,f2$/;"	f
+kmToRe	default/SSCWeb/WsExample.pro	/^FUNCTION kmToRe, value$/;"	f
+kyoto_dst	stdas/stdas/kyoto_dst.pro	/^pro kyoto_dst, tr, t0, dat$/;"	p
+line2time	fast/fast_orb2tr.pro	/^function line2time, line$/;"	f
+loadct2	stdas/stdas/loadct2.pro	/^pro loadct2,ct,invert=invert,reverse=revrse,file=file,previous_ct=previous_ct,silent = silent$/;"	p
+mag_to_geo	coord/developing/test_ephem.pro	/^pro mag_to_geo, lat, lon, degrees=deg, mag=mag$/;"	p
+main	default/SSCWeb/java/WsExample.java	/^    public static void main(String args[]) $/;"	m	class:WsExample
+main	default/SSCWeb/java/src/sscweb/Main.java	/^    public static void main(String[] args)$/;"	m	class:Main
+main	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    public static void main(String args[]) $/;"	m	class:WsExample
+mat_eg_step_fourier	topics/mat/fig_step_2d3d.pro	/^pro mat_eg_step_fourier, p$/;"	p
+miro_qshi	topics/qshi/miro/miro_qshi.pro	/^pro miro_qshi, fn$/;"	p
+nbsp	default/SSCWeb/java/JAXWSProperties.java	/^<HTML><HEAD><title> Source Code Cross Referenced for JAXWSProperties.java in &nbsp;&raquo;&nbsp;6.0-JDK-Modules-com.sun&nbsp;&raquo;&nbsp;xml&nbsp;&raquo;&nbsp;com&nbsp;&raquo;&nbsp;sun&nbsp;&raquo;&nbsp;xml&nbsp;&raquo;&nbsp;internal&nbsp;&raquo;&nbsp;ws&nbsp;&raquo;&nbsp;developer&nbsp;&raquo;&nbsp;Java Source Code \/ Java DocumentationJava Source Code and Java Documentation  <\/title><meta http-equiv="content-type" content="text\/html; charset=UTF-8"><meta http-equiv="content-style-type" content="text\/css"\/><meta name="author" content="Demo Source and Support Ltd."\/><meta name="copyright" content="2006 Demo Source and Support Ltd."\/><meta name="description" CONTENT=" Source Code Cross Referenced for JAXWSProperties.java in &nbsp;&raquo;&nbsp;6.0-JDK-Modules-com.sun&nbsp;&raquo;&nbsp;xml&nbsp;&raquo;&nbsp;com&nbsp;&raquo;&nbsp;sun&nbsp;&raquo;&nbsp;xml&nbsp;&raquo;&nbsp;internal&nbsp;&raquo;&nbsp;ws&nbsp;&raquo;&nbsp;developer&nbsp;&raquo;&nbsp;Java Source Code \/ Java DocumentationJava Source Code and Java Documentation  "\/><meta name="keywords" CONTENT=" Source Code Cross Referenced for JAXWSProperties.java in &nbsp;&raquo;&nbsp;6.0-JDK-Modules-com.sun&nbsp;&raquo;&nbsp;xml&nbsp;&raquo;&nbsp;com&nbsp;&raquo;&nbsp;sun&nbsp;&raquo;&nbsp;xml&nbsp;&raquo;&nbsp;internal&nbsp;&raquo;&nbsp;ws&nbsp;&raquo;&nbsp;developer&nbsp;&raquo;&nbsp;Java Source Code \/ Java DocumentationJava Source Code and Java Documentation  "\/><LINK href="http:\/\/www.java2s.com\/style\/java2s.css" type=text\/css rel=stylesheet><link rel="shortcut icon" href="http:\/\/www.java2s.com\/style\/favicon.ico"><\/HEAD>$/;"	typedefs
+nbsp	default/SSCWeb/java/JAXWSProperties.java	/^<TABLE class=googleBar width=800 cellSpacing=0 cellPadding=0 border=0><TBODY><TR><TD width=60%><A href="\/Open-Source\/Java-Document\/CatalogJava-Document.htm">Java Source Code \/ Java Documentation<\/a>&nbsp;&raquo;&nbsp;<A href="\/Open-Source\/Java-Document\/6.0-JDK-Modules-com.sun\/Catalog6.0-JDK-Modules-com.sun.htm">6.0 JDK Modules com.sun<\/a>&nbsp;&raquo;&nbsp;<A href="\/Open-Source\/Java-Document\/6.0-JDK-Modules-com.sun\/xml\/Catalogxml.htm">xml<\/a>&nbsp;&raquo;&nbsp;<A href="\/Open-Source\/Java-Document\/6.0-JDK-Modules-com.sun\/xml\/com.sun.xml.internal.ws.developer.htm">com.sun.xml.internal.ws.developer<\/a><\/TD><TD align=right width=10%>&nbsp;<\/TD><TD align=right height=80% width=30%><form action="http:\/\/www.google.com\/cse" id="cse-search-box"><div><input type="hidden" name="cx" value="partner-pub-1130008796007602:iri8be-v211" \/><input type="hidden" name="ie" value="ISO-8859-1" \/><input type="text" name="q" size="15" \/><input type="submit" name="sa" value="Search" \/><\/div><\/form><script type="text\/javascript" src="http:\/\/www.google.com\/cse\/brand?form=cse-search-box&amp;lang=en"><\/script><\/TD><\/FORM> <\/TD><\/TR><\/TBODY><\/TABLE><TABLE border=0><TR><TD height=3><\/TD><\/TR><\/TABLE>$/;"	typedefs
+nbsp	default/SSCWeb/java/JAXWSProperties.java	/^<body><H1>Source Code Cross Referenced for JAXWSProperties.java in &nbsp;&raquo;&nbsp;6.0-JDK-Modules-com.sun&nbsp;&raquo;&nbsp;xml&nbsp;&raquo;&nbsp;com&nbsp;&raquo;&nbsp;sun&nbsp;&raquo;&nbsp;xml&nbsp;&raquo;&nbsp;internal&nbsp;&raquo;&nbsp;ws&nbsp;&raquo;&nbsp;developer&nbsp;&raquo;&nbsp;Java Source Code \/ Java DocumentationJava Source Code and Java Documentation <\/H1><table width=1024 border=0><tr align=left><td width=140 valign=top align=left >$/;"	typedefs
+numspec2density	topics/wygant/wygant_cusp_oxygen.pro	/^pro numspec2density, vname, mass, newname = newname$/;"	p
+oral_cusp_all_data	topics/oralcusp/oral_cusp_all_data.pro	/^pro oral_cusp_all_data$/;"	p
+papco_hack	topics/papco_hack/papco_hack.pro	/^pro papco_hack$/;"	p
+pfvscr	topics/wygant/rbsp_thg/pfvscr.pro	/^pro pfvscr, etr, sites, probes, del = del$/;"	p
+play_fafieldsdespin	default/hereonly/play_fafieldsdespin.pro	/^pro play_fafieldsdespin$/;"	p
+play_thm_asi	topics/aurora/play_thm_asi.pro	/^pro play_thm_asi$/;"	p
+play_uclamagdespin	default/hereonly/play_uclamagdespin.pro	/^pro play_uclamagdespin, inm$/;"	p
+plot_hope_l2_com_mode_rej_ratio	topics/rbsp_hope/plot_hope_l2_com_mode_rej_ratio.pro	/^pro plot_hope_l2_com_mode_rej_ratio, ion, probes = probe, tr = utr$/;"	p
+plot_hope_l3_pitch2d_polygon	topics/rbsp_hope/plot_hope_l3_pitch2d_polygon.pro	/^pro plot_hope_l3_pitch2d_polygon, t0, type0, probe = probe, unit = unit0, log = log, hopel3 = hopel3$/;"	p
+plot_hope_l3_pitch2d	topics/rbsp_hope/plot_hope_l3_pitch2d.pro	/^pro plot_hope_l3_pitch2d, t0, type0, probe = probe, unit = unit0, log = log, hopel3 = hopel3$/;"	p
+plot_polar_fast_line_summary	topics/cusp/plot_polar_fast_line_summary.pro	/^pro plot_polar_fast_line_summary, tr$/;"	p
+plot_polar_fast_summary	topics/cusp/plot_polar_fast_summary.pro	/^pro plot_polar_fast_summary, tr, no_delete = no_delete, title = titl$/;"	p
+plot_polar_omni_summary	topics/cusp/plot_polar_omni_summary.pro	/^pro plot_polar_omni_summary$/;"	p
+plot_rbsp_on_asi	topics/wygant/rbsp_thg/plot_rbsp_on_asi.pro	/^pro plot_rbsp_on_asi, probe = probe, sites = sites, trange = rbtr, time = t0, \$$/;"	p
+po_sdt_plot_footpoint	topics/cusp/splot_footprint.pro	/^function po_sdt_plot_footpoint, fn, trange$/;"	f
+polar_area_los	aurora/polar/routines/polar_area_los.pro	/^pro polar_area_los, et, orbit, system, lat, lon, img, not_lbhl = not_lbhl$/;"	p
+polar_fill_orb_gap	polar/polar_fill_orb_gap.pro	/^pro polar_fill_orb_gap, fn, outdir, overwrite = overwrite$/;"	p
+polar_gen_orb_cdf	polar/polar_gen_orb_cdf.pro	/^pro polar_gen_orb_cdf, ets, outdir, overwrite = overwrite$/;"	p
+polar_ptg	aurora/polar/routines/polar_ptg.pro	/^pro polar_ptg, \$$/;"	p
+polar_read_ke_flux	polar/polar_read_ke_flux.pro	/^pro polar_read_ke_flux, fn, tr, eleyr0, ionyr0, \$$/;"	p
+polar_sdt_prep_poynting_flux	polar/polar_sdt_prep_poynting_flux.pro	/^pro polar_sdt_prep_poynting_flux, fn, tr = tr, cusptr = cusptr, \$$/;"	p
+polar_sdt_spc2fac	polar/polar_sdt_spc2fac.pro	/^pro polar_sdt_spc2fac, bmod_spc, db_spc, de_spc, \$$/;"	p
+polar_uvi_corr	aurora/polar/routines/polar_uvi_corr.pro	/^pro polar_uvi_corr, et, orbit, system, lat, lon, img, not_lbhl = not_lbhl$/;"	p
+polar_uvilook	aurora/polar/routines/polar_uvilook.pro	/^PRO polar_uvilook,o_gci,a_gci3,dsp_angle,filter,l0, \$$/;"	p
+printDataResult	default/SSCWeb/java/WsExample.java	/^    private static void printDataResult(DataResult result) {$/;"	m	class:WsExample	file:
+printDataResult	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static void printDataResult(DataResult result) {$/;"	m	class:WsExample	file:
+printFileResult	default/SSCWeb/java/WsExample.java	/^    private static void printFileResult(String title,$/;"	m	class:WsExample	file:
+printFileResult	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static void printFileResult(String title,$/;"	m	class:WsExample	file:
+printHeading	default/SSCWeb/java/WsExample.java	/^    private static void printHeading(List<CoordinateData> coords,$/;"	m	class:WsExample	file:
+printHeading	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static void printHeading(List<CoordinateData> coords,$/;"	m	class:WsExample	file:
+printResult	default/SSCWeb/java/WsExample.java	/^    private static void printResult(String title, Result result) {$/;"	m	class:WsExample	file:
+printResult	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static void printResult(String title, Result result) {$/;"	m	class:WsExample	file:
+printStringArray	default/SSCWeb/java/WsExample.java	/^    private static void printStringArray(String title,$/;"	m	class:WsExample	file:
+printStringArray	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static void printStringArray(String title,$/;"	m	class:WsExample	file:
+print	default/SSCWeb/java/WsExample.java	/^    private static void print(List<XMLGregorianCalendar> time, $/;"	m	class:WsExample	file:
+print	default/SSCWeb/java/WsExample.java	/^    private static void print(SatelliteData data) {$/;"	m	class:WsExample	file:
+print	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static void print(List<XMLGregorianCalendar> time, $/;"	m	class:WsExample	file:
+print	default/SSCWeb/java/sscWebServicesJaxWsSdk-2.1.3/WsExample.java	/^    private static void print(SatelliteData data) {$/;"	m	class:WsExample	file:
+pstplot	codemgr/pstplot.pro	/^pro pstplot,datanames,filename=filename,no_color=no_color,full=full, \$$/;"	p
+ptg	aurora/polar/routines/ptg.pro	/^PRO ptg,system,time,l0,att,orb,emis_hgt,gclat,gclon \$$/;"	p
+rbsp_efw_iono_plot	topics/aurora/rbsp_efw_iono_plot.pro	/^pro rbsp_efw_iono_plot, tr, model, scl, sites = sites, e_dot0 = e_dot0, \$$/;"	p
+rbsp_efw_plot_thm_ast	topics/aurora/rbsp_efw_plot_thm_ast.pro	/^pro rbsp_efw_plot_thm_ast, tr, model, scl, probe = probe$/;"	p
+rbsp_get_wsc	topics/aurora/rbsp_get_wsc.pro	/^function rbsp_get_wsc, t0, no_spice_load = no_spice_load, \$$/;"	f
+rbsp_hope_decompose_sector	topics/rbsp_hope/test_load_hope.pro	/^pro rbsp_hope_decompose_sector, vname, id, newname = newname$/;"	p
+rbsp_hope_l2_2d	topics/rbsp_hope/rbsp_hope_l2_2d.pro	/^pro rbsp_hope_l2_2d$/;"	p
+rbsp_hope_l2_balance_pixel_flux	topics/rbsp_hope/rbsp_hope_l2_balance_pixel_flux.pro	/^pro rbsp_hope_l2_balance_pixel_flux, hope, pxs, type = vname0, index = enidx, coefs$/;"	p
+rbsp_hope_l2_decompose_sector	topics/rbsp_hope/rbsp_hope_l2_decompose_sector.pro	/^pro rbsp_hope_l2_decompose_sector, hope, px, type = vname0$/;"	p
+rbsp_hope_l2_pixel_flux	topics/rbsp_hope/rbsp_hope_l2_pixel_flux.pro	/^pro rbsp_hope_l2_pixel_flux, hope, pxs, type = vname0, index = enidx$/;"	p
+rbsp_map_foot	topics/rbsp_hope/rbsp_map_foot.pro	/^pro rbsp_map_foot, tr, no_load_spice = no_load_spice, south = south$/;"	p
+rbsp_plot_aurora_efw	topics/aurora/rbsp_plot_aurora_efw.pro	/^pro rbsp_plot_aurora_efw, tr0, prob, type = type$/;"	p
+rbsp_shock_survey	topics/shock/rbsp_shock_survey.pro	/^pro rbsp_shock_survey, trs$/;"	p
+rbsp_thg_prep_data	topics/wygant/rbsp_thg/rbsp_thg_prep_data.pro	/^pro rbsp_thg_prep_data, utr, probes = probes, sites = sites, ofn = ofn, \$$/;"	p
+rbsp_uvw2gse	stdas/stdas/rbsp_uvw2gse.pro	/^pro rbsp_uvw2gse, tname, uvws, newname = newname, inverse = inverse, \$$/;"	p
+read_image_fuv	aurora/read_image_fuv.pro	/^function read_image_fuv, et0, rec, spin = spinphase, \$$/;"	f
+read_polar_uvi	aurora/read_polar_uvi.pro	/^function read_polar_uvi, et0, rec, \$$/;"	f
+read_thm_asi_mosaic	aurora/read_thm_asi_mosaic.pro	/^function read_thm_asi_mosaic, et0, site0, exclude = exclude, \$$/;"	f
+read_thm_asi_site	aurora/read_thm_asi_site.pro	/^function read_thm_asi_site, et0, site, \$$/;"	f
+read_thm_asi	aurora/read_thm_asi.pro	/^function read_thm_asi, et0, site0, exclude = exclude, \$$/;"	f
+root_data_dir	stdas/stdas/root_data_dir.pro	/^function root_data_dir,verbose=verbose$/;"	f
+rotation_matrix	aurora/image/routines/rotation_matrix.pro	/^FUNCTION rotation_matrix, \$$/;"	f
+s_curl	path/s_curl.pro	/^pro s_curl, remfn, locfn, reminfo$/;"	p
+s_readpspath	sread/sps2data.pro	/^pro s_readpspath, vars, xx, yy, mode = mode$/;"	p
+scalcbg	math/scalcbg.pro	/^function scalcbg, f0, nsection = nsec$/;"	f
+scat2sph	math/scat2sph.pro	/^function scat2sph, vec0, degree = degree$/;"	f
+scdf2zvar	cdf/scdf2zvar.pro	/^pro scdf2zvar, ifn, ofn$/;"	p
+scleanheap	misc/scleanheap.pro	/^pro scleanheap, id$/;"	p
+scotrant1	coord/matrices/scotrant1.pro	/^function scotrant1, mjd, inverse = inverse$/;"	f
+scotrant2	coord/matrices/scotrant2.pro	/^function scotrant2, mjd, inverse = inverse$/;"	f
+scotrant3	coord/matrices/scotrant3.pro	/^function scotrant3, mjd, inverse = inverse$/;"	f
+scotrant4	coord/matrices/scotrant4.pro	/^function scotrant4, mjd, inverse = inverse$/;"	f
+scotrant5	coord/matrices/scotrant5.pro	/^function scotrant5, mjd, inverse = inverse$/;"	f
+scross	math/scross.pro	/^function scross, vec1, vec2, transpose = transpose$/;"	f
+scurl	misc/scurl.pro	/^pro scurl, remfn, locfn, mtime = mtime, info = info$/;"	p
+sdebyelength	default/plasma/sdebyelength.pro	/^function sdebyelength, density, temperature, \$$/;"	f
+sdespike_deriv	math/sdespike_deriv.pro	/^pro sdespike_deriv, t0, f0, width = slotwd, nsigma = nsigma$/;"	p
+sdespike_median	math/sdespike_median.pro	/^pro sdespike_median, t0, f0, width = width, nsigma = nsigma, _extra = extra$/;"	p
+sdespike	math/sdespike.pro	/^pro sdespike, t0, f0, width = width, nsigma = nsgma, ratio = ratio$/;"	p
+sdipoledir	coord/sdipoledir.pro	/^pro sdipoledir, et, v1, v2, v3, interp = interp, \$$/;"	p
+sdiskdir	path/sdiskdir.pro	/^function sdiskdir, disk, sep = sep, array = array$/;"	f
+sdt_get_ae	topics/cusp/plot_polar_fast_line_summary.pro	/^pro sdt_get_ae, fn, tr$/;"	p
+sdt_get_dst	topics/cusp/plot_polar_fast_line_summary.pro	/^pro sdt_get_dst, fn, tr$/;"	p
+sdt_get_fa_pos	topics/cusp/plot_polar_fast_line_summary.pro	/^pro sdt_get_fa_pos, fn, t0, ilat, mlt, dist, orb, uniform = uniform$/;"	p
+sdt_get_po_pos	topics/cusp/plot_polar_fast_line_summary.pro	/^pro sdt_get_po_pos, fn, t0, ilat, mlt, dist$/;"	p
+set_inst_angles_p	aurora/image/routines/image_get_inst_angles_p.pro	/^pro set_inst_angles_p, inst, year_, day_, ang_, root_dir, new=new$/;"	p
+setidlpath	setidlpath.pro	/^pro setidlpath, f0, outfile = ofn0, idlexe = idlexe, \$$/;"	p
+sfatr2pos	fast/sfatr2pos.pro	/^pro sfatr2pos, orbs, ifn$/;"	p
+sfilter	default/sfilter.pro	/^function sfilter, data0, p10, p20, datarate, \$$/;"	f
+sfindnode	math/sfindnode.pro	/^function sfindnode, dat, err, sign = sign$/;"	f
+sfmdate	default/sfmdate.pro	/^function sfmdate, d0, f10$/;"	f
+sg_autolim	sgraph/sg_autolim.pro	/^function sg_autolim, x0, ntick = ntick, maxntick = maxntick$/;"	f
+sg_free_data	sgraph/sg_free_data.pro	/^pro sg_free_data, px, py, pz, x0 = x0, y0 = y0, z0 = z0, nparam = nparam$/;"	p
+sg_obj_plot	sgraph/sg_obj_plot.pro	/^pro sg_obj_plot, x0, y0, \$$/;"	p
+sg_og_axis	sgraph/sg_og_axis.pro	/^function sg_og_axis, direction, $; [012] for [xyz], or string.$/;"	f
+sg_og_plot	sgraph/sg_og_plot.pro	/^function sg_og_plot, x0, y0, \$$/;"	f
+sg_og_pos2view	sgraph/sg_obj_plot.pro	/^function sg_og_pos2view, pos, xr, yr$/;"	f
+sg_og_pos2view	sgraph/sg_og_plot.pro	/^function sg_og_pos2view, pos, xr, yr$/;"	f
+sg_prep_data	sgraph/sg_prep_data.pro	/^pro sg_prep_data, x0, y0, z0, px = px, py = py, pz = pz, nparam = nparam0$/;"	p
+sg_restore_device	sgraph/sg_restore_device.pro	/^pro sg_restore_device, d0$/;"	p
+sg_set_colormode	sgraph/sg_set_colormode.pro	/^pro sg_set_colormode, dev, decomposed = decomposed, depth = depth$/;"	p
+sg_tmp	sgraph/sg_tmp.pro	/^pro sg_tmp$/;"	p
+sgcalcrange	sgraph/sgcalcrange.pro	/^function sgcalcrange, r0, r1, pad = pad$/;"	f
+sgcallexe	sgraph/sgcallexe.pro	/^pro sgcallexe, calls$/;"	p
+sgcallexport	sgraph/sgcallexport.pro	/^pro sgcallexport, calls, fn$/;"	p
+sgcolor_index2true	default/test/test_sg_colormap.pro	/^function sgcolor_index2true, img, ct0$/;"	f
+sgcolorbar	sgraph/sgcolorbar.pro	/^pro sgcolorbar, colors, zrange = zr, ztitle = ztitle, position = pos, \$$/;"	p
+sgcolormode	sgraph/sgcolormode.pro	/^pro sgcolormode, dev, decomposed = dec, depth = depth, set = set$/;"	p
+sgcontour	sgraph/sgcontour.pro	/^pro sgcontour, x0, y0, z0, position = pos, _extra = ex$/;"	p
+sgdefopt	sgraph/sgdefopt.pro	/^function sgdefopt, func$/;"	f
+sgdistr2d_polygon	topics/rbsp_hope/sgdistr2d_polygon.pro	/^pro sgdistr2d_polygon, tdat, angs, diss, cangs, cdiss, ncolor = nztk, \$$/;"	p
+sgdistr2d	topics/rbsp_hope/sgdistr2d.pro	/^pro sgdistr2d, tdat, angs, vels, ncolor = nztk, \$$/;"	p
+sgei2geo	coord/cotran/sgei2geo.pro	/^function sgei2geo, vec0, et$/;"	f
+sgei2gse	coord/cotran/sgei2gse.pro	/^function sgei2gse, vec0, et$/;"	f
+sgeo2gei	coord/cotran/sgeo2gei.pro	/^function sgeo2gei, vec0, et$/;"	f
+sgeo2hor	coord/cotran/sgeo2hor.pro	/^function sgeo2hor, vec0, glat0, glon0, degree = degree$/;"	f
+sgeo2mag	coord/cotran/sgeo2mag.pro	/^function sgeo2mag, vec0, et, degree = degree, radian = radian$/;"	f
+sgeo2mlt	coord/developing/sgeo2mlt.pro	/^pro sgeo2mlt, et, glat, glon, mlat, mlon, mlt$/;"	p
+sgeopack_par	geopack/sgeopack_par.pro	/^pro sgeopack_par, tr, model0, delete = delete$/;"	p
+sgetfile	path/sgetfile.pro	/^function sgetfile, basefn, locpath0, rempath0, \$$/;"	f
+sgfont	sgraph/sgfont.pro	/^function sgfont, str, fname, help = help$/;"	f
+sglct	sgraph/sglct.pro	/^pro sglct$/;"	p
+sglogplot_calcpos	sgraph/sglogplot_calcpos.pro	/^pro sglogplot_calcpos, x00, x01, xmin, xmax, mlim0, plim0, x10, x11, x12, x13$/;"	p
+sglogplot	sgraph/sglogplot.pro	/^pro sglogplot, x0, y0, \$$/;"	p
+sgmst	coord/sgmst.pro	/^pro sgmst, t0, gmst, radian = radian, degree = degree$/;"	p
+sgnum2str	sgraph/sgnum2str.pro	/^function sgnum2str, num0, ndec = ndec0, mdec = mdec0, \$$/;"	f
+sgplot	sgraph/sgplot.pro	/^pro sgplot, x0, y0, \$$/;"	p
+sgpsclose	sgraph/sgpsclose.pro	/^pro sgpsclose, pdf = pdf$/;"	p
+sgpsopen	sgraph/sgpsopen.pro	/^pro sgpsopen, fn, _extra = extra$/;"	p
+sgptrfree	sgraph/sgptrfree.pro	/^pro sgptrfree, datptr, dat0$/;"	p
+sgputdata	sgraph/sgputdata.pro	/^pro sgputdata, x0, y0, z0, func = func$/;"	p
+sgse2gei	coord/cotran/sgse2gei.pro	/^function sgse2gei, vec0, et$/;"	f
+sgse2gsm	coord/cotran/sgse2gsm.pro	/^function sgse2gsm, vec0, et$/;"	f
+sgse2mgse	coord/cotran/sgse2mgse.pro	/^function sgse2mgse, vec0, et0, probe = probe0, wsc = wsc$/;"	f
+sgse2mlat	coord/developing/sgse2mlat.pro	/^function sgse2mlat, vec0, et, degree = degree$/;"	f
+sgse2sm	topics/aurora/sgse2sm.pro	/^function sgse2sm, vec0, et$/;"	f
+sgset_map	sgraph/sgset_map.pro	/^pro sgset_map, \$$/;"	p
+sgsetcoord	sgraph/sgsetcoord.pro	/^pro sgsetcoord, pos, type = type, _extra = extra$/;"	p
+sgsm2gse	coord/cotran/sgsm2gse.pro	/^function sgsm2gse, vec0, et$/;"	f
+sgsm2sm	coord/cotran/sgsm2sm.pro	/^function sgsm2sm, vec0, et$/;"	f
+sgstruct	sgraph/sgstruct.pro	/^function sgstruct, s0, tag0, val0, delete = delete$/;"	f
+sgwclose	sgraph/sgwclose.pro	/^pro sgwclose$/;"	p
+sgwindow	sgraph/sgwindow.pro	/^pro sgwindow, sgidw, xsize = xsize, ysize = ysize, \$$/;"	p
+sgwopen	sgraph/sgwopen.pro	/^pro sgwopen, wid, _extra = extra$/;"	p
+sgzclose	sgraph/sgzclose.pro	/^pro sgzclose$/;"	p
+sgzopen	sgraph/sgzopen.pro	/^pro sgzopen, fn, _extra = extra$/;"	p
+shomedir	path/shomedir.pro	/^function shomedir, sep = sep, array = array$/;"	f
+shor2geo	coord/cotran/shor2geo.pro	/^function shor2geo, vec0, glat0, glon0, degree = degree$/;"	f
+sind	aurora/polar/routines/polar_uvilook.pro	/^FUNCTION sind,x$/;"	f
+slon2lt	coord/developing/slon2lt.pro	/^function slon2lt, lon, et, mag = mag, \$$/;"	f
+slprpath	path/slprpath.pro	/^pro slprpath, path0$/;"	p
+slprtime	coord/developing/test_coord.pro	/^function slprtime, t0$/;"	f
+smag2geo	coord/cotran/smag2geo.pro	/^function smag2geo, vec0, et, degree = degree, radian = radian$/;"	f
+smap2iono	default/smap2iono.pro	/^pro smap2iono, v1, v2, b = b, h0 = h0, newname = newname$/;"	p
+smatlocal	math/smatlocal.pro	/^pro smatlocal, f0, t0, scale = scl, edge = edge, \$$/;"	p
+smedfilt	math/smedfilt.pro	/^function smedfilt, f0, width = width, \$$/;"	f
+smgse2gse	coord/cotran/smgse2gse.pro	/^function smgse2gse, vec0, et0, probe = probe0, wsc = wsc$/;"	f
+smode	math/smode.pro	/^function smode, v0, error = err$/;"	f
+smodelva	default/plasma/smodelva.pro	/^function smodelva, ilat, r0, density = n$/;"	f
+smoon	misc/smoon.pro	/^function smoon, et0, glat0, glon0, azimuth = azm, degree = degree$/;"	f
+smvmean	math/smvmean.pro	/^function smvmean, y0, x0, \$$/;"	f
+smvstddev	math/smvstddev.pro	/^function smvstddev, y0, x0, \$$/;"	f
+snum2str	misc/snum2str.pro	/^function snum2str, nums0, ndigit, maxdigit = mdigit, shortfloat = short$/;"	f
+solar_angular	aurora/image/routines/solar_angular.pro	/^PRO solar_angular, \$$/;"	p
+spic2movie	default/spic2movie.pro	/^pro spic2movie, dir, vfn, ext, fps$/;"	p
+splasmafreq	default/plasma/splasmafreq.pro	/^function splasmafreq, density, species$/;"	f
+splot_footprint	topics/cusp/splot_footprint.pro	/^pro splot_footprint, fafn, fatr, pofn, potr, ps = ps$/;"	p
+splot_spect	stdas/stdas/splot_spect.pro	/^pro splot_spect, vname$/;"	p
+sprepfile0	sread/sprepfile0.pro	/^pro sprepfile0, tr0, fn = fn0, ptn = fnptn, dt = dt, \$$/;"	p
+sprepfile	sread/sprepfile.pro	/^function sprepfile, tr0, dt = dt, paths = paths, flags = flags$/;"	f
+sprepfn	sread/sprepfn.pro	/^function sprepfn, in0, t = et0s, all = all$/;"	f
+spreproot	path/spreproot.pro	/^function spreproot, sat$/;"	f
+sps2data	sread/sps2data.pro	/^function sps2data, ifn$/;"	f
+sptn2fn_thm_asi	aurora/sptn2fn_thm_asi.pro	/^function sptn2fn_thm_asi, et, sites, root, type = type$/;"	f
+sptn2fn	misc/sptn2fn.pro	/^function sptn2fn, ptn, et0$/;"	f
+sptrn2name	path/sptrn2name.pro	/^function sptrn2name, pattern, epoch$/;"	f
+sread_fast_esa	sread/sread_fast_esa.pro	/^function sread_fast_esa, tr0, filename = fn0, tflag = tflag, \$$/;"	f
+sread_fast_pos	sread/sread_fast_pos.pro	/^function sread_fast_pos, tr0, filename = fn0, tflag = tflag, \$$/;"	f
+sread_fast_tms	sread/sread_fast_tms.pro	/^function sread_fast_tms, tr0, filename = fn0, \$$/;"	f
+sread_omni	sread/sread_omni.pro	/^function sread_omni, tr0, filename = fn0, \$$/;"	f
+sread_polar_hydra	sread/sread_polar_hydra.pro	/^function sread_polar_hydra, tr0, filename = fn0, \$$/;"	f
+sread_polar_orbit	sread/sread_polar_orbit.pro	/^function sread_polar_orbit, tr0, filename = fn0, tflag = tflag, \$$/;"	f
+sread_polar_pos	sread/sread_polar_pos.pro	/^function sread_polar_pos, datsrc, vars = ivars, \$$/;"	f
+sread_polar_timas	sread/sread_polar_timas.pro	/^function sread_polar_timas, tr0, filename = fn0, \$$/;"	f
+sread_polar_uvi	sread/sread_polar_uvi.pro	/^function sread_polar_uvi, tr0, filename = fn0, \$$/;"	f
+sread_rbsp_emfisis	sread/sread_rbsp_emfisis.pro	/^function sread_rbsp_emfisis, tr0, probes = probe0, filename = fn0, \$$/;"	f
+sread_rbsp_hope_l2	sread/sread_rbsp_hope_l2.pro	/^function sread_rbsp_hope_l2, tr0, probes = probe0, filename = fn0, \$$/;"	f
+sread_rbsp_hope_l3	sread/sread_rbsp_hope_l3.pro	/^function sread_rbsp_hope_l3, tr0, probes = probe0, filename = fn0, \$$/;"	f
+sread_rbsp_hope	sread/sread_rbsp_hope.pro	/^function sread_rbsp_hope, tr0, probes = probe0, filename = fn0, \$$/;"	f
+sread_thg_asc	sread/sread_thg_asc.pro	/^function sread_thg_asc, tr0, site0, filename = fn0, \$$/;"	f
+sread_thg_asi_mosaic_diff	sread/sread_thg_asi_mosaic_diff.pro	/^function sread_thg_asi_mosaic_diff, tr0, site0, filename = fn0, \$$/;"	f
+sread_thg_asi	sread/sread_thg_asi.pro	/^function sread_thg_asi, tr0, site0, filename = fn0, \$$/;"	f
+sread_thg_check_data	sread/sread_thg_check_data.pro	/^pro sread_thg_check_data, tr0, type = type$/;"	p
+sread_thg_mlt	sread/sread_thg_mlt.pro	/^function sread_thg_mlt, tr0, site0, exclude = exclude, \$$/;"	f
+sread_thg_mosaic	sread/sread_thg_mosaic.pro	/^function sread_thg_mosaic, tr0, site0, exclude = exclude, \$$/;"	f
+sread_thm_asc	sread/sread_thm_asc.pro	/^function sread_thm_asc, tr0, sites, filename = fn0, \$$/;"	f
+sread_thm_asi	sread/sread_thm_asi.pro	/^function sread_thm_asi, tr0, site0, filename = fn0, \$$/;"	f
+sread_thm_mlt	sread/sread_thm_mlt.pro	/^function sread_thm_mlt, tr0, site0, exclude = exclude, \$$/;"	f
+sread_xml_parse_tag	sread/sread_xml_parse_tag.pro	/^function sread_xml_parse_tag, tag0, atts0, attribute = atts$/;"	f
+sread_xml_parse_xml	sread/sread_xml_parse_xml.pro	/^function sread_xml_parse_xml, fn$/;"	f
+sreadtxt	default/sreadtxt.pro	/^function sreadtxt, ifile, start, nlines, ofile = ofile$/;"	f
+srootdir	path/srootdir.pro	/^function srootdir, nosep = nosep$/;"	f
+srotate	math/srotate.pro	/^pro srotate, vec, ang, axis, degree = degree$/;"	p
+srot	math/srot.pro	/^pro srot, vx, vy, vz, ang, axis, degree = degree$/;"	p
+sround	math/sround.pro	/^function sround, num0, error = maxerr$/;"	f
+srprep	sread/sread_prep.pro	/^pro srprep, fn, tr, vars, \$$/;"	p
+sscweb	default/SSCWeb/java/src/sscweb/Main.java	/^package sscweb;$/;"	p
+ssdtread	cdf/ssdtread.pro	/^function ssdtread, fn$/;"	f
+ssgnfig	math/ssgnfig.pro	/^function ssgnfig, num0$/;"	f
+ssm2gsm	coord/cotran/ssm2gsm.pro	/^function ssm2gsm, vec0, et$/;"	f
+sstrsplit	misc/sstrsplit.pro	/^function sstrsplit, str0, ptn0, count = nstr, length = lens, extract = extract$/;"	f
+ssundir	coord/ssundir.pro	/^pro ssundir, et, e, l, g, q, degree = degree$/;"	p
+ssunlon	coord/ssunlon.pro	/^pro ssunlon, et, slon, dec, ra, eqt, mag = mag, degree = degree$/;"	p
+start_up	start_up.pro	/^pro start_up, infile, rootdir = rootdir$/;"	p
+step_amp	topics/mat/step_amp.pro	/^pro step_amp, np, pos, figlab, single = single$/;"	p
+stodate	default/stodate.pro	/^function stodate, ut0, f10$/;"	f
+stofilter	misc/stofilter.pro	/^function stofilter, ifilters$/;"	f
+stouch	path/stouch.pro	/^pro stouch, fn, mtime = mtime0$/;"	p
+stplot_bar	stdas/stdas/stplot_bar.pro	/^pro stplot_bar, var, val, position = pos$/;"	p
+stplot_calc_pflux_mat	stdas/stdas/stplot_calc_pflux_mat.pro	/^pro stplot_calc_pflux_mat, dename, dbname, pfname, \$$/;"	p
+stplot_calc_poynting_flux_mat	stdas/stdas/stplot_calc_poynting_flux_mat.pro	/^pro stplot_calc_poynting_flux_mat, de0, db0, pf0, trange = tr, \$$/;"	p
+stplot_calc_poynting_flux	stdas/stdas/stplot_calc_poynting_flux.pro	/^pro stplot_calc_poynting_flux, dename, dbname, pfname, method = method, \$$/;"	p
+stplot_cat	stdas/stdas/stplot_cat.pro	/^pro stplot_cat, var0, xx, yy, \$$/;"	p
+stplot_despike	stdas/stdas/stplot_despike.pro	/^pro stplot_despike, vname, sigma, newname = newname$/;"	p
+stplot_ebratio	stdas/stdas/stplot_ebratio.pro	/^function stplot_ebratio, dename, dbname, pfname, trange = tr, \$$/;"	f
+stplot_enspec2density	stdas/stdas/stplot_enspec2density.pro	/^pro stplot_enspec2density, vname, mass = mass, newname = newname, keV = keV, electron = electron$/;"	p
+stplot_filter	stdas/stdas/stplot_filter.pro	/^pro stplot_filter, vname, mode, newname = newname, filter = tfilter, \$$/;"	p
+stplot_index	stdas/stdas/stplot_index.pro	/^pro stplot_index, var0, idx, newnames = vnames, ytitles = ytitles, \$$/;"	p
+stplot_intpl	stdas/stdas/stplot_intpl.pro	/^pro stplot_intpl, vars, t0, tinfo = tinfo$/;"	p
+stplot_mat_filter	stdas/stdas/stplot_mat_filter.pro	/^pro stplot_mat_filter, vname, order = order, \$$/;"	p
+stplot_mat	stdas/stdas/stplot_mat.pro	/^pro stplot_mat, vname, scale = tscales, nscale = nscale, \$$/;"	p
+stplot_merge	stdas/stdas/stplot_merge.pro	/^pro stplot_merge, vars, newname = newname, ytitle = ytitle, labels = labels, \$$/;"	p
+stplot_minmax	stdas/stdas/stplot_minmax.pro	/^pro stplot_minmax, vars0, minmax, log = log, set = set, get = get, newname = tnames, trange = tr$/;"	p
+stplot_newxx	stdas/stdas/stplot_newxx.pro	/^pro stplot_newxx, var0, vars = vars, suffix = suffix$/;"	p
+stplot_pfstar	stdas/stdas/stplot_pfstar.pro	/^function stplot_pfstar, dename, dbname, trange = tr$/;"	f
+stplot_renew	stdas/stdas/stplot_renew.pro	/^pro stplot_renew, vname, newname = newname, \$$/;"	p
+stplot_split	stdas/stdas/stplot_split.pro	/^pro stplot_split, var0, newnames = vnames, \$$/;"	p
+stplot_total	stdas/stdas/stplot_total.pro	/^pro stplot_total, vars, newname = newname, delete = delete, \$$/;"	p
+stplot_uniyr	stdas/stdas/stplot_uniyr.pro	/^pro stplot_uniyr, vars0, trange = tr, yrange = yr, ylog = ylog$/;"	p
+strimpath	path/strimpath.pro	/^function strimpath, path0, keep_trailing_slash = keep_trailing_slash$/;"	f
+stzinfo	default/stzinfo.pro	/^function stzinfo, ut0, string = string$/;"	f
+suniq	math/suniq.pro	/^function suniq, dat0, keep_last = keep_last$/;"	f
+surlinfo	path/surlinfo.pro	/^function surlinfo, remfn0$/;"	f
+survey_polar_uvi_themis_asi	topics/aurora/survey_polar_uvi_themis_asi.pro	/^pro survey_polar_uvi_themis_asi, utr$/;"	p
+susrhost	misc/susrhost.pro	/^function susrhost, usr = usr, host = host$/;"	f
+sval2str	misc/sval2str.pro	/^function sval2str, val, max = maxn$/;"	f
+svec2map	math/svec2map.pro	/^function svec2map, v0, p0, scl, log = log$/;"	f
+swfaorbtr	fast/swfaorbtr.pro	/^pro swfaorbtr, orbs, ofn, iptn$/;"	p
+swvcwt	math/swvcwt.pro	/^function swvcwt, f0, order, family = wvtype, scale = recscl, \$$/;"	f
+swvdas	math/swvdas.pro	/^function swvdas, f0, suftr, scale = scl, filter = ftr, inverse = inverse$/;"	f
+swvmat_v1	math/swvmat_v1.pro	/^function swvmat_v1, f0, scale = scl, filter = ftr, inverse = inverse, \$$/;"	f
+swvmatcorr	math/swvmatcorr.pro	/^function swvmatcorr, mat0, scales, width0$/;"	f
+swvmat	math/swvmat.pro	/^function swvmat, f0, order, background = bg, \$$/;"	f
+test_arc_geometry	default/test/test_arc_geometry.pro	/^pro test_arc_geometry$/;"	p
+test_bias	topics/bias/test_bias.pro	/^pro test_bias, date, rbx, probe, reload = reload$/;"	p
+test_coord_convert	default/test/test_coord_convert.pro	/^pro test_coord_convert$/;"	p
+test_coord_trans	coord/test/test_coord_trans.pro	/^pro test_coord_trans, vec0, et$/;"	p
+test_despike_derivative_or_smooth	default/test/test_despike_derivative_or_smooth.pro	/^pro test_despike_derivative_or_smooth$/;"	p
+test_dipole_dir	coord/test/test_dipole_dir.pro	/^pro test_dipole_dir, et$/;"	p
+test_efield_interpol_or_smooth	default/test/test_efield_interpol_or_smooth.pro	/^pro test_efield_interpol_or_smooth$/;"	p
+test_figure_size	default/test/test_figure_size.pro	/^pro test_figure_size$/;"	p
+test_geo2mag	coord/test/test_geo2mag.pro	/^pro test_geo2mag, et$/;"	p
+test_image_color	default/test/test_image_color.pro	/^pro test_image_color$/;"	p
+test_map2iono	default/test_map2iono.pro	/^pro test_map2iono$/;"	p
+test_mat_rbsp_shock	default/test/test_mat_rbsp_shock.pro	/^pro test_mat_rbsp_shock$/;"	p
+test_moon_pos	default/test/test_moon_pos.pro	/^pro test_moon_pos, et0, glat, glon$/;"	p
+test_mtime	default/test_mtime.pro	/^pro test_mtime$/;"	p
+test_on_poynting_flux_bands	topics/cusp/test_on_poynting_flux_bands.pro	/^pro test_on_poynting_flux_bands, eventid$/;"	p
+test_polar_fast_orbital_plane	topics/cusp/test_polar_fast_orbital_plane.pro	/^pro test_polar_fast_orbital_plane$/;"	p
+test_polar_sdt_smooth_model_b	default/test/test_polar_sdt_smooth_model_b.pro	/^pro test_polar_sdt_smooth_model_b$/;"	p
+test_sg_basic_plot_structure	default/test/test_sg_basic_plot_structure.pro	/^pro test_sg_basic_plot_structure$/;"	p
+test_sg_colormap	default/test/test_sg_colormap.pro	/^pro test_sg_colormap$/;"	p
+test_sg_routine_array	default/test/test_sg_routine_array.pro	/^pro test_sg_routine_array$/;"	p
+test_sgraph_axis	sgraph/test_sgraph_axis.pro	/^pro test_sgraph_axis$/;"	p
+test_sgraph_datastruct	sgraph/test_sgraph_datastruct.pro	/^pro test_sgraph_datastruct, dat$/;"	p
+test_sgraph_font	sgraph/test_sgraph_font.pro	/^pro test_sgraph_font$/;"	p
+test_sgtv	default/test/test_sgtv.pro	/^pro test_sgtv$/;"	p
+test_sun_lon	coord/test/test_sun_lon.pro	/^pro test_sun_lon, et$/;"	p
+test_uniform_display	default/test/test_uniform_display.pro	/^pro test_uniform_display$/;"	p
+test_vi	topics/bias/test_vi.pro	/^pro test_vi, tr, rbx, probe, reload = reload$/;"	p
+thm_asi_asf2ast	topics/aurora/thm_asi_asf2ast.pro	/^pro thm_asi_asf2ast, sites, ut0$/;"	p
+thm_asi_countrate	topics/aurora/thm_asi_countrate.pro	/^pro thm_asi_countrate, etr, sites, fpvars, del = del, sc = sc$/;"	p
+thm_asi_project	aurora/thm_asi_project.pro	/^pro thm_asi_project, img0, lat0, lon0$/;"	p
+thm_asi_proj	aurora/thm_asi_proj.pro	/^function thm_asi_proj, img, lat, lon, mask$/;"	f
+thm_asi_show_ast	topics/aurora/thm_asi_show_ast.pro	/^pro thm_asi_show_ast, sites, ut0$/;"	p
+thm_asi_weight	aurora/thm_asi_weight.pro	/^pro thm_asi_weight, fn$/;"	p
+thm_save_asi	aurora/thm_save_asi.pro	/^pro thm_save_asi, wid$/;"	p
+time_ticks	stdas/stdas/time_ticks.pro	/^function time_ticks,timerange,offset \$$/;"	f
+timebar	stdas/stdas/timebar.pro	/^PRO timebar,t1,color=color0,linestyle=linestyle,thick=thick,verbose=verbose,\$$/;"	p
+tplot_restore	stdas/stdas/tplot_restore.pro	/^pro tplot_restore,filenames=filenames,all=all,append=append,sort=sort,\$$/;"	p
+tplot_save	stdas/stdas/tplot_save.pro	/^pro tplot_save,handlenames,filename=filename,limits=limits,compress=compress$/;"	p
+tplot_tr	stdas/stdas/tplot_tr.pro	/^function tplot_tr, vname, full = full$/;"	f
+tplot_var_labels	stdas/stdas/tplot_var_labels.pro	/^pro tplot_var_labels,def_opts,trg,var_label,local_time,pos,chsize,vtitle=vtitle,vlab=vlab,time_offset=time_offset,time_scale=time_scale$/;"	p
+tplot	stdas/stdas/tplot.pro	/^pro tplot,datanames,      \$$/;"	p
+vars_on_asi_2013_0414	topics/wygant/rbsp_thg/vars_on_asi_2013_0414.pro	/^pro vars_on_asi_2013_0414, asivar, asivars = asivars, pltvars = pltvars, \$$/;"	p
+vars_on_asi_2013_0501	topics/wygant/rbsp_thg/vars_on_asi_2013_0501.pro	/^pro vars_on_asi_2013_0501, asivar, asivars = asivars, pltvars = pltvars, \$$/;"	p
+vars_on_asi_2013_0601	topics/wygant/rbsp_thg/vars_on_asi_2013_0601.pro	/^pro vars_on_asi_2013_0601, asivar, asivars = asivars, pltvars = pltvars, \$$/;"	p
+vars_on_asi	topics/wygant/rbsp_thg/vars_on_asi.pro	/^pro vars_on_asi, asivar, asivars = asivars, pltvars = pltvars, \$$/;"	p
+vec3d_calcpolarangle	default/test/test_moon_pos.pro	/^function vec3d_calcpolarangle, vec$/;"	f
+vec3d	default/test/test_moon_pos.pro	/^function vec3d, phi, theta, r$/;"	f
+vector_to_ra_decP	aurora/image/routines/vector_to_ra_decp.pro	/^PRO vector_to_ra_decP,x,y,z,ra,dec$/;"	p
+vector_to_ra_decP	aurora/polar/routines/ptg.pro	/^PRO vector_to_ra_decP,x,y,z,ra,dec$/;"	p
+vector_to_ra_dec	aurora/polar/routines/polar_uvilook.pro	/^PRO vector_to_ra_dec,x,y,z,ra,dec$/;"	p
+vector_to_ra_decp	aurora/polar/routines/polar_ptg.pro	/^pro vector_to_ra_decp,x,y,z,ra,dec$/;"	p
+wygant_asi_diff_keogram	topics/wygant/wygant_asi_diff_keogram.pro	/^pro wygant_asi_diff_keogram, tr$/;"	p
+wygant_asi_keogram	topics/wygant/wygant_asi_keogram.pro	/^pro wygant_asi_keogram, tr$/;"	p
+wygant_compare_scott_and_my_poynting_flux_for_2013_0501_11	topics/wygant/wygant_compare_scott_and_my_poynting_flux_for_2013_0501_11.pro	/^pro wygant_compare_scott_and_my_poynting_flux_for_2013_0501_11$/;"	p
+wygant_compare_scott_and_my_poynting_flux_for_2013_0501_event	topics/wygant/wygant_compare_scott_and_my_poynting_flux_for_2013_0501_event.pro	/^pro wygant_compare_scott_and_my_poynting_flux_for_2013_0501_event$/;"	p
+wygant_cusp_oxygen	topics/wygant/wygant_cusp_oxygen.pro	/^pro wygant_cusp_oxygen$/;"	p
+xml_find_tag	polar/polar_read_ke_flux.pro	/^function xml_find_tag, tags, atts$/;"	f

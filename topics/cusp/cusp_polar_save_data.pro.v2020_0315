@@ -1,0 +1,469 @@
+;+
+; Read and save first order data, including
+;   dE FAC, dB FAC, ion, ele KE flux, position and mapping info.
+;-
+pro cusp_polar_save_data, eventid, test=test, $
+    no_plot=noplot, save_data=save_data, reload=reload
+
+
+    if n_elements(eventid) eq 0 then message, 'no event id ...'
+
+;---constant.
+    re = 6378d & re1 = 1d/re
+    va0 = 22d
+    rad = !dpi/180d
+    deg = 180d/!dpi
+
+
+;---settings.
+    ; rootdir to save the data and plots.
+    rootdir = join_path([googledir(),'works'])
+    if file_test(rootdir) eq 0 then rootdir = shomedir()
+
+    ; dir to save plots and data.
+    figdir = rootdir+'/works/cusp/cusp list polar 2-4Re'
+    datdir = rootdir+'/data/cusp'
+    if ~file_test(figdir,/directory) then file_mkdir, figdir
+    if ~file_test(datdir,/directory) then file_mkdir, datdir
+
+    ; to prevent overwriting useful data without confirm.
+    if keyword_set(test) then begin
+        figdir = shomedir()+'/cusp'
+        datdir = shomedir()+'/cusp/data'
+    endif
+
+    ; log file contains all the conjunc events.
+    log_file = rootdir+'/works/cusp/cusp_list_of_polar_2-4Re.log'
+    info_file = datdir+'/'+eventid+'_scinfo.tplot'
+    data_file = datdir+'/'+eventid+'_polar_data.tplot'
+
+
+;---plot settings and generate plots to disk.
+    posl = [0.1,0.10,0.40,0.90]
+    posr = [0.6,0.10,0.90,0.90]
+    faclabs = ['v','p','b']
+    polabs = 'po_'+['ilat','mlt','dis']
+    rgb = [6,4,2] & red = 6
+    ct = 43
+    charsz = 1
+    !p.font = 1
+    tplot_options, 'ygap', 0.25
+    tplot_options, 'ynozero', 1
+    tplot_options, 'version', 2
+    tplot_options, 'num_lab_min', 8
+    tplot_options, 'labflag', 1
+    tplot_options, 'constant', 0
+    time_stamp, /off
+
+
+
+;---basic info for loading data.
+; [po]plottr. time range for plots.
+; [po]cusptr. cusp entry and exit times.
+
+    ; read basic info from list of conjunc events.
+    loginfo = cusp_polar_read_event_info(log_file, event=eventid)
+    if size(loginfo,/type) ne 8 then message, 'no id found ...'
+
+    poinfo = loginfo.polar
+    ; plot time range.
+    poplotutr = poinfo.plot_time
+    ; cusp time range.
+    pocusputr = poinfo.cusp_time
+
+
+
+;---calculate data and save to tplot.
+; [po]_[ion,ele]_keflux
+; [po]_[de,db]_fac
+; [po]_map_coef
+
+    ; KE flux, mapping coef.
+    store_data, '*', /delete
+
+
+;---read kinetic energy flux.
+    ; po_[ion,ele]_keflux.
+    fn = rootdir+'/works/cusp/cusp list polar 2-4Re/'+eventid+'/'+ $
+        eventid+'_ke_special.svg'
+    fn1 = rootdir+'/data/cusp/'+eventid+'_ke_special.svg'
+    if file_test(fn1) eq 0 then file_copy, fn, fn1
+    yrange = poinfo.keflux  ; [ele,ion].
+    type = poinfo.ketype    ; etp,p2p,ptp.
+    case type of
+        'etp':ex = {epstopdf:1}
+        'ptp':ex = {pstopdf:1}
+        'p2p':ex = {ps2pdf:1}
+    endcase
+    polar_read_ke_flux, fn1, poplotutr, yrange[0]*[-1,1], $
+        yrange[1]*[-1,1], _extra = ex
+
+
+;---read field data.
+    ; [po]_[de,db]_fac, original field.
+    pre0 = 'po_'
+    fn = rootdir+'/data/cusp/po_sdt_fld_'+eventid+'.sdt'
+    ; preprocess field, remove spike, separate model B and dB, etc.
+    polar_sdt_prep_poynting_flux, fn, e56=poinfo.e56, tr=poplotutr, $
+        eventid=eventid, cusptr=pocusputr, noplot=noplot, $
+        orootdir=figdir+'/'+eventid, titpre='Event ID: '+eventid+'    '
+    vars = pre0+['b0_spc','spc2fac','db_spc','de_spc','mlat']
+    store_data, vars, /delete
+
+
+
+;---map coef.
+    ; [po]_fpt_[mlat,mlt]
+    ; [po]_pos_gsm
+    ; [po]_map_coef
+    model = 't89'
+    sats = ['po']
+    foreach tsat, sats do begin
+        pre0 = tsat+'_'
+        scalc_map_coef, pre0+'pos_gsm', pre0+'b', coord='gsm', $
+            /igrf, pre=pre0, model=model
+    endforeach
+
+
+
+;---structure to hold useful info.
+    scinfo = cusp_scinfo()
+
+    scinfo.id = eventid
+    scinfo.model = model
+
+
+    ; polar.
+    pre0 = 'po_'
+    tinfo = scinfo.polar
+    tloginfo = loginfo.polar
+    cusputr = pocusputr
+    ; time range.
+    tinfo.plot_time = poplotutr
+    tinfo.cusp_time = pocusputr
+    ; values at the entry and exit.
+    vars = pre0+['dis','mlt','ilat','fpt_mlt','fpt_mlat']
+    nvar = n_elements(vars)
+    tval = dblarr(nvar,2)
+    for i=0, nvar-1 do begin
+        get_data, vars[i], uts, dat
+        tval[i,*] = interpol(dat, uts, cusputr)
+    endfor
+    tinfo.cusp_dis = reform(tval[0,*])
+    tinfo.cusp_mlt = reform(tval[1,*])
+    tinfo.cusp_ilat = reform(tval[2,*])
+    tinfo.cusp_fpt_mlt = reform(tval[3,*])
+    tinfo.cusp_fpt_mlat = reform(tval[4,*])
+    ; characteristic values within cusp.
+    vars = pre0+['b','dis','mlt','ilat']
+    nvar = n_elements(vars)
+    tval = dblarr(nvar)
+    for i=0, nvar-1 do begin
+        get_data, vars[i], uts, dat
+        idx = where(uts ge cusputr[0] and uts le cusputr[1])
+        tval[i] = median(dat[idx])
+    endfor
+    tinfo.b0 = tval[0]
+    tinfo.dis0 = tval[1]
+    tinfo.mlt0 = tval[2]
+    tinfo.ilat0 = tval[3]
+    ; data rate.
+    get_data, pre0+'de_fac', uts
+    tinfo.dr0 = sdatarate(uts)
+    ; density.
+    tinfo.n0 = max(tloginfo.n)
+    ; derived quantities.
+    tinfo.va = tinfo.b0/sqrt(tinfo.n0)*va0
+    tinfo.vsc = (tinfo.cusp_ilat[1]-tinfo.cusp_ilat[0])*$
+        rad*tinfo.dis0/(tinfo.cusp_time[1]-tinfo.cusp_time[0])*re
+    tinfo.vdir = tinfo.cusp_ilat[1] gt tinfo.cusp_ilat[0]
+    ; save values.
+    scinfo.polar = tinfo
+
+
+
+
+    ; scinfo.
+    tutr = minmax([pocusputr])
+    omni = sread_omni(tutr)
+    uts = sfmepoch(omni.epoch, 'unix')
+    idx = where(uts ge tutr[0] and uts le tutr[1])
+    scinfo.ae = max((omni.ae_index)[idx])
+    scinfo.dst = min((omni.sym_h)[idx])
+
+
+
+;---calc ratio of O/H.
+    ; polar.
+    pre0 = 'po_'
+    tinfo = scinfo.polar
+    plotutr = tinfo.plot_time
+    cusputr = tinfo.cusp_time
+
+    dat = sread_polar_timas(plotutr, type='h0')
+    if size(dat,/type) ne 8 then begin
+        tinfo.r_oh_cusp = 0d
+        tinfo.r_oh_pcap = 0d
+    endif else begin
+        uts = sfmepoch(dat.epoch_h, 'unix')
+        utidx = where(uts ge plotutr[0] and uts le plotutr[1], nrec)
+        if nrec eq 0 then begin
+            tinfo.r_oh_cusp = 0d
+            tinfo.r_oh_pcap = 0d
+        endif else begin
+            uts = uts[utidx]
+            tsz = size(dat.flux_h,/dimensions)
+
+            ens = dat.energy        ; energy bins, in eV.
+            nen = n_elements(ens)
+            if nen ne tsz[1] then begin ; some data has energy bin twice.
+                ens = ens[0:tsz[1]-1]
+                nen = n_elements(ens)
+            endif
+            dens = [ens[0],ens[1:nen-1]-ens[0:nen-2]]; dE at each energy bin, in eV.
+
+
+            pas = dat.angle         ; pitch angle, in deg.
+            npa = n_elements(pas)
+            if npa ne tsz[2] then begin
+                pas = pas[0:tsz[2]-1]
+                npa = n_elements(pas)
+            endif
+            dpas = dblarr(npa)+180d/npa
+            dpas = dpas*rad
+
+            ospec = (dat.flux_o)[utidx,*,*]
+            for i=0, nen-1 do ospec[*,i,*] *= (1d-3*dens[i]) ; convert to '#/(cm!U2!N-s-sr)'.
+            hspec = (dat.flux_h)[utidx,*,*]
+            for i=0, nen-1 do hspec[*,i,*] *= (1d-3*dens[i]) ; convert to '#/(cm!U2!N-s-sr)'.
+
+
+        ;---oxygen.
+            tspec = ospec
+            pre1 = 'po_o_'
+            tmass = omass
+
+            idx = where(finite(tspec,/nan),cnt)
+            if cnt ne 0 then tspec[idx] = 0
+
+            tvar = pre1+'n'
+            ns = dblarr(nrec)
+            for i = 0, nrec-1 do begin
+                nflux = reform(tspec[i,*,*])    ; in #/s-cm^2-sr.
+                vs = sqrt(2*ens/tmass)*1e3      ; energy converted to velocity, in km/s.
+                for j = 0, nen-1 do begin       ; integrate over the energy bins.
+                    for k = 0, npa-1 do $       ; integrate each pitch angle.
+                        ns[i]+= nflux[j,k]/vs[j]* $
+                        2*!dpi*sin(pas[k])*dpas[k]
+                endfor
+            endfor
+            store_data, pre1+'n', uts, ns
+
+
+        ;---proton.
+            tspec = hspec
+            pre1 = 'po_h_'
+            tmass = hmass
+
+            idx = where(finite(tspec,/nan),cnt)
+            if cnt ne 0 then tspec[idx] = 0
+
+            tvar = pre1+'n'
+            ns = dblarr(nrec)
+            for i = 0, nrec-1 do begin
+                nflux = reform(tspec[i,*,*])    ; in #/s-cm^2-sr.
+                vs = sqrt(2*ens/tmass)*1e3      ; energy converted to velocity, in km/s.
+                for j = 0, nen-1 do begin       ; integrate over the energy bins.
+                    for k = 0, npa-1 do $       ; integrate each pitch angle.
+                        ns[i]+= nflux[j,k]/vs[j]* $
+                        2*!dpi*sin(pas[k])*dpas[k]
+                endfor
+            endfor
+            store_data, pre1+'n', uts, ns
+
+
+        ;---calc numbers.
+            ; proton.
+            get_data, pre0+'h_n', uts, dat
+            idx = where(dat ne 0)
+            dat = interpol(dat[idx],uts[idx],uts)
+
+            idx = where(uts ge cusputr[0] and uts le cusputr[1])
+            nh1 = mean(dat[idx])
+
+            if tinfo.vdir eq 0 then begin
+                idx = where(uts le cusputr[0])
+                nh2 = mean(dat[idx])
+            endif else begin
+                idx = where(uts ge cusputr[1])
+                nh2 = mean(dat[idx])
+            endelse
+
+            ; oxygen.
+            get_data, pre0+'o_n', uts, dat
+            idx = where(dat ne 0)
+            dat = interpol(dat[idx],uts[idx],uts)
+
+            idx = where(uts ge cusputr[0] and uts le cusputr[1])
+            no1 = mean(dat[idx])
+
+            if tinfo.vdir eq 0 then begin
+                idx = where(uts le cusputr[0])
+                no2 = mean(dat[idx])
+            endif else begin
+                idx = where(uts ge cusputr[1])
+                no2 = mean(dat[idx])
+            endelse
+
+
+            tinfo.r_oh_cusp = double(no1/nh1)
+            tinfo.r_oh_pcap = double(no2/nh2)
+        endelse
+    endelse
+    scinfo.polar = tinfo
+
+
+;---pflux.
+    scaleinfo = {s0:0d,s1:0d,dj:1d/8,ns:0d}
+    stplot_calc_pflux_mor, pre0+'de_fac', pre0+'db_fac', pre0+'pf_fac', $
+        scaleinfo = scaleinfo
+    scinfo.polar.scaleinfo = scaleinfo
+
+    deidx = 0   ; v: north-south.
+    dbidx = 1   ; p: east-west.
+    pfidx = 2   ; b: parallel.
+    vars = pre0+['de','db','pf']
+    idxs = [deidx,dbidx,pfidx]
+    for i=0, 2 do begin
+        tvar = vars[i]+'_mor'
+        stplot_index, vars[i]+'_fac', idxs[i], newname=tvar
+        stplot_mor, vars[i]+'_fac', newname=tvar
+    endfor
+    options, pre0+'pf_mor', 'constant', (cusputr[1]-cusputr[0])
+
+
+;---filter and map.
+    tinfo = scinfo.polar
+
+    ; filter.
+    pmin = (tinfo.dr0)*4
+    pmax = (tinfo.cusp_time[1]-tinfo.cusp_time[0])
+    stplot_calc_pflux_mor, pre0+'de_fac', pre0+'db_fac', pre0+'pf1_fac', $
+        scaleinfo=scaleinfo, filter=[pmin,pmax]
+
+    ; map.
+    vars = pre0+['ion_keflux','ele_keflux','pf1_fac']
+    get_data, pre0+'map_coef', uts, mapc
+    foreach tvar, vars do begin
+        get_data, tvar, tuts, dat, limit=lims
+        ndim = (tvar eq pre0+'pf1_fac')? 3: 1
+        tmapc = interpol(mapc, uts, tuts)
+        for i=0, ndim-1 do dat[*,i] = dat[*,i]*tmapc
+        store_data, tvar+'_map', tuts, dat, limit=lims
+    endforeach
+
+    stplot_split, pre0+'pf1_fac_map', newnames=pre0+'pf'+faclabs+'_map'
+    stplot_renew, pre0+'ion_keflux_map', newname=pre0+'kei_map'
+    stplot_renew, pre0+'ele_keflux_map', newname=pre0+'kee_map'
+
+    ; integrate.
+    h0 = 100d   ; km.
+    coef = (re+h0)*rad
+    vars = pre0+['kei','kee','pf'+faclabs]+'_map'
+    nvar = n_elements(vars)
+    tval = dblarr(nvar)
+    get_data, pre0+'ilat', uts, ilats
+    for i=0, nvar-1 do begin
+        tvar = vars[i]
+        get_data, tvar, tuts, tdat
+        idx = where(tuts ge cusputr[0] and tuts le cusputr[1], cnt)
+        tuts = tuts[idx]
+        tdat = tdat[idx]
+        tilats = interpol(ilats, uts, tuts)
+        v1 = 0.5*(tdat[1:cnt-1]+tdat[0:cnt-2])
+        v2 = abs(tilats[1:cnt-1]-tilats[0:cnt-2])
+        tval[i] = total(v1*v2*coef,/nan)
+    endfor
+
+    tinfo.int_kei = tval[0]
+    tinfo.int_kee = tval[1]
+    tinfo.int_pfb = tval[4]
+    tinfo.int_pfs = tval[2:4]
+    tinfo.filters = [pmin,pmax]
+
+    ; ebratio and parallel pflux integrated over time.
+    ; pre_pf1_fac_mor_spec_3 saves the pflux which directly sum to pf1_fac.
+    get_data, pre0+'pf1_fac_mor_spec_3', uts, dat, ps
+    ; map.
+    get_data, pre0+'map_coef', tuts, mapc
+    mapc = interpol(mapc, tuts, uts)
+    np = n_elements(ps)
+    for i=0, np-1 do dat[*,i] *= mapc
+    ; integrate over time.
+    coef = (re+h0)*rad
+    get_data, pre0+'ilat', tuts, ilats
+    ilats = interpol(ilats, tuts, uts)
+    idx = where(uts ge cusputr[0] and uts le cusputr[1], cnt)
+    dat = dat[idx,*]
+    ilats = ilats[idx]
+    v1 = 0.5*(dat[1:cnt-1,*]+dat[0:cnt-2,*])
+    v2 = abs(ilats[1:cnt-1]-ilats[0:cnt-2])
+    dat = fltarr(np)
+    for i=0, np-1 do dat[i] = total(v1[*,i]*v2*coef,/nan)
+    store_data, pre0+'pfb_spec', dat, ps
+
+    ; ebratio.
+    get_data, pre0+'de_mor_fft_info', 0, einfo
+    get_data, pre0+'db_mor_fft_info', 0, binfo
+    ebratio = sqrt(einfo.gws/binfo.gws)*1e3
+    store_data, pre0+'ebratio_spec', ebratio, ps, limits={unit:'km/s'}
+
+
+;---ion and electron ratio.
+    get_data, pre0+'ilat', uts, ilats
+    vars = pre0+['kei','kee','pfb']+'_map'
+    nvar = n_elements(vars)
+    tval = dblarr(nvar)
+    get_data, pre0+'ilat', uts, ilats
+    for i=0, nvar-1 do begin
+        tvar = vars[i]
+        get_data, tvar, tuts, tdat
+        idx = where(tuts ge cusputr[0] and tuts le cusputr[1], cnt)
+        tuts = tuts[idx]
+        tdat = abs(tdat[idx])
+        tilats = interpol(ilats, uts, tuts)
+        v1 = 0.5*(tdat[1:cnt-1]+tdat[0:cnt-2])
+        v2 = abs(tilats[1:cnt-1]-tilats[0:cnt-2])
+        tval[i] = total(v1*v2*coef,/nan)
+    endfor
+    tinfo.r_kei = tinfo.int_kei/tval[0]
+    tinfo.r_kee = tinfo.int_kee/tval[1]
+    tinfo.r_pfb = tinfo.int_pfb/tval[2]
+
+
+    scinfo.polar = tinfo
+    store_data, 'scinfo', tutr, scinfo
+    tplot_save, 'scinfo', filename=info_file
+
+
+;---save data to disk.
+    ; save labels, de_fac, db_fac, ele_keflux, ion_keflux, in situ.
+    ; save event info to (1) include other info and (2) info for calc
+    ; quantities are not saved (e.g., pflux).
+    if keyword_set(save_data) then begin
+        vars = ['ilat','mlt','dis','fpt_mlat','fpt_mlt','map_coef','pos_gsm', $
+            'de_fac','db_fac','ele_keflux','ion_keflux']
+        vars = [vars,['pf_fac',['pf','de','db']+'_mor_fft_info']]
+        vars = [vars,[['pf1']+'_fac',['pfb','kei','kee']+'_map',['pfb','ebratio']+'_spec']]
+        vars = ['po_'+vars]
+        tplot_save, vars, filename=data_file
+    endif
+    while !d.window ne -1 do wdelete, !d.window
+
+end
+
+
+;foreach id, cusp_id_new('polar_2to4re_good') do cusp_polar_save_data, id, /save_data, /no_plot
+id = '2000_0902_07'
+cusp_polar_save_data, id, /save_data, /no_plot
+end

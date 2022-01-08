@@ -1,0 +1,160 @@
+
+IDL> help, system, /obj
+** Object class IDLJAVAOBJECT$STATIC$JAVA_LANG_SYSTEM, 1 direct superclass, 2 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$STATIC$JAVA_LANG_SYSTEM::INIT
+      IDLJAVAOBJECT$STATIC$JAVA_LANG_SYSTEM::SETPROPERTY
+
+IDL> help, wsdlUrl, /obj
+** Object class IDLJAVAOBJECT$JAVA_NET_URL, 1 direct superclass, 1 known method
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$JAVA_NET_URL::INIT
+
+IDL> help, sscWsQName, /obj
+** Object class IDLJAVAOBJECT$JAVAX_XML_NAMESPACE_QNAME, 1 direct superclass, 1 known method
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$JAVAX_XML_NAMESPACE_QNAME::INIT
+
+IDL> help, satelliteSituationCenterService, /obj
+** Object class IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITESITUATIONCENTERSERVICE, 1 direct superclass, 2 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITESITUATIONCENTERSERVICE::GETSATELLITESITUATIONCENTERPORT
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITESITUATIONCENTERSERVICE::INIT
+
+IDL> help, ssc, /obj
+** Object class IDLJAVAOBJECT$$PROXY35, 1 direct superclass, 1 known method
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$$PROXY35::GETALLSATELLITES
+
+IDL> help, sats, /obj
+** Object class IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST, 1 direct superclass, 2 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::GET
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::SIZE
+
+IDL> help, sat, /obj
+** Object class IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITEDESCRIPTION, 1 direct superclass, 5 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITEDESCRIPTION::GETENDTIME
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITEDESCRIPTION::GETID
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITEDESCRIPTION::GETNAME
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITEDESCRIPTION::GETRESOLUTION
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITEDESCRIPTION::GETSTARTTIME
+
+IDL> help, startTime, /obj
+** Object class IDLJAVAOBJECT$COM_SUN_ORG_APACHE_XERCES_INTERNAL_JAXP_DATATYPE_XMLGREGORIANCALENDARIMPL, 1 direct superclass, 1 known method
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$COM_SUN_ORG_APACHE_XERCES_INTERNAL_JAXP_DATATYPE_XMLGREGORIANCALENDARIMPL::TOSTRING
+
+IDL> help, endTime, /obj
+** Object class IDLJAVAOBJECT$COM_SUN_ORG_APACHE_XERCES_INTERNAL_JAXP_DATATYPE_XMLGREGORIANCALENDARIMPL, 1 direct superclass, 1 known method
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$COM_SUN_ORG_APACHE_XERCES_INTERNAL_JAXP_DATATYPE_XMLGREGORIANCALENDARIMPL::TOSTRING
+
+IDL> help, stations, /obj
+** Object class IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST, 1 direct superclass, 2 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::GET
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::SIZE
+
+IDL> help, station, /obj
+** Object class IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_GROUNDSTATIONDESCRIPTION, 1 direct superclass, 0 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+
+IDL> help, staticDatatypeFactory, /obj
+** Object class IDLJAVAOBJECT$STATIC$JAVAX_XML_DATATYPE_DATATYPEFACTORY, 1 direct superclass, 1 known method
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$STATIC$JAVAX_XML_DATATYPE_DATATYPEFACTORY::INIT
+
+IDL> help, datatypeFactory, /obj
+** Object class IDLJAVAOBJECT$COM_SUN_ORG_APACHE_XERCES_INTERNAL_JAXP_DATATYPE_DATATYPEFACTORYIMPL, 1 direct superclass, 0 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+
+IDL> help, dataRequest, /obj
+** Object class IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_DATAREQUEST, 1 direct superclass, 5 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_DATAREQUEST::GETSATELLITES
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_DATAREQUEST::INIT
+   Known Procedure Methods:
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_DATAREQUEST::SETBEGINTIME
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_DATAREQUEST::SETENDTIME
+      IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_DATAREQUEST::SETOUTPUTOPTIONS
+
+IDL> help, dataResult, /obj
+** Object class IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_DATARESULT, 1 direct superclass, 0 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+
+IDL> help, resultStatusCodeEnum, /obj
+** Object class IDLJAVAOBJECT$STATIC$GOV_NASA_GSFC_SPDF_SSC_CLIENT_RESULTSTATUSCODE, 1 direct superclass, 1 known method
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$STATIC$GOV_NASA_GSFC_SPDF_SSC_CLIENT_RESULTSTATUSCODE::INIT
+
+IDL> help, errorStatusCode, /obj
+** Object class IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_RESULTSTATUSCODE, 1 direct superclass, 0 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+
+IDL> help, resultStatusCode, /obj
+** Object class IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_RESULTSTATUSCODE, 1 direct superclass, 0 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+
+IDL> help, data, /obj
+** Object class IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST, 1 direct superclass, 3 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::GET
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::SIZE
+   Known Procedure Methods:
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::ADD
+
+IDL> help, satData, /obj
+** Object class IDLJAVAOBJECT$GOV_NASA_GSFC_SPDF_SSC_CLIENT_SATELLITEDATA, 1 direct superclass, 0 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+
+IDL> help, bFieldTraceData, /obj
+** Object class IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST, 1 direct superclass, 3 known methods
+   Superclasses:
+      IDLJAVAOBJECT  <Direct>
+   Known Function Methods:
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::GET
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::SIZE
+   Known Procedure Methods:
+      IDLJAVAOBJECT$JAVA_UTIL_ARRAYLIST::ADD
+
+
+
+
+
+

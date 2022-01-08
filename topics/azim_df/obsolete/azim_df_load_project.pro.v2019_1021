@@ -1,0 +1,137 @@
+;+
+; Return a dictionary of settings of the project.
+;-
+
+function azim_df_load_project
+
+    project = load_project('azim_df')
+    project_updated = 0
+
+;---Constants.
+    the_key = 'constant'
+    if ~project.haskey(the_key) then begin
+        constant = dictionary()
+        constant['re'] = 6378d
+        constant['secofday'] = 86400d
+        constant['rad'] = !dpi/180d
+        constant['deg'] = 180d/!dpi
+        constant['rgb'] = sgcolor(['red','green','blue'])
+        project[the_key] = constant
+        project_updated = 1
+    endif else constant = project.constant
+
+
+;---Overall settings.
+    the_key = 'time_step'
+    if ~project.haskey(the_key) then begin
+        project[the_key] = 10. ; sec.
+        project_updated = 1
+    endif
+
+;---Settings for finding storm.
+    the_key = 'storm_setting'
+    if ~project.haskey(the_key) then begin
+        settings = dictionary()
+        settings['time_range'] = time_double(['2012-10-01','2018-10-01'])
+        ; Call wen Dst drops below -50 nT as "main phase".
+        settings['dst_threshold'] = -50.
+        ; "Main phase" must be longer than this.
+        settings['main_phase_min_duration'] = 3600. ; 1 hour.
+        ; Expand "main phase" by this amount of time.
+        settings['pad_time'] = constant.secofday*0.5
+        settings['file_suffix'] = 'storm_list.txt'
+        project[the_key] = settings
+        project_updated = 1
+    endif
+
+;---Settings for filtering storm by apogee.
+    the_key = 'apogee_filter_setting'
+    if ~project.haskey(the_key) then begin
+        settings = dictionary()
+        ; The spacecraft required to be in the range.
+        settings['probes'] = ['rbsp'+letters('b'),'th'+['a','d','e']]
+        ; Apogee must be in this range.
+        settings['mlt_around_midnight'] = 7.
+        settings['mlt_range'] = [-1,1]*settings.mlt_around_midnight
+        settings['file_suffix'] = 'storm_list_apogee_filter_'+sgnum2str(settings.mlt_around_midnight)+'hr_around_midnight.txt'
+        project[the_key] = settings
+        project_updated = 1
+    endif
+
+;---Check mission based settings.
+    mission_probes = ['rbsp'+letters('b'),'th'+['b','c','d'],'mms1','g'+['13','14','15']]
+    the_key = 'mission_probes'
+    if ~project.haskey(the_key) then begin
+        project[the_key] = mission_probes
+        project_updated = 1
+    endif
+
+    foreach mission_probe, mission_probes do begin
+        if project.haskey(mission_probe) then continue
+        project_updated = 1
+        settings = dictionary()
+        case mission_probe of
+            'rbspa': begin
+                settings['prefix'] = 'rbspa_'
+                settings['routine_name'] = 'rbsp'
+                settings['probe'] = 'a'
+                settings['short_name'] = 'rba'
+            end
+            'rbspb': begin
+                settings['prefix'] = 'rbspb_'
+                settings['routine_name'] = 'rbsp'
+                settings['probe'] = 'b'
+                settings['short_name'] = 'rbb'
+            end
+            'tha': begin
+                settings['prefix'] = 'tha_'
+                settings['routine_name'] = 'themis'
+                settings['probe'] = 'a'
+                settings['short_name'] = 'tha'
+            end
+            'thd': begin
+                settings['prefix'] = 'thd_'
+                settings['routine_name'] = 'themis'
+                settings['probe'] = 'd'
+                settings['short_name'] = 'thd'
+            end
+            'the': begin
+                settings['prefix'] = 'the_'
+                settings['routine_name'] = 'themis'
+                settings['probe'] = 'e'
+                settings['short_name'] = 'the'
+            end
+            'g13': begin
+                settings['prefix'] = 'g13_'
+                settings['routine_name'] = 'goes'
+                settings['probe'] = '13'
+                settings['short_name'] = 'g13'
+            end
+            'g14': begin
+                settings['prefix'] = 'g14_'
+                settings['routine_name'] = 'goes'
+                settings['probe'] = '14'
+                settings['short_name'] = 'g14'
+            end
+            'g15': begin
+                settings['prefix'] = 'g15_'
+                settings['routine_name'] = 'goes'
+                settings['probe'] = '15'
+                settings['short_name'] = 'g15'
+            end
+            'mms1': begin
+                settings['prefix'] = 'mms1_'
+                settings['routine_name'] = 'mms'
+                settings['probe'] = '1'
+                settings['short_name'] = 'mms1'
+            end
+            else: lprmsg, 'Do not support mission_probe: '+mission_probe+' yet ...'
+        endcase
+        project[mission_probe] = settings
+    endforeach
+
+
+    if project_updated then update_project, project
+    return, project
+
+end

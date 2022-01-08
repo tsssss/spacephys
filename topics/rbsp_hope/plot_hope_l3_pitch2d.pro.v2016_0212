@@ -1,0 +1,143 @@
+;+
+; Type: crib.
+; Purpose: Plot HOPE L3 2d distribution at certain time.
+; Parameters:
+;   date, in, string, req. 'YYYY-MM-DD'.
+;   ut0, in, string, req. 'YYYY-MM-DD/hh:mm', the time to be plotted.
+;   probe, in, string, req. 'a','b'.
+;   ion, in, string, req. 'proton','oxygen','helium'.
+; Keywords: none.
+; Notes: none.
+; Dependence: slib.
+; History:
+;   2016-02-12, Sheng Tian, create.
+;-
+
+
+
+; date and time.
+date = '2013-04-14'
+date = '2014-02-19'
+date = '2013-05-01'
+ut0 = time_double(date+'/07:40')
+utr = time_double(date)+[0,86400d]
+probe = ['b']
+ion = 'proton'
+
+; suppress math exception.
+!except = 0
+
+; constants.
+npixel = 5
+nenergy = 72
+nsection = 16
+npitch = 11
+
+rad = !dpi/180d
+deg = 180d/!dpi
+
+timespan, date, 1, /day
+
+case ion of
+    'proton': type = 'FPDU'
+    'oxygen': type = 'FODU'
+    'helium': type = 'FHEDU'
+endcase
+
+
+; load hope l3 data.
+hopel3 = sread_rbsp_hope_l3(utr, probes = probe)
+
+case ion of
+    'proton': mass0 = 1
+    'oxygen': mass0 = 16
+    'helium': mass0 = 4
+endcase
+mass0 = mass0*(1.67e-24/1.6e-19)   ; E in eV, mass in kg.
+
+
+tmp = min(hopel3.epoch_ion-stoepoch(ut0,'unix'),idx,/absolute)
+i0 = where(tag_names(hopel3) eq type)
+datl3 = reform((hopel3.(i0))[idx,*,*])            ; in [72,11].
+enl3 = reform(hopel3.hope_energy_ion[idx,*])
+pal3 = reform(hopel3.pitch_angle)
+tmp = min(hopel3.epoch-stoepoch(ut0,'unix'),idx,/absolute)
+idx = where(datl3 eq -1e31, cnt)
+if cnt ne 0 then datl3[idx] = !values.d_nan
+
+stop
+
+;tdat = dblarr(2*npitch,nenergy)
+;tdis = dblarr(2*npitch,nenergy)
+;tang = dblarr(2*npitch,nenergy)
+;
+;for i = 0, nenergy-1 do begin
+;    tmp = reform(datl3[i,*])
+;    tdat[0:npitch-1,i] = tmp
+;    tdat[npitch:*,i] = reverse(tmp)
+;    tdis[*,i] = replicate(enl3[i],2*npitch)
+;    tang[*,i] = [pal3,pal3+180]*rad
+;endfor
+    
+    
+tdat = dblarr(nenergy,2*npitch)
+tdis = dblarr(nenergy,2*npitch)
+tang = dblarr(nenergy,2*npitch)
+
+for i = 0, npitch-1 do begin
+    tdat[*,i] = datl3[*,i]
+    tdat[*,-i-1] = datl3[*,i]
+    tdis[*,i] = enl3
+    tdis[*,-i-1] = enl3
+    tang[*,i] = (pal3[i] # (bytarr(nenergy)+1))+smkarthm(0,0.1,nenergy,'n')
+    tang[*,-i-1] = (360-(pal3[i]) # (bytarr(nenergy)+1))+smkarthm(0,1,nenergy,'n')
+;    tang[*,i] = (pal3[i] # (bytarr(nenergy)+1))
+;    tang[*,-i-1] = (360-(pal3[i]) # (bytarr(nenergy)+1))
+endfor
+tang*= rad
+    
+
+tmp = findgen(11)*2*!dpi/10
+txs = cos(tmp)
+tys = sin(tmp)
+
+min0 = min(tdat[where(tdat ne 0)],/nan)
+max0 = max(tdat[where(tdat ne 0)],/nan)
+tdis = alog10(tdis)
+idx = where(finite(tdat,/nan), cnt)
+if cnt ne 0 then tdat[idx] = 0
+
+;    nrec = n_elements(tdat)
+;    plot, [-1,1]*max(tdis,/nan), [-1,1]*max(tdis,/nan), /iso, /nodata
+;    for i = 0, nrec-1 do begin
+;        tmp = (tdat[i] eq 0)? 0: (alog10(tdat[i])-alog10(min0))*60
+;        if tmp eq 0 then continue
+;;        print, tdat[i], tmp
+;        usersym, txs, tys, color = tmp, /fill
+;        plots, tdis[i]*cos(tang[i]), tdis[i]*sin(tang[i]), psym = 8
+;    endfor
+
+;    idx = where(tdis le 2)
+;    tdat[idx] = !values.d_nan
+;    stop
+
+nztick = 10
+zr = [ceil(min0),floor(max0)]
+tpos = [0.1,0.1,0.85,0.85]
+colors = floor(smkarthm(10,250,nztick,'n'))
+
+sgpsopen, shomedir()+'/test_hope_2d.eps', xsize = 5, ysize = 5, /inch
+sgindexcolor, 43
+polar_contour, tdat, tang, tdis, nlevel = nztick, /fill, $
+    position = tpos, c_colors = colors, $
+    levels = smkgmtrc(zr[0], zr[1],nztick,'n'), /isotropic, $
+    xtitle = 'Log Para. Energy (eV)', $
+    ytitle = 'Log Perp. Energy (eV)', $
+    title = 'RBSP-'+strupcase(probe)+' HOPE '+type+' Eflux!C'+$
+        time_string(ut0)+' - '+time_string(ut0+12,tformat='hh:mm:ss')
+sgcolorbar, colors, position = [0.9,0.1,0.92,0.9], zrange = alog10(zr), $
+    ztitle = 'Log Eflux (s!E-1!Ncm!E-2!Nsr!E-1!NeV!E-1!N)', zcharsize = 0.8
+sgpsclose, /pdf
+;    polar_surface, tdat, tang, tdis
+
+end

@@ -1,0 +1,561 @@
+
+; settings.
+utra = time_double(['2013-06-07/04:52','2013-06-07/04:59'])
+utrb = time_double(['2013-06-07/04:54','2013-06-07/05:01'])
+
+load = 0
+reload = 0
+
+
+; one settings.
+probes = ['a','b']
+dra = 1d/4096
+drb = 1d/1024
+vars = ['vb1']
+datvars = ['rbspa_'+vars, 'rbspb_'+vars]
+
+device, decomposed = 0
+loadct2, 43
+tplot_options, 'constant', 0
+tplot_options, 'labflag', -1
+
+
+
+; constants.
+deg = 180d/!dpi
+rad = !dpi/180
+re = 6378d & re1 = 1d/re
+r0 = 100d/re+1
+
+
+datfn = shomedir()+'/psbl_de_32hz/2013_0607_b1_data.tplot'
+if tnames(datvars[0]) eq '' then if file_test(datfn) ne 0 then begin
+    store_data, '*', /delete
+    tplot_restore, filename = datfn
+endif
+foreach tvar, datvars do if tnames(tvar) eq '' then reload = 1
+
+if reload eq 1 then begin
+    if file_test(datfn) ne 0 then begin
+        store_data, '*', /delete
+        tplot_restore, filename = datfn
+    endif else begin
+        psbl_de_trim_b1_data, utra, 'a'
+        psbl_de_trim_b1_data, utrb, 'b'
+    endelse
+    options, 'rbspa_vb1', 'yrange', [-35,-5]
+    options, 'rbspb_vb1', 'yrange', [-50,0]
+    tplot_save, datvars, filename = datfn
+endif
+
+
+
+corrfn = shomedir()+'/test_corr.tplot'
+tvar = 'rbspa_corr_v12'
+if tnames(tvar) eq '' then tplot_restore, filename = corrfn
+
+probes = ['a','b']
+foreach tprobe, probes do begin
+    pre0 = 'rbsp'+tprobe+'_'
+    vars = pre0+'corr_v'+['12','34','56']
+    
+    tdat = []
+    foreach tvar, vars do begin
+        get_data, tvar, uts, dat, val
+        nrec = n_elements(uts)
+        ccdts = dblarr(nrec)
+        for i = 0, nrec-1 do begin
+            tmp = max(dat[i,*],idx,/absolute)
+            ccdts[i] = val[idx]
+            if tmp le 0.5 then ccdts[i] = !values.d_nan
+            if tmp eq dat[i,0] or tmp eq dat[i,-1] then ccdts[i] = !values.d_nan
+        endfor
+        tdat = [tdat,ccdts]
+    endforeach
+    
+    tdat = reform(tdat,nrec,3)
+    
+    dr0 = (tprobe eq 'a')? 1d3/4096: 1d3/1024
+    
+    idx = where(abs(tdat) le dr0, cnt)
+    if cnt ne 0 then tdat[idx] = !values.d_nan
+    
+    store_data, pre0+'ccdt', uts, tdat, limits = {ytitle:'dT!C(msec)', $
+        labels:['u','v','w'], colors:[6,4,2]}
+    
+    
+    boomlens = [100,100,12]
+    vph = tdat
+    for i = 0, 2 do vph[*,i] = boomlens[i]/tdat[*,i]
+    store_data, pre0+'vph_uvw', uts, vph, limits = {ytitle:'Vph!C(km/s)', $
+        labels:['u','v','w'], colors:[6,4,2]}
+        
+    tplot, pre0+['vb1','ccdt','vph_uvw']
+
+    stop
+endforeach
+
+
+stop
+
+; **** chop the data according to the spikes at half spin cadance.
+
+maxdv0 = 10
+padt0 = 0.05
+
+probes = 'b'
+foreach tprobe, probes do begin
+    pre0 = 'rbsp'+tprobe+'_'
+    get_data, pre0+'vb1', uts, vb1
+    nrec = n_elements(uts)
+    
+    dvb1 = abs(vb1[*,4]-vb1[*,5])
+    tmp = where(dvb1 gt maxdv0, cnt)
+    if cnt eq 0 then message, 'no spin axis spikes ...'
+    flags = [0,dvb1 gt maxdv0,0]
+    tmp = flags[1:nrec+1]-flags[0:nrec]
+    t1s = where(tmp eq 1)
+    t2s = where(tmp eq -1)
+    
+    utrs = [[uts[t1s]],[uts[t2s]]]  ; trigger error when t1s/t2s mismatch.
+    nutr = n_elements(utrs)/2
+    for i = 0, nutr-1 do utrs[i,*]+= [-1,1]*padt0
+    
+    for i = 0, nutr-1 do begin
+        idx = where(uts ge utrs[i,0] and uts le utrs[i,1])
+        dvb1[idx] = !values.d_nan
+    endfor
+    
+    utrs = utrs[sort(utrs)]
+    utrs = utrs[1:-2]
+    nutr = n_elements(utrs)/2
+    utrs = reform(utrs, 2, nutr)
+    
+    dr0 = sdatarate(uts)
+    dt0 = 0.2   ; sec.      ; max time shift.
+    drec0 = fix(0.1/dr0)    ; max rec shift.
+    
+    corrs = dblarr(nutr*10,2*drec0+1,3)
+    corts = dblarr(nutr*10)
+    tscls = (-drec0+findgen(2*drec0+1))*dr0*1e3
+    
+    for i = 0, nutr-1 do begin
+        utr = utrs[*,i]        
+        nsec = 10
+        tutrs = smkarthm(utr[0],utr[1],nsec+1,'n')
+        corts[i*nsec:i*nsec+nsec-1] = (tutrs[0:nsec-1]+tutrs[1:nsec])*0.5
+        for j = 0, nsec-1 do begin
+            tutr = tutrs[j:j+1]
+            
+            tvar = pre0+'vb1'
+            get_data, tvar, uts, vb1
+            
+            idx = where(uts ge tutr[0] and uts le tutr[1], nrec)
+            vb1 = vb1[idx,*]
+            uts = uts[idx]
+            if max(uts)-min(uts) lt drec0*dr0 then continue
+            
+            ; remove background, and TDS.
+            nvb1 = (size(vb1,/dimensions))[1]
+            for l = 0, nvb1-1 do begin
+                tvb1 = vb1[*,l]
+                vb1bg = tvb1[0]-(tvb1[0]-tvb1[nrec-1])/(uts[nrec-1]-uts[0])*(uts-uts[0])
+                tvb1 = tvb1-vb1bg
+                sdespike, uts, tvb1, width = 10e-3/dr0
+                vb1[*,l] = tvb1
+            endfor
+            
+            store_data, tvar+'_sec', uts, vb1, limits = $
+                {labels:'V'+string(findgen(nvb1)+1,format='(I0)'),colors:findgen(nvb1)+1,ytitle:'VB1!C(V)'}
+                
+            
+            tnrec = 2*drec0+1       ; # time shift to be tested.
+            corr = dblarr(tnrec)
+            drecs = -drec0+findgen(tnrec)
+            
+            neb1 = nvb1/2
+            poss = sgcalcpos(neb1+1, ypad = 8)
+            ofn = shomedir()+'/corr/'+pre0+'cross_correlation_'+time_string(tutr[0],tformat='YYYY_MMDD_hhmm_ss.ff')+'.pdf'
+; ofn = 0
+            sgopen, ofn, xsize = 11, ysize = 8.5, /inch
+            device, decompose = 0
+            loadct2, 43
+            
+            xchsz = double(!d.x_ch_size)/!d.x_size
+            ychsz = double(!d.y_ch_size)/!d.y_size
+            
+            tpos = poss[*,0]
+            tplot, tvar+'_sec', position = tpos, /noerase, trange = tutr, $
+                /novtitle, $
+                title = 'RBSP-'+strupcase(tprobe)+', '+$
+                time_string(tutr[0],tformat='YYYY-MM-DD/hh:mm:')+ $
+                strjoin(time_string(tutr,tformat='ss.fff'),' to ')
+                
+            for k = 0, neb1-1 do begin
+                v1 = vb1[*,k*2]
+                v2 = vb1[*,k*2+1]
+                for l = 0, tnrec-1 do corr[l] = c_correlate(v1,v2,drecs[l])
+                tmp = max(corr, idx)
+                drec = drecs[idx]
+                tmaxcorr = drec*dr0*1e3
+                corrs[i*10+j,*,k] = corr
+                
+                tpos = poss[*,k+1]
+                tpos[2] = tpos[0]+(tpos[2]-tpos[0])*0.6
+                tdat = [[v1],[shift(v2,-drec)]]
+                tdat[0:abs(drec),*] = !values.d_nan
+                tdat[nrec-1-abs(drec):nrec-1,*] = !values.d_nan
+                store_data, tvar+'_tmp', uts, tdat, limits = $
+                    {labels:'V'+string(k*2+[1,2],format='(I0)'),colors:k*2+[1,2],ytitle:'V'+sgnum2str(k*2+1)+sgnum2str(k*2+2)+' shfted!C(V)'}
+                tplot, tvar+'_tmp', trange = tutr, position = tpos, /noerase, /novtitle
+                
+                
+                tpos = poss[*,k+1]
+                tpos[0] = tpos[0]+(tpos[2]-tpos[0])*0.75
+                plot, drecs*dr0*1e3, corr, /noerase, position = tpos, $
+                    yrange = [0,1], ystyle = 1, $
+                    xtitle = 'Time shift (msec)', ytitle = 'Correlation', $
+                    title = 'dT = '+sgnum2str(drecs[idx]*dr0*1e3,ndec=3)+' msec'
+                plots, drec*dr0*1e3+[0,0], !y.crange, linestyle = 1
+            endfor
+            sgclose
+        endfor
+    endfor
+    
+    for k = 0, 2 do $
+        store_data, pre0+'corr_v'+sgnum2str(2*k+1)+sgnum2str(2*k+2), $
+            corts, reform(corrs[*,*,k]), tscls, limits = $
+            {spec:1, no_interp:1, $
+            ytitle:'Time shift!C(msec)', zrange:[-1,1], $
+            ztitle:'Correlation V'+sgnum2str(2*k+1)+sgnum2str(2*k+2)}
+endforeach
+
+stop
+
+
+
+
+; **** test on several manually selected times.
+
+tprobe = 'a'
+pre0 = 'rbsp'+tprobe+'_'
+
+tutrs = []
+tutrs = [tutrs,time_double('2013-06-07/04:54:'+['22.00','22.80'])]
+tutrs = [tutrs,time_double('2013-06-07/04:53:'+['44.95','45.35'])]
+tutrs = [tutrs,time_double('2013-06-07/04:53:'+['37.95','38.65'])]
+tutrs = [tutrs,time_double('2013-06-07/04:53:'+['32.60','33.50'])]
+nutr = n_elements(tutrs)/2
+tutrs = transpose(reform(tutrs, 2, nutr))
+for i = 0, nutr-1 do begin
+    tutr = reform(tutrs[i,*])
+    
+    tvar = pre0+'vb1'
+    get_data, tvar, uts, vb1
+    idx = where(uts ge tutr[0] and uts le tutr[1], nrec)
+    vb1 = vb1[idx,*]
+    uts = uts[idx]
+
+    ; remove background.
+    nvb1 = (size(vb1,/dimensions))[1]    
+    for j = 0, nvb1-1 do begin
+        vb1bg = vb1[0,j]-(vb1[0,j]-vb1[nrec-1,j])/(uts[nrec-1]-uts[0])*(uts-uts[0])
+        vb1[*,j] = vb1[*,j]-vb1bg
+    endfor
+    
+    store_data, tvar+'_sec', uts, vb1, limits = $
+        {labels:'V'+string(findgen(nvb1)+1,format='(I0)'),colors:findgen(nvb1)+1,ytitle:'VB1!C(V)'}
+    
+    dr0 = sdatarate(uts)
+    dt0 = 0.2   ; sec.      ; max time shift.
+    drec0 = fix(0.1/dr0)    ; max rec shift.
+    tnrec = 2*drec0+1       ; # time shift to be tested.
+    corr = dblarr(tnrec)
+    drecs = -drec0+findgen(tnrec)
+    
+    neb1 = nvb1/2
+    poss = sgcalcpos(neb1+1, ypad = 8)
+    ofn = 0
+    ofn = shomedir()+'/'+pre0+'cross_correlation_'+time_string(tutr[0],tformat='YYYY_MMDD_hhmm_ss')+'.pdf'
+    sgopen, ofn, xsize = 11, ysize = 8.5, /inch
+    device, decompose = 0
+    loadct2, 43
+    
+    xchsz = double(!d.x_ch_size)/!d.x_size
+    ychsz = double(!d.y_ch_size)/!d.y_size
+    
+    tpos = poss[*,0]
+    tplot, tvar+'_sec', position = tpos, /noerase, trange = tutr, $
+        /novtitle, $
+        title = 'RBSP-'+strupcase(tprobe)+', '+$
+            time_string(tutr[0],tformat='YYYY-MM-DD/hh:mm:')+ $
+            strjoin(time_string(tutr,tformat='ss.fff'),' to ')
+    
+    for k = 0, neb1-1 do begin
+        v1 = vb1[*,k*2]
+        v2 = vb1[*,k*2+1]
+        for j = 0, tnrec-1 do corr[j] = c_correlate(v1,v2,drecs[j])
+        tmp = max(corr, idx)
+        drec = drecs[idx]
+        tmaxcorr = drec*dr0*1e3
+        
+        tpos = poss[*,k+1]
+        tpos[2] = tpos[0]+(tpos[2]-tpos[0])*0.6
+        tdat = [[v1],[shift(v2,-drec)]]
+        tdat[0:abs(drec),*] = !values.d_nan
+        tdat[nrec-1-abs(drec):nrec-1,*] = !values.d_nan
+        store_data, tvar+'_tmp', uts, tdat, limits = $
+            {labels:'V'+string(k*2+[1,2],format='(I0)'),colors:k*2+[1,2],ytitle:'V'+sgnum2str(k*2+1)+sgnum2str(k*2+2)+' shfted!C(V)'}
+        tplot, tvar+'_tmp', trange = tutr, position = tpos, /noerase, /novtitle
+
+
+        tpos = poss[*,k+1]
+        tpos[0] = tpos[0]+(tpos[2]-tpos[0])*0.75
+        plot, drecs*dr0*1e3, corr, /noerase, position = tpos, $
+            yrange = [0,1], ystyle = 1, $
+            xtitle = 'Time shift (msec)', ytitle = 'Correlation', $
+            title = 'dT = '+sgnum2str(drecs[idx]*dr0*1e3,ndec=3)+' msec'
+        plots, drec*dr0*1e3+[0,0], !y.crange, linestyle = 1
+    endfor
+    sgclose
+endfor
+
+stop
+
+
+
+
+
+
+
+stop
+
+tvar = 'rbspa_vb1'
+get_data, tvar, uts, vb1
+
+nrec = n_elements(uts)
+
+secdt = 1     ; sec, length of each sector.
+t1 = min(uts) & t1 = t1-(t1 mod secdt)+secdt
+t2 = max(uts) & t2 = t2-(t2 mod secdt)
+sects = smkarthm(t1, t2, secdt, 'dx')
+nsec = n_elements(sects)-1
+
+dr0 = dra
+maxdt = 0.03    ; sec.
+maxdrec = fix(maxdt/dr0)
+nscl = maxdrec*2+1
+drecs = -maxdrec+findgen(nscl)
+
+corr = fltarr(nsec,nscl)
+
+tutr = [t1,t2]
+
+
+
+iv1 = 0
+iv2 = 1
+
+for i = 0, nsec-1 do begin
+    idx = where(uts ge sects[i] and uts le sects[i+1], nrec)
+
+    
+    tuts = uts[idx]
+    tvb1 = vb1[idx,*]
+    
+    for j = 0, 5 do $
+        tvb1[*,j] = tvb1[*,j]-tvb1[0,j]+$
+        (tvb1[0,j]-tvb1[nrec-1,j])/(tuts[nrec-1]-tuts[0])*(tuts-tuts[0])
+        
+    
+    if max(abs(tvb1)) ge 5 then begin
+        vb1[idx,*] = !values.d_nan
+        corr[i,*] = !values.d_nan
+    endif else begin
+        vb1[idx,*] = tvb1
+        
+        v1 = tvb1[*,iv1]
+        v2 = tvb1[*,iv2]
+        
+        for j = 0, nscl-1 do $
+            corr[i,j] = c_correlate(v1,v2,drecs[j])
+    endelse
+    
+    
+endfor
+
+store_data, 'tvb1', uts, vb1, $
+    limits = {labels:['1','2','3','4','5','6'],colors:[1,2,3,4,5,6]}
+
+tuts = sects[0:nsec-1]+secdt*0.5
+tvar = 'corr_v'+sgnum2str(iv1+1)+sgnum2str(iv2+1)
+store_data, tvar, tuts, corr, drecs*dr0*1e3, limits = $
+    {ytitle:'Time (msec)', spec:1, no_interp:1, zrange:[-1,1], $
+    yrange:maxdt*[-1,1]*1e3, ztitle:'Cross Corr'}
+
+maxcorr = dblarr(nsec)
+for i = 0, nsec-1 do begin
+    tmp = max(corr[i,*], tidx)
+    maxcorr[i] = drecs[tidx]*dr0
+    if finite(corr[i,0],/nan) then maxcorr[i] = !values.d_nan
+endfor
+idx = where(finite(maxcorr))
+maxcorr = interpol(maxcorr[idx], tuts[idx], tuts)
+store_data, 'max_'+tvar, tuts, maxcorr*1e3, limits = {yrange:maxdt*[-1,1]*1e3}
+
+
+
+
+iv1 = 2
+iv2 = 3
+
+for i = 0, nsec-1 do begin
+    idx = where(uts ge sects[i] and uts le sects[i+1], nrec)
+    
+    
+    tuts = uts[idx]
+    tvb1 = vb1[idx,*]
+    
+    for j = 0, 5 do $
+        tvb1[*,j] = tvb1[*,j]-tvb1[0,j]+$
+        (tvb1[0,j]-tvb1[nrec-1,j])/(tuts[nrec-1]-tuts[0])*(tuts-tuts[0])
+        
+        
+    if max(abs(tvb1)) ge 5 then begin
+        vb1[idx,*] = !values.d_nan
+        corr[i,*] = !values.d_nan
+    endif else begin
+        vb1[idx,*] = tvb1
+        
+        v1 = tvb1[*,iv1]
+        v2 = tvb1[*,iv2]
+        
+        for j = 0, nscl-1 do $
+            corr[i,j] = c_correlate(v1,v2,drecs[j])
+    endelse
+    
+    
+endfor
+
+store_data, 'tvb1', uts, vb1, $
+    limits = {labels:['1','2','3','4','5','6'],colors:[1,2,3,4,5,6]}
+    
+tuts = sects[0:nsec-1]+secdt*0.5
+tvar = 'corr_v'+sgnum2str(iv1+1)+sgnum2str(iv2+1)
+store_data, tvar, tuts, corr, drecs*dr0*1e3, limits = $
+    {ytitle:'Time (msec)', spec:1, no_interp:1, zrange:[-1,1], $
+    yrange:maxdt*[-1,1]*1e3, ztitle:'Cross Corr'}
+    
+maxcorr = dblarr(nsec)
+for i = 0, nsec-1 do begin
+    tmp = max(corr[i,*], tidx)
+    maxcorr[i] = drecs[tidx]*dr0
+    if finite(corr[i,0],/nan) then maxcorr[i] = !values.d_nan
+endfor
+idx = where(finite(maxcorr))
+maxcorr = interpol(maxcorr[idx], tuts[idx], tuts)
+store_data, 'max_'+tvar, tuts, maxcorr*1e3, limits = {yrange:maxdt*[-1,1]*1e3}
+
+
+
+iv1 = 4
+iv2 = 5
+
+for i = 0, nsec-1 do begin
+    idx = where(uts ge sects[i] and uts le sects[i+1], nrec)
+    
+    
+    tuts = uts[idx]
+    tvb1 = vb1[idx,*]
+    
+    for j = 0, 5 do $
+        tvb1[*,j] = tvb1[*,j]-tvb1[0,j]+$
+        (tvb1[0,j]-tvb1[nrec-1,j])/(tuts[nrec-1]-tuts[0])*(tuts-tuts[0])
+        
+        
+    if max(abs(tvb1)) ge 5 then begin
+        vb1[idx,*] = !values.d_nan
+        corr[i,*] = !values.d_nan
+    endif else begin
+        vb1[idx,*] = tvb1
+        
+        v1 = tvb1[*,iv1]
+        v2 = tvb1[*,iv2]
+        
+        for j = 0, nscl-1 do $
+            corr[i,j] = c_correlate(v1,v2,drecs[j])
+    endelse
+    
+    
+endfor
+
+store_data, 'tvb1', uts, vb1, $
+    limits = {labels:['1','2','3','4','5','6'],colors:[1,2,3,4,5,6]}
+    
+tuts = sects[0:nsec-1]+secdt*0.5
+tvar = 'corr_v'+sgnum2str(iv1+1)+sgnum2str(iv2+1)
+store_data, tvar, tuts, corr, drecs*dr0*1e3, limits = $
+    {ytitle:'Time (msec)', spec:1, no_interp:1, zrange:[-1,1], $
+    yrange:maxdt*[-1,1]*1e3, ztitle:'Cross Corr'}
+    
+maxcorr = dblarr(nsec)
+for i = 0, nsec-1 do begin
+    tmp = max(corr[i,*], tidx)
+    maxcorr[i] = drecs[tidx]*dr0
+    if finite(corr[i,0],/nan) then maxcorr[i] = !values.d_nan
+endfor
+idx = where(finite(maxcorr))
+maxcorr = interpol(maxcorr[idx], tuts[idx], tuts)
+store_data, 'max_'+tvar, tuts, maxcorr*1e3, limits = {yrange:maxdt*[-1,1]*1e3}
+
+
+stplot_merge, 'max_corr_v'+['12','34','56'], newname = 'max_corr', limits = {colors:[6,4,2]}
+
+; boom length 100,100,24.
+get_data, 'max_corr', uts, dat
+boomlens = [100,100,24]
+for i = 0, 2 do begin
+    tdat = dat[*,i]
+    idx = where(abs(tdat le 1), cnt)
+    dat[*,i] = boomlens[i]/dat[*,i]
+    if cnt ne 0 then dat[idx,i] = !values.d_nan
+    idx = where(abs(tdat gt 1))
+    dat[*,i] = interpol(dat[idx,i],uts[idx], uts)
+endfor
+store_data, 'v_uvw', uts, dat, limits = {colors:[6,4,2]}
+
+tplot, ['rbspa_vb1','tvb1','max_corr','v_uvw'], trange = tutr
+
+stop
+
+tutr = time_double(['2013-06-07/04:54:22','2013-06-07/04:54:24'])+11d/4*2+0.5
+idx = where(uts ge tutr[0] and uts le tutr[1])
+uts = uts[idx]
+vb1 = vb1[idx,*]
+
+maxtscl = 0.01  ; sec. max time difference to be checked for correlation.
+maxrscl = ceil(maxtscl/dra)
+seclen = maxrscl
+scls = smkarthm(-maxrscl,maxrscl,1,'dx')
+nscl = n_elements(scls)
+nrec = n_elements(uts)
+corr = dblarr(nrec,nscl)
+
+v1 = vb1[*,0]
+v2 = vb1[*,1]
+;v1 = v1-scalcbg(v1)
+;v2 = v2-scalcbg(v2)
+store_data, 'tvb1', uts, [[v1],[v2]], limits = {colors:[0,6], labels:['v1','v2']}
+for i = 0, nscl-1 do begin
+    for j = seclen, nrec-seclen-1 do begin
+        corr[j,i] = c_correlate(v1[j-seclen:j+seclen],v2[j-seclen:j+seclen],scls[i])
+    endfor
+endfor
+
+store_data, 'corr_v12', uts, corr, scls*tdr*1e3, limits = $
+    {ytitle:'Time (msec)', spec:1, no_interp:1, zrange:[-1,1], $
+    yrange:maxtscl*[-1,1]*1e3, ztitle:'Cross Corr'}
+
+tplot, ['tvb1','corr_v12'], trange = tutr
+
+end

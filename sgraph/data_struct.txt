@@ -1,0 +1,20 @@
+* !sgraph.
+    dev0: !device. Original device info.
+    plt0: !plt. Original plot info.
+    xyz0: !axis[3]. Original [xyz]axis info.
+    sgmode: string. 'window' mode only plot data to screen; 'postscript' mode also generate postscript output file; 'zbuffer' mode generate raster output file.
+    datq: struct[n]. n is # of variables. Each elements contains variable's plot type, actual x, y, z data value and axis settings and labels.
+
+* datq.
+    name: string. Variable name.
+    type: string. Plot type, i.e., use which routine to plot data (plot, contour, image, shade_surf, etc.)
+    [xyz]: struct[n]. n is # of data pairs. Each element contains actual data, axis info, and label info.
+
+* [xyz]:
+    data: pointer. Point to actual data array. Use pointer because data may change size, and save memory by avoiding copy arrays.
+    axis: pointer. Point to !axis[n], n is # of axis.
+    labs: pointer. Point to labs[n], n is # of labels. If no label, then it's !null.
+
+* labs:
+    type: string. Label type, i.e., use which routine to draw label (symbol, text, grid, polyfill. plots, xyouts, etc.)
+    TODO

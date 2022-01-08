@@ -1,0 +1,467 @@
+; rbspx_de_[mgse,gse,fac,uvw], rbspx_db_[gse,fac], rbspx_[b,bmod]_gse.
+; rbspx_[pos_gsm,dis], rbspx_vsc
+pro psbl_de_load_ebfield, utr, probes, $
+    load_spice = load_spice, nodata = nodata
+
+    nprobe = n_elements(probes)
+    re = 6374d & re1 = 1d/re
+    rgb = [6,4,2]
+
+
+    for i = 0, nprobe-1 do begin
+        pre0 = 'rbsp'+probes[i]+'_'        
+
+        if keyword_set(load_spice) then $
+            rbsp_load_spice_kernels, trange = utr, probes = probes[i]
+
+        ; load e_despun, 32 Hz.
+        ; rbspx_de_[mgse,gse].
+        tvar = pre0+'de_mgse'
+        dat = sread_rbsp_efw_l2(utr, probes = probes[i], type = 'esvy')
+        if size(dat,/type) ne 8 then begin
+            nodata = 1
+            continue
+        endif else nodata = 0
+        tmp = sfmepoch(dat.epoch, 'unix', /epoch16)
+        dr = sdatarate(tmp[sort(tmp)])
+        uts = smkarthm(min(tmp), max(tmp), dr, 'dx')    ; get uniform time.
+        dat = sinterpol(dat.efield_mgse, tmp, uts)
+        dat[*,0] = 0.   ; set x to 0.
+        store_data, tvar, uts, dat, limits = $
+            {ytitle:'dE MGSE!C(mV/m)', colors:rgb, labels:'MGSE '+['x','y','z']}
+
+        tvar = pre0+'de_gse'
+        rbsp_mgse2gse, pre0+'de_mgse', newname = tvar, probe = probes[i], /no_spice_load, dt = 60
+        options, tvar, 'ytitle', 'dE GSE!C(mV/m)'
+        options, tvar, 'colors', rgb
+        options, tvar, 'labels', 'GSE '+['x','y','z']
+
+
+        ; load b, 64 Hz.
+        ; rbspx_b_gse.
+        tvar = pre0+'b_gse'
+        dat = sread_rbsp_emfisis_l3(utr, probes = probes[i], type = 'hires', coord = 'gse')
+        if size(dat,/type) ne 8 then begin
+            nodata = 1
+            continue
+        endif else nodata = 0
+        tmp = sfmepoch(dat.epoch, 'unix', /tt2000)
+        dat = sinterpol(dat.mag, tmp, uts)  ; down sample B.
+        store_data, tvar, uts, dat, limits = $
+            {ytitle:'B!C(nT)', colors:rgb, labels:'GSE '+['x','y','z']}
+
+
+        ; calc bmod, db.
+        ; rbspx_[db,bmod]_gse.
+        tvar = pre0+'bmod_gse'
+        get_data, pre0+'b_gse', uts, bmod
+        len = 1200d/sdatarate(uts)    ; 20 min.
+        for j = 0, 2 do bmod[*,j] = smooth(bmod[*,j], len)
+        store_data, tvar, uts, bmod, limits = $
+            {ytitle:'B model!C(nT)', colors:rgb, labels:'GSE '+['x','y','z']}
+
+        tvar = pre0+'db_gse'
+        get_data, pre0+'b_gse', uts, dat
+        store_data, tvar, uts, dat-bmod, limits = $
+            {ytitle:'dB!C(nT)', colors:rgb, labels:'GSE '+['x','y','z']}
+
+
+        ; load position.
+        ; rbspx_[pos_gsm,dis].
+        tvar = pre0+'pos_gsm'
+        rbsp_load_spice_state, probe = probes[i], $
+            coord = 'gsm', /no_spice_load, trange = utr
+        get_data, pre0+'state_pos_gsm', tmp, pos
+        pos = pos*re1
+        store_data, tvar, tmp, pos, limits = $
+            {ytitle:'R GSM (Re)', colors:rgb}
+        
+        tvar = pre0+'dis'
+        store_data, tvar, tmp, sqrt(total(pos^2,2)), limits = $
+            {ytitle:'Dis (Re)'}
+        
+        store_data, pre0+'state_*', /delete
+
+        ; load euvw, vsc.
+        ; rbspx_[euvw,vsc].
+        tvar = pre0+'de_uvw'
+        dat = sread_rbsp_efw_l2(utr, probes = tprobe, type = 'euvw')
+        uts = sfmepoch(dat.epoch, 'unix', /epoch16)
+        store_data, tvar, uts, dat.efield_uvw, limits = $
+            {ytitle:'dE UVW!C(mV/m)', labels:['u','v','w'], colors:rgb, constant:0}
+
+        tvar = pre0+'vsc'
+        dat = sread_rbsp_efw_l2(utr, probes = tprobe, type = 'vsvy')
+        uts = sfmepoch(dat.epoch, 'unix', /epoch16)
+        tmp = dat.vsvy
+        store_data, tvar, uts, 0.5*(tmp[*,2]+tmp[*,3]), limits = $
+            {ytitle:'Vsc/L 34!C(mV/m)'}
+
+    endfor
+    
+
+    ; *** decompose e field, ex is along b, ey is east-west, ez is up.
+    ; rbspx_[de,db]_fac.
+    for i = 0, nprobe-1 do begin
+        pre0 = 'rbsp'+probes[i]+'_'
+        get_data, pre0+'db_gse', uts, db
+        get_data, pre0+'bmod_gse', uts, bmod
+        bhat = sunitvec(bmod)
+        
+        p = atan(bhat[*,1],bhat[*,0])
+        cosp = cos(p) & sint = bhat[*,2]
+        cost = bhat[*,0]/cosp & sinp = bhat[*,1]/cost
+
+        ; de_fac.
+        get_data, pre0+'de_gse', uts, de
+        ex = cost*cosp*de[*,0] + cost*sinp*de[*,1] - sint*de[*,2]
+        ey = -sinp*de[*,0] + cosp*de[*,1]
+        ez = sint*sinp*de[*,0] + sint*cosp*de[*,2] + cost*de[*,2]
+        store_data, pre0+'de_fac', uts, [[ex],[ey],[ez]], limits = {ytitle:'dE!C(mV/m)'}
+        
+        ; db_fac.
+        bx = cost*cosp*db[*,0] + cost*sinp*db[*,1] - sint*db[*,2]
+        by = -sinp*db[*,0] + cosp*db[*,1]
+        bz = sint*sinp*db[*,0] + sint*cosp*db[*,2] + cost*db[*,2]
+        store_data, pre0+'db_fac', uts, [[bx],[by],[bz]], limits = {ytitle:'dB!C(nT)'}
+
+        vars = pre0+['db_fac','de_fac']
+        options, vars, 'colors', [6,4,2]
+        options, vars, 'labels', ['b','e','n']
+    endfor
+end
+
+
+pro psbl_de_find_rbsp_large_efield_32hz, utr, tprobe
+
+    if n_elements(utr) eq 0 then message, 'no time range ...'
+    if n_elements(tprobe) eq 0 then message, 'no probe ...'
+
+    ; initial settings and constants.
+    rbsp_efw_init
+    cdf_leap_second_init
+    rbsp_emfisis_init
+    tplot_options, 'labflag', -1
+    tplot_options, 'constant', 0
+    tplot_options, 'num_lab_min', 10
+
+
+    tmax = 300  ; sec. threshold for event separation.
+    tmin = 60  ; sec. min duration of the event.
+    emax = 50   ; mV/m.
+    padtime = 5*60d ; sec. padd time for bad data flag.
+    perigeelim = 3d ; re. limit for perigee region.
+    spc = '    '
+    secofday = 86400d
+    rgb = [6,4,2]
+    rbx = 'rbsp'+tprobe
+    pre0 = rbx+'_'
+
+    
+    rootdir = shomedir()+'/psbl_de/rbsp'+tprobe
+    proclog = shomedir()+'/psbl_de/process.log'     ; record important steps during the loop.
+    if file_test(proclog) eq 0 then stouch, proclog
+
+    ; log file to save info of potential events.
+    logfn = rootdir+'/list_rbsp'+tprobe+'_large_efield_32hz.log'
+    if file_test(logfn) eq 0 then begin
+        tmp = file_dirname(logfn)
+        if file_test(tmp,/directory) eq 0 then file_mkdir, tmp
+        openw, lun, logfn, /get_lun
+        tit = '   event id   '+spc+'  start & end time  '+spc+ $
+            'dE max'+spc+' dE normal '+spc+'  dE perp  '+spc+'  dE para  '
+        printf, lun, tit
+        tit = 'YYYY_MMDD_hhmm'+spc+'hh:mm:ss'+spc+'hh:mm:ss'+spc+ $
+            '(mV/m)'+spc+'  min,max  '+spc+'  min,max  '+spc+'  min,max  '
+        printf, lun, tit
+        tit = '--------------'+spc+'--------'+spc+'--------'+spc+ $
+            '------'+spc+'-----------'+spc+'-----------'+spc+'-----------'
+        printf, lun, tit
+        free_lun, lun
+    endif
+
+    
+    etr = stoepoch(utr, 'unix')
+
+    ; set up the data buffer.
+    uts = []
+    defac = []
+    demag = []
+    deuvw = []
+    dbfac = []
+    bmag = []
+    posgsm = []
+    dis = []
+    flags = []
+
+    ; start time of a day.
+    et1 = sepochfloor(etr[0], 'dy')
+    ut1 = sfmepoch(et1, 'unix')
+
+
+
+    ; loop through each orbit. 
+    go = 1
+    load = 1    ; 1 for load a new day into buffer.
+    while go do begin
+        ; load new data into data buffer if needed.
+        if load eq 1 then begin
+            ut1 = ut1-(ut1 mod secofday)
+            openw, loglun, proclog, /get_lun, /append
+            printf, loglun, 'loading data '+time_string(ut1)+' ...'
+            free_lun, loglun
+            ; load data for a whole day.
+            tutr = ut1+[0,secofday]
+            rbsp_load_spice_kernels, trange = tutr, probes = tprobe
+            psbl_de_load_ebfield, tutr, tprobe, nodata = nodata
+            
+            ; if no data, clear data buffer, move to the next day.
+            if nodata then begin
+                openw, loglun, proclog, /get_lun, /append
+                printf, loglun, 'no data on '+time_string(ut1)+' ...'
+                free_lun, loglun
+            endif else begin
+                ; **** get flags for bad data using various methods.
+                rbsp_efw_euvw_flag, tutr, probes = tprobe, pad = padtime
+                rbsp_efw_perigee_flag, tutr, probes = tprobe, pad = padtime, /re
+                rbsp_efw_vsc_flag, tutr, probes = tprobe, pad = padtime
+                
+                ; combine the flags into one flag.
+                get_data, pre0+'de_fac', t0
+                tflags = bytarr(n_elements(t0))
+                vars = pre0+[['euvw','perigee','vsc']+'_flag']
+                for i = 0, n_elements(vars)-1 do begin
+                    get_data, vars[i], tmp, dat
+                    tflags = tflags or interpol(dat, tmp, t0)
+                endfor
+                store_data, vars, /delete
+                tvar = pre0+'bad_eflield_flag'
+                store_data, tvar, t0, tflags, limits = {yrange:[-0.5,1.5], ytitle:'Bad E flag'}
+                
+                ; mask bad data using the flag.
+                idx = where(tflags eq 1, cnt)
+                if cnt ne 0 then begin
+                    vars = pre0+['de_fac','de_mgse','de_gse']
+                    for i = 0, n_elements(vars)-1 do begin
+                        get_data, vars[i], tmp, dat
+                        dat[idx,*] = !values.f_nan
+                        store_data, vars[i], tmp, dat
+                    endfor
+                endif
+                
+                ; **** add new data to data buffer.
+                get_data, pre0+'de_fac', t0, tmp & defac = [defac,tmp]
+                demag = sqrt(total(defac^2,2))
+                get_data, pre0+'de_uvw', t0, tmp & deuvw = [deuvw,tmp]
+                get_data, pre0+'db_fac', t0, tmp & dbfac = [dbfac,tmp]
+                get_data, pre0+'b_gse', t0, tmp
+                bmag = [bmag,sqrt(total(tmp^2,2))]
+                uts = [uts,t0]
+                get_data, pre0+'pos_gsm', t1, tmp
+                tmp = sinterpol(tmp, t1, t0)
+                posgsm = [posgsm,tmp]
+                get_data, pre0+'dis', t1, tmp
+                tmp = sinterpol(tmp, t1, t0)
+                dis = [dis,tmp]
+                get_data, pre0+'bad_efield_flag', t1, tmp
+                flags = [flags,tmp]
+            endelse
+        endif
+
+        ; prepare next round. idx0, idx1.
+        idx = where(dis gt perigeelim, cnt)
+        if cnt eq 0 then begin  ; all points are around perigee, so load more.
+            ut1 = ut1+secofday
+            load = 1
+            continue
+        endif
+        idx0 = idx[0]   ; the first point exits perigee region, or the first point available.
+        idx = where(dis[idx0:*] le perigeelim, cnt)
+        if cnt eq 0 then begin
+            ut1 = ut1+secofday
+            load = 1
+            continue
+        endif
+        idx1 = idx[0]+idx0
+
+
+        ; treat the current orbit.
+        load = 0
+        
+        ; the data in the current orbit.
+        tuts = uts[idx0:idx1]
+        tdefac = defac[idx0:idx1,*]
+        tdemag = demag[idx0:idx1]
+        tdeuvw = deuvw[idx0:idx1,*]
+        tdbfac = dbfac[idx0:idx1,*]
+        tbmag = bmag[idx0:idx1]
+        tposgsm = posgsm[idx0:idx1,*]
+        tflags = flags[idx0:idx1]
+        
+        ; update the buffer, exclude data in the current orbit.
+        uts = uts[idx1+1:*]
+        defac = defac[idx1+1:*,*]
+        demag = demag[idx1+1:*]
+        deuvw = deuvw[idx1+1:*,*]
+        dbfac = dbfac[idx1+1:*,*]
+        bmag = bmag[idx1+1:*]
+        posgsm = posgsm[idx1+1:*,*]
+        dis = dis[idx1+1:*]
+        flags = flags[idx1+1:*]
+
+        dr = sdatarate(tuts)
+
+
+        ; check large e field.
+        openw, loglun, proclog, /get_lun, /append
+        printf, loglun, time_string(tuts[0])+' to '+time_string(tuts[idx1-idx0-1])
+        free_lun, loglun
+        idx = where(tdemag ge emax, cnt)
+        if cnt eq 0 then begin
+            openw, loglun, proclog, /get_lun, /append
+            printf, loglun, 'no large dE ...'
+            free_lun, loglun
+        endif
+        eidx0 = 0
+        eidx1 = 0
+        while eidx0 lt cnt-1 do begin
+            ; the large e field within tmax are grouped into one chunk.
+            tmp = eidx0
+            for i = eidx0, cnt-2 do if idx[i+1]-idx[i] gt tmax/dr then break  ; about 5 min.
+            eidx1 = i
+            tidx0 = idx[eidx0]
+            tidx1 = idx[eidx1]
+            openw, loglun, proclog, /get_lun, /append
+            printf, loglun, 'event duration: '+string(tuts[tidx1]-tuts[tidx0])+' sec ...'
+            free_lun, loglun
+            if (tidx1-tidx0) lt tmin then begin    ; 1 point, interpreted as spike.
+                eidx0 = eidx1+1
+                openw, loglun, proclog, /get_lun, /append
+                printf, loglun, 'shorter than '+string(tmin)+' sec ...'
+                free_lun, loglun
+                continue
+            endif
+
+            
+            ; generate plots to file.
+            ofn = rootdir+time_string(tuts[tidx0], tformat='/YYYY/MM/')+ $
+                pre0+'large_efield_32Hz_'+ $
+                time_string(tuts[tidx0], tformat='YYYY_MMDD_hhmm')+'.pdf'
+            tutr = [tuts[tidx0],tuts[tidx1]]+[-1,1]*tmax*0.5
+            
+            tvar = pre0+'de_fac'
+            store_data, tvar, tuts, tdefac
+            options, tvar, 'ytitle', 'dE FAC!C(mV/m)'
+            
+            tvar = pre0+'db_fac'
+            store_data, tvar, tuts, tdbfac
+            options, tvar, 'ytitle', 'dB FAC!C(nT)'
+            
+            tvar = pre0+'b_mag'
+            store_data, tvar, tuts, tbmag
+            options, tvar, 'ynozero', 1
+            options, tvar, 'ytitle', 'B mag (nT)'
+            tvar = pre0+['de_fac','db_fac','pos_gsm']
+            options, tvar, 'colors', rgb
+            
+            tvar = pre0+'pos_gsm'
+            store_data, tvar, tuts, tposgsm
+            stplot_split, tvar, newname = tvar+'_'+['x','y','z']
+            tvar = pre0+'pos_gsm_x'
+            options, tvar, 'ytitle', 'X GSM (Re)'
+            tvar = pre0+'pos_gsm_y'
+            options, tvar, 'ytitle', 'Y GSM (Re)'
+            tvar = pre0+'pos_gsm_z'
+            options, tvar, 'ytitle', 'Z GSM (Re)'
+
+ofn = 0
+            sgopen, ofn, xsize = 8, ysize = 11.5, /inch
+
+            pos1 = [0.2,0.4,0.9,0.9]
+            pos2 = [0.2,0.1,0.9,0.25]
+            vars = pre0+['de_fac','db_fac','b_mag']
+            nvar = n_elements(vars)
+            labs = pre0+['pos_gsm_'+['z','y','x']]
+            titl = 'RBSP-'+strupcase(tprobe)+' dE,dB survey '+$
+                time_string(tuts[tidx0])
+            poss = sgcalcpos(nvar, position = pos1)
+            tplot, vars, var_label = labs, trange = tutr, title = titl, /noerase, position = poss
+            
+            tmp = max(tdemag[tidx0:tidx1],maxdeidx)
+            tmp = tuts[tidx0+maxdeidx]+tmin*[-1,1]*0.5
+            timebar, tmp, color = sgcolor('red')
+            
+            tvar = pre0+'euvw'
+            tplot, tvar, trange = tmp, $
+                title = 'Zoom in dE UVW, dt = '+sgnum2str(tmin)+' sec', /noerase, position = pos2
+            
+            sgclose
+            stop
+            
+            
+            cmd = time_string(tuts[tidx0], tformat='YYYY_MMDD_hhmm')+spc
+            cmd+= time_string(tuts[tidx0], tformat='hh:mm:ss')+spc
+            cmd+= time_string(tuts[tidx1], tformat='hh:mm:ss')+spc
+            tmp = sgnum2str(max(tdemag[tidx0:tidx1],maxdeidx),nsgn=3)
+            for i = 1, 6-strlen(tmp) do tmp = ' '+tmp
+            cmd = cmd+tmp+spc
+            tmp = sgnum2str(min(tdefac[tidx0:tidx1,2]),msgn=3)+','+$
+                sgnum2str(max(tdefac[tidx0:tidx1,2]),msgn=3)
+            for i = 1, 11-strlen(tmp) do tmp = ' '+tmp
+            cmd = cmd+tmp+spc
+            tmp = sgnum2str(min(tdefac[tidx0:tidx1,1]),msgn=3)+','+$
+                sgnum2str(max(tdefac[tidx0:tidx1,1]),msgn=3)
+            for i = 1, 11-strlen(tmp) do tmp = ' '+tmp
+            cmd = cmd+tmp+spc
+            tmp = sgnum2str(min(tdefac[tidx0:tidx1,0]),msgn=3)+','+$
+                sgnum2str(max(tdefac[tidx0:tidx1,0]),msgn=3)
+            for i = 1, 11-strlen(tmp) do tmp = ' '+tmp
+            cmd = cmd+tmp+spc
+            
+            openw, lun, logfn, /get_lun, /append
+            printf, lun, cmd
+            free_lun, lun
+
+            eidx0 = eidx1+1
+        endwhile
+        
+        
+        ; update data buffer.
+        ; trim the near earth field.
+        idx = where(dis gt perigeelim, cnt)
+        if cnt eq 0 then begin
+            rbsp_load_spice_kernels, trange = ut1+[0,secofday], probes = tprobe, /unload
+            ut1 = ut1+secofday
+            load = 1
+            continue
+        endif else begin
+            uts = uts[idx[0]:*]
+            defac = defac[idx[0]:*,*]
+            demag = demag[idx[0]:*]
+            deuvw = deuvw[idx[0]:*,*]
+            dbfac = dbfac[idx[0]:*,*]            
+            bmag = bmag[idx[0]:*]
+            posgsm = posgsm[idx[0]:*,*]
+            dis = dis[idx[0]:*,*]
+            flags = flags[idx[0]:*]
+        endelse
+        
+        ; add a new day when less than 9 hour.
+        if (uts[0] mod secofday) gt 15d*3600 then begin
+            rbsp_load_spice_kernels, trange = ut1+[0,secofday], probes = tprobe, /unload
+            ut1 = ut1+secofday  ; move to the next day.
+            load = 1
+            continue    ; this continue will load data in next day.
+        endif
+        
+        if ut1 ge max(utr) then break
+    endwhile
+
+end
+
+;tr = ['2013-01-01','2013-06-01']
+tr = ['2013-05-01','2013-05-03']
+utr = time_double(tr)
+;psbl_de_find_rbsp_large_efield_32hz, utr, 'a'
+psbl_de_find_rbsp_large_efield_32hz, utr, 'b'
+end

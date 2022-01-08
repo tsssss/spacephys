@@ -1,0 +1,524 @@
+;+
+; on daily bases, preprocess efield for certain probe.
+; subtract background E field near earth (<3 Re)
+; remove bad E field when Eu and Ev do not match and
+; when they are asymetric around 0.
+; 
+; calc E GSE from V, save the quaternion of rotation matrix uvw2gse, 
+; from which wsc_gse can be extracted.
+;-
+
+
+pro rbsp_preprocess_efield, ut0, probes = probes, no_spice_load = no_spice_load
+
+
+    if n_elements(probes) eq 0 then probes = ['a','b']
+    rootdir = shomedir()+'/rbsp_efield_preprocess'
+    if file_test(rootdir,/directory) eq 0 then file_mkdir, rootdir
+    
+    dt0 = 86400d
+    utr = ut0-(ut0 mod dt0)+[0,dt0]
+    dr0 = 1d/16     ; data rate, 16 Hz.
+    ut2016 = time_double('2015-10-01')
+    spinrate = 11   ; sec, 10.9378 sec.
+    
+    deg = 180d/!dpi
+    rad = !dpi/180
+    re = 6378d & re1 = 1d/re
+    
+    rgb = [6,4,2]
+    device, decomposed = 0
+    loadct2, 43
+    tplot_options, 'labflag', -1
+    
+;goto, startplot
+
+    foreach tprobe, probes do begin
+        
+        pre0 = 'rbsp'+tprobe+'_'
+    
+
+    ; **** load position.
+    ; rbspx_[pos_gse,pos_gse_[x,y,z],mlt,lshell,dis]
+    
+        if no_spice_load eq 0 then $
+            rbsp_load_spice_kernels, trange = utr, probes = tprobe
+        tvar = pre0+'pos_gse'
+        tuts = smkarthm(utr[0],utr[1],60,'dx')
+        rbsp_load_spice_state, probe = tprobe, coord = 'gse', times = tuts, /no_spice_load
+        get_data, pre0+'state_pos_gse', tmp, posgse
+        posgse = posgse*re1
+        tdat = posgse
+        store_data, pre0+'state_*', /delete
+        if no_spice_load eq 0 then $
+            rbsp_load_spice_kernels, trange = utr, probes = tprobe, /unload
+        
+        store_data, tvar, tuts, tdat, $
+            {ytitle:'R GSE (Re)', colors:rgb, labels:'GSE '+['x','y','z']}
+
+                
+        
+        tvar = pre0+'mlt'
+        tdat = atan(posgse[*,1],posgse[*,0])*deg
+        tdat = (tdat+360) mod 360   ; convert to 0-360.
+        tdat = (tdat/15 + 12) mod 24
+        store_data, tvar, tuts, tdat, limits = {ytitle:'MLT (hr)'}
+        
+        
+        tvar = pre0+'lshell'
+        possm = sgse2sm(posgse, stoepoch(tuts,'unix'))
+        mlat = atan(possm[*,2],sqrt(possm[*,0]^2+possm[*,1]^2)) ; in rad.
+        dis = sqrt(possm[*,0]^2+possm[*,1]^2+possm[*,2]^2)
+        tdat = dis/(cos(mlat)^2)
+        store_data, tvar, tuts, tdat, limits = {ytitle:'L-shell'}
+        
+        store_data, pre0+'mlat', tuts, mlat*deg, limits = {ytitle:'MLat (deg)'}
+        store_data, pre0+'dis', tuts, dis, limits = {ytitle:'Dist (Re)'}
+
+    
+    ; **** load vsvy and calc esvy (instead of load esvy).
+    ; rbspx_[vsc,vsvy]
+    
+        tvar = pre0+'vsc'    
+        dat = sread_rbsp_efw_l2(utr, probes = tprobe, type = 'vsvy')
+        if size(dat,/type) ne 8 then begin
+            message, 'no V data ...', /continue
+            return
+        endif
+        
+        uts = sfmepoch(dat.epoch, 'unix')
+        nrec = n_elements(uts)
+        vsvy = dat.vsvy
+        ; calibrate vsvy, tried rbsp_efw_get_cal_params, but really no effect
+        ; since offset is 0, gain is not used.  
+        ; end up using V12, may consider more complex ways.
+        vsc = mean(vsvy[*,0:1], dimension = 2)
+        if utr[0] gt ut2016 then vsc = mean(vsvy[*,2:3], dimension = 2)
+        store_data, tvar, uts, vsc, limits = {ytitle:'Vsc!C(V)', labels:'Vsc'}
+        store_data, pre0+'vsvy', uts, vsvy[*,0:3], limits = $
+            {ytitle:'Vsvy!C(V)', colors:[1,2,3,4], labels:'V'+['1','2','3','4']}
+    
+    
+    ; calc E uvw.
+    ; rbspx_euvw
+
+        tvar = pre0+'euvw'    
+        ; the following is based on linear regression on v1,v2 and eu, v3,v4 and ev.
+        eu = (vsvy[*,0]-vsvy[*,1])/100*1e3   ; V -> V/m -> mV/m.
+        ev = (vsvy[*,2]-vsvy[*,3])/100*1e3
+        ew = (vsvy[*,4]-vsvy[*,5])/12*1e3
+        ew[*] = 0
+        ; remove offset.
+;        nsec = 48   ; 30 min. tested to be very comparable to Euvw.
+;        eu = eu-scalcbg(eu, nsection = nsec)
+;        ev = ev-scalcbg(ev, nsection = nsec)
+        eu = eu-smooth(eu, spinrate/dr0, /edge_truncate, /nan)
+        ev = ev-smooth(ev, spinrate/dr0, /edge_truncate, /nan)
+        store_data, tvar, uts, [[eu],[ev],[ew]], limits = $
+            {ytitle:'E UVW!C(mV/m)', labels:['Eu','Ev','Ew'], colors:[6,4,2], yrange:[-200,200]}
+        
+        
+    ; coefficient to remove E field near earth (< 3 Re).
+    ; rbspx_[e0,coef_e0].
+
+        ; make a decaying window.
+        mindis0 = 3 ; Re.
+        get_data, pre0+'dis', tuts, dis
+        dis = interpol(dis, tuts, uts)
+        win0 = double(dis le mindis0)
+        winwd = 9600/dr0
+        winedge = exp(-findgen(winwd)/winwd*5)
+        idx = where(win0-shift(win0,1) eq 1, cnt)   ; left edge.
+        for i = 0, cnt-1 do begin
+            j0 = idx[i]
+            dj = (winwd-1)<(j0-0)
+            win0[j0-dj:j0] = reverse(winedge[0:dj])
+        endfor
+        
+        idx = where(win0-shift(win0,-1) eq 1, cnt)   ; right edge.
+        for i = 0, cnt-1 do begin
+            j0 = idx[i]
+            dj = (winwd-1)<(nrec-1-j0)
+            win0[j0:j0+dj] = (winedge[0:dj])
+        endfor
+        
+        emag = sqrt(eu^2+ev^2+ew^2)
+        emagbg = dblarr(nrec)
+        drec = (dis-mindis0)/(max(dis)-mindis0)>0
+        drec = (drec^0.4*100+1)*spinrate/dr0*0.5
+        for i = 0, nrec-1 do begin
+            ti = i
+            i1 = (ti-drec[i])>0
+            i2 = (ti+drec[i])<nrec-1
+            emagbg[ti] = min(emag[i1:i2])
+        endfor
+        ec = (1-emagbg/emag)
+        store_data, pre0+'coef_e0', uts, ec
+        store_data, pre0+'e0', uts, emagbg, limits = {ytitle:'|E| BG!C(mV/m)'}
+        
+        
+
+
+;startplot:
+;pre0 = 'rbspa_'
+;mindis0 = 3
+   
+    ; **** plot: show removal of E near perigee.
+        xsz = 11
+        ysz = 8.5
+        date = time_string(utr[0],tformat='YYYY_MMDD')        
+        tplot_options, 'version', 0
+        tplot_options, 'num_lab_min', 10
+        tplot_options, 'labflag', -1
+        !x.ticks = 12
+        !x.minor = 2
+        !x.ticklen = 1
+        !x.gridstyle = 1
+        !p.charsize = 1
+        
+        ofn = rootdir+'/e0_correction/'+date+'_rbsp'+tprobe+'_e0_correction.pdf'
+; ofn = 0
+        
+        sgopen, ofn, xsize = xsz, ysize = ysz, /inch
+        
+        device, decomposed = 0
+        loadct2, 43
+        
+        
+        xchsz = double(!d.x_ch_size)/!d.x_size
+        ychsz = double(!d.y_ch_size)/!d.y_size
+        panx0 = 0.15
+        panx1 = 0.90
+        
+        poss = sgcalcpos(4)
+        
+        xyouts, 0.5, poss[3,0]+ychsz*0.5, /normal, alignment = 0.5, $
+            date+', RBSP-'+strupcase(tprobe)+', correction for E near perigee (<'+sgnum2str(mindis0)+' Re)', charsize = 1.25
+        
+        tpos = poss[*,0]
+        
+        get_data, pre0+'euvw', uts, dat
+        emag = snorm(dat)
+        
+        get_data, pre0+'e0', uts, dat
+        
+        xr = utr
+        yr = [0,300]
+        plot, xr, yr, /nodata, /noerase, position = tpos, xstyle = 1, ystyle = 1, xrange = xr, yrange = yr, xtickformat='(A1)', yticks = 3, yminor = 5, ytitle = '|E|!C(mV/m)'
+
+        oplot, uts, emag
+        xyouts, tpos[2]+xchsz*2, tpos[3]-ychsz*1.2, /normal, '|E|'
+        oplot, uts, dat, color = 6
+        xyouts, tpos[2]+xchsz*2, tpos[3]-ychsz*2.4, /normal, '|E|!DBG!N', color = 6
+        
+        tpos = poss[*,1]
+        yr = [0,10]
+        plot, xr, yr, /nodata, /noerase, position = tpos, xstyle = 1, ystyle = 1, xrange = xr, yrange = yr, xtickformat='(A1)', ytitle = '|E|-|E|!DBG!N!C(mV/m)'
+        oplot, uts, emag-dat
+        xyouts, tpos[2]+xchsz*2, tpos[3]-ychsz*1.2, /normal, '|E|-|E|!DBG!N'
+        
+        tvar = pre0+'euvw'
+        get_data, tvar, uts, dat
+        tpos = poss[*,2]
+        yr = [-200,200]
+        plot, xr, yr, /nodata, /noerase, position = tpos, xstyle = 1, ystyle = 1, xrange = xr, yrange = yr, xtickformat='(A1)', yticks = 4, yminor = 5, ytitle = 'E UVW!C(mV/m)'
+        colors = [6,4,2]
+        labels = ['E!DU!N','E!DV!N','E!DW!N']
+        for i = 0, 2 do begin
+            oplot, uts, dat[*,i], color = colors[i]
+            xyouts, tpos[2]+xchsz*2, tpos[3]-ychsz*1.2*(i+1), /normal, labels[i], color = colors[i]
+        endfor
+        plot, xr, yr, /nodata, /noerase, position = tpos, xstyle = 1, ystyle = 1, xrange = xr, yrange = yr, xtickformat='(A1)', yticks = 4, yminor = 5, ytitle = 'E UVW!C(mV/m)'
+
+        
+        tpos = poss[*,3]
+        yr = [-5,5]
+        
+        eu = eu*ec
+        ev = ev*ec
+        for i = 0, 2 do dat[*,i] *= ec
+        store_data, tvar, uts, dat, limits = {ystyle:1, yrange:yr, yticks:2, yminor:5, colors:colors, ytitle:'E UVW - BG!C(mV/m)'}
+        
+
+        tplot, tvar, position = tpos, /noerase, trange = utr
+        for i = 0, 2 do begin
+            xyouts, tpos[2]+xchsz*2, tpos[3]-ychsz*1.2*(i+1), /normal, labels[i]+' - BG', color = colors[i]
+        endfor
+        plot, xr, yr, /nodata, /noerase, position = tpos, xstyle = 1, ystyle = 1, xrange = xr, yrange = yr, xtickformat='(A1)', yticks = 2, yminor = 5, ytitle = ''
+
+        sgclose
+        
+    
+    
+    
+    
+    ; flag for bad E field.
+    ; rbspx_flag_[euv_diff,euv_asym,eclipse,sdt]
+    ; rbspx_[euv_mag,euv_mag_diff_abs,euv_avg]
+        
+        
+        ; compare magnitude of Eu and Ev, within 2 spins.
+        ; if difference in magnitude is larger than 15 mV/m, then bad field.
+        maxdiff = 15
+        padt = 60 ; sec.
+        drec = padt/dr0
+        
+        wd0 = 11
+        euenv = scalcenv(eu, width = wd0/dr0)
+        evenv = scalcenv(ev, width = wd0/dr0)
+        store_data, pre0+'euv_mag', uts, [[euenv],[evenv]], limits = $
+            {ytitle:'|E|!C(mV/m)', colors:[6,4], labels:['|Eu|','|Ev|'], yrange:[-200,200]}
+            
+        euvdiff = abs(euenv-evenv)
+        store_data, pre0+'euv_mag_diff_abs', uts, euvdiff, limits = $
+            {ytitle: '|Eu-Ev|!C(mV/m)', yrange:[0.01,1000], ylog:1, constant:maxdiff}
+        nrec = n_elements(uts)
+        
+        tdat = euvdiff ge maxdiff or finite(euvdiff,/nan)
+        idx = where(tdat eq 1, cnt)
+        for j = 0, cnt-1 do begin
+            j0 = idx[j]-drec>0
+            j1 = idx[j]+drec<nrec-1
+            tdat[j0:j1] = 1
+        endfor
+        store_data, pre0+'flag_euv_diff', uts, tdat, limits = $
+            {ytitle:'', yrange:[-0.5,1.5], yticks:1, yminor:0, ystyle:1, $
+            labels:['1:Diff.Euv>'+sgnum2str(maxdiff)+'mV/m']}
+            
+            
+        ; flag for bad E, when Eu and Ev are not symmetric.
+        maxasym = 5 ; mV/m.
+        padt = 60 ; sec.
+        drec = padt/dr0
+        
+        get_data, pre0+'euvw', uts, tdat
+        nrec = n_elements(uts)
+        tdat = tdat[*,0:1]
+        
+        for i = 0, 1 do $
+            tdat[*,i] = smooth(tdat[*,i], 600/dr0, /nan, /edge_truncate)  ; 10 min average.
+        store_data, pre0+'euv_avg', uts, tdat[*,0:1], limits = $
+            {ytitle:'Euv Avg!C(mV/m)', colors:[6,4], labels:['Eu','Ev'], $
+            constant:[-1,1]*maxasym}
+        tdat = (abs(tdat) ge maxasym)
+        for i = 0, 1 do begin
+            idx = where(tdat[*,i] eq 1, cnt)
+            for j = 0, cnt-1 do begin
+                j0 = idx[j]-drec>0
+                j1 = idx[j]+drec<nrec-1
+                tdat[j0:j1,i] = 1
+            endfor
+        endfor
+        store_data, pre0+'flag_euv_asym', uts, tdat, limits = $
+            {ytitle:'', yrange:[-0.5,1.5], yticks:1, yminor:0, ystyle:1, $
+            colors:[6,4], $
+            labels:['1:Asym.Euv>'+sgnum2str(maxasym)+'mV/m']}
+            
+        ; check eclipse time.
+        tmp = sread_rbsp_eclipse_time(utr, probes = tprobe)
+        flags = interpol(double(tmp.flags),tmp.uts,uts)
+        idx = where(flags ne 0, cnt)
+        if cnt ne 0 then flags[idx] = 1
+        store_data, pre0+'flag_eclipse', uts, flags, limits = $
+            {ytitle:'', yrange:[-0.5,1.5], yticks:1, yminor:0, ystyle:1, $
+            labels:['1:eclipse']}
+            
+        ; check sdt time.
+        tmp = sread_rbsp_efw_sdt_time(utr[0], probes = tprobe)
+        flags = interpol(double(tmp.flags),tmp.uts,uts)
+        idx = where(flags ne 0, cnt)
+        if cnt ne 0 then flags[idx] = 1
+        store_data, pre0+'flag_sdt', uts, flags, limits = $
+            {ytitle:'', yrange:[-0.5,1.5], yticks:1, yminor:0, ystyle:1, $
+            labels:['1:sdt']}
+            
+            
+        flagvars = pre0+'flag_'+['euv_diff','euv_asym','eclipse','sdt']
+        
+        
+        
+    ; **** plot: show different flags.
+        xsz = 11
+        ysz = 8.5
+        
+        date = time_string(utr[0],tformat='YYYY_MMDD')
+        ofn = rootdir+'/bade_flag/'+date+'_rbsp'+tprobe+'_bade_flag.pdf'
+; ofn = 0
+        
+        sgopen, ofn, xsize = xsz, ysize = ysz, /inch
+        device, decomposed = 0
+        loadct2, 43
+        
+        options, flagvars, 'ytickformat', '(A1)'
+        options, flagvars, 'labels', ''
+        options, flagvars, 'ystyle', 1
+        options, flagvars, 'yticks', 3
+        options, flagvars, 'ytickv', [0,1]
+        options, flagvars, 'yminor', 0
+        options, flagvars, 'yticklen', 1
+        options, flagvars, 'ygridstyle', 1
+        options, flagvars, 'yrange', [-0.2,1.2]
+        
+        tvar = pre0+'euv_avg'
+        options, tvar, 'yrange', maxasym*3*[-1,1]
+        
+        vars = pre0+['euv_avg','flag_euv_asym', 'euv_mag_diff_abs','flag_euv_diff', 'flag_eclipse','flag_sdt','euvw']
+        nvar = n_elements(vars)
+        poss = sgcalcpos(nvar+1)
+        poss[1,*]-= ychsz
+        poss[3,*]-= ychsz
+        
+        ypansz = poss[3,0]-poss[1,0]
+        ypad = poss[1,0]-poss[3,1]
+        
+        poss[1,1] = poss[3,1]-ypansz*0.3
+        poss[1,3] = poss[3,3]-ypansz*0.3
+        poss[1,4] = poss[3,4]-ypansz*0.3
+        poss[3,5] = poss[1,4]-ypad
+        poss[1,5] = poss[3,5]-ypansz*0.3
+        poss[3,6] = poss[1,5]-(poss[1,1]-poss[3,2])
+        tmp = 0.5*(poss[3,6]+poss[1,7])
+        poss[1,6] = tmp+0.5*ypad
+        poss[3,7] = tmp-0.5*ypad
+        
+
+        xyouts, 0.5, poss[3,0]+ychsz*0.5, /normal, alignment = 0.5, 'E UV asymmetry flag, 1 for >'+sgnum2str(maxasym)+' (mV/m)'
+        xyouts, 0.5, poss[3,2]+ychsz*0.5, /normal, alignment = 0.5, 'E UV difference flag, 1 for >'+sgnum2str(maxdiff)+' (mV/m)'
+        xyouts, 0.5, poss[3,4]+ychsz*0.5, /normal, alignment = 0.5, 'Eclipse and SDT flag, 1 for eclipse/sdt'
+        xyouts, 0.5, poss[3,6]+ychsz*0.5, /normal, alignment = 0.5, 'E UVW before and after flags are applied'
+        xyouts, 0.5, poss[3,0]+ychsz*2, /normal, alignment = 0.5, $
+            date+', RBSP-'+strupcase(tprobe)+', cover bad E', charsize = 1.25
+
+        
+        get_data, pre0+'euvw', uts, dat
+        xr = utr
+        yr = [-300,300]
+        plot, xr, yr, /nodata, /noerase, position = poss[*,6], $
+            xstyle = 1, ystyle = 1, xrange = xr, yrange = yr, xtickformat='(A1)', $
+            yticks = 4, yminor = 5, ytitle = 'E UVW - BG!C(mV/m)'
+        for i = 0, 2 do oplot, uts, dat[*,i], color = colors[i]
+        
+        foreach tvar, flagvars do begin
+            get_data, tvar, uts, flags
+            if size(flags,/n_dimensions) eq 2 then flags = total(flags,2)<1
+            idx = where(flags eq 1, cnt)
+            if cnt eq 0 then continue
+            dat[idx,*] = !values.d_nan
+        endforeach
+        store_data, pre0+'euvw', uts, dat
+        
+        tplot, vars, position = poss[*,[0,1,2,3,4,5,7]], /noerase, trange = utr
+        tpos = poss[*,7]
+        
+        yr = [-5,5]
+        plot, xr, yr, /nodata, /noerase, position = tpos, xstyle = 1, ystyle = 1, xrange = xr, yrange = yr, xtickformat='(A1)', yticks = 2, yminor = 5, ytitle = ''
+        
+        sgclose
+        
+        
+   ; **** clean up the variables.
+   ; combine flags into 1 flag, delete vars won't be used in the future.
+        flags = bytarr(nrec)
+        foreach tvar, flagvars do begin
+            get_data, tvar, uts, tdat
+            if size(tdat,/n_dimensions) eq 2 then tdat = total(tdat,2)<1
+            flags = flags or tdat
+        endforeach
+        store_data, flagvars, /delete
+        store_data, pre0+'flag_bade', uts, flags
+        
+        vars = pre0+['vsvy','euv_mag','euv_mag_diff_abs','euv_avg','e0']
+        store_data, vars, /delete
+        
+        idx = where(flags eq 1, cnt)
+        if cnt ne 0 then begin
+            eu[idx] = !values.d_nan
+            ev[idx] = !values.d_nan
+            ew[idx] = !values.d_nan
+        endif
+        
+        
+    ; **** rotate uvw into mgse.
+        dt0 = 1 ; sec.
+        ; calc epoch times for spice (different than the epoch in cdfs).
+        tuts = smkarthm(utr[0], utr[1], dt0, 'dx')
+        tmp = time_string(tuts[0],tformat='YYYY-MM-DDThh:mm:ss.ffffff')
+        cspice_str2et, tmp, tet0
+        tets = tet0+tuts-tuts[0]
+    
+        scid = strupcase(pre0+'science')
+        cspice_pxform, scid, 'GSE', tets, muvw2gse
+        quvw2gse = mtoq(transpose(muvw2gse))
+        store_data, pre0+'q_uvw2gse', tuts, quvw2gse
+        quvw2gse = qslerp(quvw2gse, tuts, uts)
+        if n_elements(quvw2gse) eq 1 and quvw2gse[0] eq -1 then begin
+            ; failed to use quternion, use the dumb way.
+            ; this means manauver?
+            tfn = shomedir()+'/maybe_manauver.dat'
+            openw, lun, tfn, /get_lun, /append
+            printf, lun, 'RBSP-'+strupcase(tprobe)+': '+ $
+                time_string(uts[0],tformat='YYYY-MM-DD')
+            free_lun, lun
+            tmp = time_string(uts[0],tformat='YYYY-MM-DDThh:mm:ss.ffffff')
+            cspice_str2et, tmp, tet0
+            ets = tet0+uts-uts[0]
+            cspice_pxform, scid, 'GSE', ets, muvw2gse
+            quvw2gse = mtoq(transpose(muvw2gse))
+            store_data, pre0+'q_uvw2gse', tuts, quvw2gse
+        endif else muvw2gse = transpose(qtom(quvw2gse))
+        
+        ex = eu*muvw2gse[0,0,*] + ev*muvw2gse[1,0,*] + ew*muvw2gse[2,0,*]
+        ey = eu*muvw2gse[0,1,*] + ev*muvw2gse[1,1,*] + ew*muvw2gse[2,1,*]
+        ez = eu*muvw2gse[0,2,*] + ev*muvw2gse[1,2,*] + ew*muvw2gse[2,2,*]
+        
+        tvar = pre0+'egse'
+        store_data, tvar, uts, [[ex],[ey],[ez]], limits = $
+            {ytitle:'dE GSE!C(mV/m)', colors:[6,4,2], labels:'GSE '+['x','y','z']}            
+    
+        
+        
+        
+        xsz = 11
+        ysz = 8.5
+        
+        date = time_string(utr[0],tformat='YYYY_MMDD')
+        ofn = rootdir+'/e_uwv2gse/'+date+'_rbsp'+tprobe+'_uwv2gse.pdf'
+; ofn = 0
+        
+        sgopen, ofn, xsize = xsz, ysize = ysz, /inch
+        device, decomposed = 0
+        loadct2, 43
+        
+        vars = pre0+['euvw'+['u','v','w'],'egse'+['x','y','z']]
+        
+        tvar = pre0+'euvw'
+        stplot_split, tvar, newnames = tvar+['u','v','w']
+        tvar = pre0+'egse'
+        stplot_split, tvar, newnames = tvar+['x','y','z']
+        
+        tplot, vars, trange = utr
+        
+        store_data, vars, /delete
+        
+        sgclose
+    
+    endforeach
+end
+
+
+utr0 = time_double(['2012-09-25','2016-12-31'])
+utr0 = time_double(['2012-11-14','2012-11-15']) 
+utr0 = time_double(['2012-09-25','2012-09-26'])
+
+
+; load spice kernel for all.
+no_spice_load = 1
+rbsp_load_spice_kernels, trange = utr0
+
+;utr0 = time_double(['2012-11-14','2012-11-15'])
+uts = smkarthm(utr0[0], utr0[1], 86400, 'dx')
+foreach tut, uts do rbsp_preprocess_efield, tut, no_spice_load = no_spice_load
+
+rbsp_load_spice_kernels, trange = utr0, /unload
+
+end

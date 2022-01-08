@@ -1,0 +1,12 @@
+Sheng Tian's IDL library II, a messier one than slib. Routines that are stable enough should be moved to slib.
+
+The structure of the library: 
+(1) root directory: assume the absolute path to this README file is '/abs/path/of/slib/README', then the root directory is '/abs/path/of/slib/'.
+(2) under the root directory, files (in relative path refering to root directory) are:
+	(a) idl_path: contain the subdirectories or other directories you want to add. Each line contains one directory entry, which can be:
+		(i) paths relative to the root directory, /abs/path/of/slib/cdf/ will be */cdf/;
+		(ii) paths relative to the home directory, /home/dir/to/thisdir/ will be ~/thisdir/;
+		(iii) absolute paths, e.g., /abs/path/to/directory.
+	(b) start_up.pro: start up file which reads the paths in idl_path, then merge these paths to <IDL_DEFAULT>, and set !path in idl.
+	(c) README: hey, just read me :)
+(3) under the root directory, folders can be added.

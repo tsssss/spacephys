@@ -1,0 +1,7 @@
+*.swo
+*.swp
+*.pdf
+*.cdf
+*.sav
+*.png
+.DS_Store

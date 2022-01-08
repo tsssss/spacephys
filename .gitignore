@@ -2,6 +2,7 @@
 *.swp
 *.pdf
 *.cdf
+*.tplot
 *.sav
 *.png
 *.jpg

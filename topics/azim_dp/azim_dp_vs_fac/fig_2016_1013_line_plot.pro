@@ -2,7 +2,7 @@
 ; DP after time lag removed, and with keV electron.
 ;-
 
-    test = 1
+    test = 0
     short_time_range = time_double(['2016-10-13/12:00','2016-10-13/13:30'])
 
 ;---Check inputs.
@@ -94,7 +94,7 @@
 
 ;---Get the size of the figure, and position of the panels.
     plot_file = join_path([homedir(),'Dropbox','mypapers','dp_vs_fac','plot',$
-        'fig_dp_vs_injection_v01.pdf'])
+        'fig_dp_vs_injection_2016_1013_v01.pdf'])
     if keyword_set(test) then plot_file = test
     sgopen, plot_file, xsize=6, ysize=5, /inch, xchsz=xchsz, ychsz=ychsz
 

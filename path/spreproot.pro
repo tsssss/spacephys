@@ -20,7 +20,7 @@ function spreproot, sat
     ; get hostname.
     case susrhost() of
         '': ; do nothing, I'm using an external disk called 'Research'.
-        else: root = file_search(sdiskdir('Research'))
+        else: root = file_search(sdiskdir('data'))
     endcase
     
     ; remove trailing sep.

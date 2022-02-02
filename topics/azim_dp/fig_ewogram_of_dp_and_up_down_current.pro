@@ -78,7 +78,7 @@ pro fig_ewogram_of_dp_and_up_down_current, time_range, probes=probes, $
     label_size = 0.7
     constant_linestyle = 1
     panel_xsize_max = 10
-    panel_xsize_min = 4
+    panel_xsize_min = 2
 
 
 ;---Get the size of the figure, and position of the panels.
@@ -253,6 +253,8 @@ pro fig_ewogram_of_dp_and_up_down_current, time_range, probes=probes, $
         zzs = azim_df_normalize_theta(zzs[index], zrange=tilt_range, ct=ct, /reverse_ct)
         rxy = rxy[index]
         rsm = rsm[index,*]
+        
+;        if time ge mean(time_range) then stop
 
         ; Filter spatially.
         index = lazy_where(yys, '[]', yrange, count=count)
@@ -463,6 +465,14 @@ test = 1
 time_range = time_double(['2017-09-08/03:00','2017-09-08/05:00'])
 probes = ['tha','thd','the','g13','g15','mms1']
 mlt_range = [-12,2]
+mlat_range = [50,80]
+test = 1
+
+; Merkin's event.
+time_range = time_double(['2016-08-09/06:00','2016-08-09/20:00'])
+time_range = time_double(['2016-08-09/09:00','2016-08-09/10:30'])
+probes = ['g13','g14','g15','mms1','rbspa','rbspb','tha','thd','the']
+mlt_range = [-4,8]
 mlat_range = [50,80]
 test = 1
 

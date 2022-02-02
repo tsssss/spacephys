@@ -11,6 +11,12 @@ pro GeotoApex, geographic_lat, geographic_lon, apexfile, apex_lat, apex_lon
 apex_lat = FltArr(361, 181)
 apex_lon = FltArr(361, 181)
 
+; Sheng: auto find the apexfile.
+if n_elements(apexfile) eq 0 then apexfile = ''
+if file_test(apexfile) eq 0 then begin
+    image_root = sparentdir(srootdir())
+    apexfile = join_path([image_root,'support','mlatlon.1997a.xdr'])
+endif
 OpenR, lun, apexfile, /Get_Lun, /xdr
 ReadU, lun, apex_lat
 ReadU, lun, apex_lon

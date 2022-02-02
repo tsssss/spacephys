@@ -1,7 +1,8 @@
 ;+
-; dir: the directory containing the images (string) or the images (strarr[n]).
-; vfn: movie filename.
-; fps: frame per sec, default is 10.
+; vfn. The movie filename.
+; fps. The frame per sec, default is 10.
+; plot_files=. The plots.
+; plot_dir=. The directory contains the plots.
 ;-
 pro spic2movie, vfn, fps, plot_files=plot_files, plot_dir=dir, plot_ext=ext
     compile_opt idl2

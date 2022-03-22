@@ -79,6 +79,17 @@ function smoon, et0, glat0, glon0, azimuth = azm, degree = degree
     hor = equ & srotate, hor,-(!dpi*0.5-glat), 1
     azm = atan(hor[1],hor[0])       ; azimuth
     alt = asin(hor[2])              ; altitude in rad.
+    
+;    ; convert from earth's center to the required location on earth's surface.
+;    re = constant('re')    
+;    dis = 384472.282d/re   ; Re.
+;    r_moon = cv_coord(from_sphere=[tau,dec,dis], to_rect=1, double=1)
+;    r_ground = cv_coord(from_sphere=[glon,glat,1], to_rect=1, double=1)
+;    equ = transpose(sunitvec(r_moon-r_ground))
+;    hor = equ & srotate, hor,-(!dpi*0.5-glat), 1
+;    azm = atan(hor[1],hor[0])       ; azimuth
+;    alt = asin(hor[2])              ; altitude in rad.
+
 
     if keyword_set(degree) then begin
         alt *= deg & azm *= deg

@@ -1,10 +1,10 @@
 ;+
 ; Test different methods to get MLT, either from MLon, or from GLon.
-; 
+;
 ; Two methods are used here and shown consistent results:
 ;   1. A mapping methods used by Polar and Image spacecraft when dealing with auroral images
 ;   2. A calculation based on solar direction, encapsulated in slon2lt.
-;   
+;
 ; The calculated results are checked against to Mlon of the all-sky imagers.
 ;-
 ;
@@ -16,9 +16,9 @@
 ;    ; mlon,mlat are in deg. The position of the camera is known for sure.
 ;    ; glon,glat are in deg. They are also knonw for sure.
 ;    ; midn in hour. The UT in the day when the camera passes the midn, i.e., MLT=12 hr.
-;    sites = themis_asi_sites()
+;    sites = themis_read_asi_sites()
 ;    nsite = n_elements(sites)
-;    
+;
 ;    midns = dblarr(nsite)
 ;    mlons = dblarr(nsite)
 ;    mlats = dblarr(nsite)
@@ -54,37 +54,37 @@
 ;    glons = glons[index]
 ;    glats = glats[index]
 ;    sites = sites[index]
-    
+
     secofday = 86400d
     ut = times[0]
     et = stoepoch(ut, 'unix')
     nsite = n_elements(mlons)
-    
+
     ; test 1: use the Polar and Image way.
     apexfile = '/Users/Sheng/Projects/idl/slib/sread/support/mlatlon.1997a.xdr'
     geotoapex, glats, glons, apexfile, mlats_polar, mlons_polar
     get_local_time, et, glats, glons, apexfile, glts, mlts_polar
     index = where(mlts_polar gt 12, count)
     if count ne 0 then mlts_polar[index] -= 24
-    
+
     ; test 2: use my conversion function.
     mlts_sheng = dblarr(nsite)
     for i=0, nsite-1 do mlts_sheng[i] = slon2lt(mlons[i], et, /mag, /degree)
-    
+
     ; difference from the midnight UT to the current UT, gives the current MLT.
     mlts_asi = (ut mod 86400)/3600-midns
 
-    
+
     ofn = srootdir()+'/test_calc_mlt_from_mlon_or_glon.pdf'
     figsz = 8
     sgopen, ofn, xsize=figsz, ysize=figsz, /inch
     poss = sgcalcpos(2,2, position=[0.1,0.1,0.95,0.95], rmargin=5, tmargin=5, xpad=8, ypad=8)
     xchsz = double(!d.x_ch_size)/!d.x_size
     ychsz = double(!d.y_ch_size)/!d.y_size
-    
+
     symsz = 0.5
     ticklen = -0.02
-    
+
     ; Show MLon agree.
     tpos = poss[*,0,0]
     mlon_range = [-150,50]
@@ -94,7 +94,7 @@
         position=tpos, psym=1, symsize=symsz
     plots, mlon_range, mlon_range, linestyle=1
     xyouts, tpos[0], tpos[3]+ychsz*0.5, /normal, 'a. MLon. ASI vs calc from Polar'
-    
+
     ; Show MLat agree.
     tpos = poss[*,1,0]
     mlat_range = [55,85]
@@ -114,7 +114,7 @@
         position=tpos, psym=1, symsize=symsz
     plots, mlt_range, mlt_range, linestyle=1
     xyouts, tpos[0], tpos[3]+ychsz*0.5, /normal, 'c. MLT. Sheng vs Polar (both from calc)'
-    
+
     ; Show MLT disagree.
     tpos = poss[*,1,1]
     mlt_range = [-12,12]

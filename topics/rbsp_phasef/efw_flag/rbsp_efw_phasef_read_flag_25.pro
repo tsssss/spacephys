@@ -12,7 +12,7 @@ pro rbsp_efw_phasef_read_flag_25, time_range, probe=probe, boom_pair=boom_pair
     rbsp_efw_read_flags, time_range, probe=probe
 
     all_flags = get_var_data(flag_var, times=common_times)
-    flag_names = get_setting(flag_var, 'labels')
+    flag_names = strtrim(get_setting(flag_var, 'labels'),2)
 
     wanted_flag_names = [$
         'global_flag',$

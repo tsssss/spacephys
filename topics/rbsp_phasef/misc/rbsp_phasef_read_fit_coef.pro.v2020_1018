@@ -11,7 +11,7 @@ function rbsp_phasef_read_fit_coef, time_range, probe=probe
     xyz = constant('xyz')
 
     rbspx = 'rbsp'+probe
-    root_dir = join_path([default_local_root(),'data','rbsp',rbspx,'e_fit'])
+    root_dir = join_path([default_local_root(),'rbsp',rbspx,'e_fit'])
     if file_test(root_dir) eq 0 then file_mkdir, root_dir
 
 

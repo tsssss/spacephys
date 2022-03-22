@@ -11,7 +11,7 @@ pro rbsp_phasef_read_e_wake_spinfit, time, probe=probe
 ;---Check inputs.
     sync_threshold = 0
     if n_elements(probe) eq 0 then probe = 'x'
-    if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'data','rbsp'])
+    if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'rbsp'])
     if n_elements(version) eq 0 then version = 'v01'
     if n_elements(datatype) eq 0 then datatype = 'e_spinfit'
 

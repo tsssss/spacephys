@@ -53,7 +53,7 @@ pro rbsp_efw_read_l2, tr, probe=probe, datatype=datatype, trange=trange, $
     suffix = ''
     prefix = rbspx+'_efw_'
     cdf2tplot, file=local_files, all=0, prefix=prefix, suffix=suffix, verbose=vb, $
-        tplotnames=tns, /convert_int1_to_int2, get_support_data=0
+        tplotnames=tns, convert_int1_to_int2=1, get_support_data=0, load_labels=1
 
 
     if datatype eq 'spec' then begin

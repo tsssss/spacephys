@@ -4,7 +4,7 @@
 
 
 probes = ['a','b']
-root_dir = join_path([default_local_root(),'data','rbsp'])
+root_dir = join_path([default_local_root(),'rbsp'])
 ;root_dir = join_path([homedir(),'data','rbsp'])
 cdf_var = 'orbit_num'
 time_var = 'epoch'

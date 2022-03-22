@@ -4,7 +4,7 @@
 ;-
 
 probes = ['a','b']
-root_dir = join_path([default_local_root(),'data','rbsp'])
+root_dir = join_path([default_local_root(),'rbsp'])
 ;root_dir = join_path([homedir(),'data','rbsp'])
 foreach probe, probes do begin
     prefix = 'rbsp'+probe+'_'

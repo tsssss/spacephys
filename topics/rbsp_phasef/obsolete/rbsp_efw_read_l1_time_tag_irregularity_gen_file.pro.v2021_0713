@@ -30,7 +30,7 @@ pro rbsp_efw_read_l1_time_tag_irregularity_gen_file, time_range, probe=probe, fi
     rbspx = 'rbsp'+probe
 
 ;---Locate L1 files.
-    local_root = join_path([default_local_root(),'data','rbsp'])
+    local_root = join_path([default_local_root(),'rbsp'])
     version = 'v*'
     cdf_files = strarr(n_elements(days))
     foreach day, days, day_id do begin

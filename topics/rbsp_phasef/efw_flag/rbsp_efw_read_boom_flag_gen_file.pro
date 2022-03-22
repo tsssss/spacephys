@@ -3,7 +3,7 @@ pro rbsp_efw_read_boom_flag_gen_file, date, probe=probe, filename=data_file, $
     errmsg=errmsg, local_root=local_root
 
 ;---Internal, do not check inputs.
-    local_root = join_path([default_local_root(),'data','rbsp'])
+    local_root = join_path([default_local_root(),'rbsp'])
     rbspx = 'rbsp'+probe
 
 ;---Load Vsvy.

@@ -5,7 +5,7 @@
 ;-
 
 probes = ['a','b']
-root_dir = join_path([default_local_root(),'data','rbsp'])
+root_dir = join_path([default_local_root(),'rbsp'])
 
 skeleton_base = prefix+'efw-lX_00000000_vXX.cdf'
 skeleton_path = join_path([homedir(),'Projects','idl','spacephys','stdas','aaron_spedas_efw_code','efw','cdf_file_production'])

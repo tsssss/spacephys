@@ -5,11 +5,14 @@
 ;
 ; coord=. A lower case string sets the coordinate of the output data. 'mgse' by default.
 ; keep_spin_axis=. A boolean, set to keep the spin axis E field. 0 by default.
+; keep_shadow_spike=. A boolean, set to keep shadow spike. 0 by default.
 ;-
 
 pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
     datatype=datatype, trange=trange, $
     coord=coord, keep_spin_axis=keep_spin_axis, $
+    apply_dc_flag=apply_dc_flag, $
+    keep_shadow_spike=keep_shadow_spike, $
     level=level, verbose=verbose, downloadonly=downloadonly, $
     cdf_data=cdf_data,get_support_data=get_support_data, $
     tplotnames=tns, make_multi_tplotvar=make_multi_tplotvar, $
@@ -93,15 +96,16 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
     survey_time_range = minmax(times)+[-1,1]*30
     rbsp_efw_phasef_read_dc_offset, survey_time_range, probe=probe
     get_data, prefix+'efw_e_uvw_dc_offset', uts, euvw_offset
-    euvw_offset[*,2] = 0    ; Do nothing to Ew.
     esvy -= sinterpol(euvw_offset, uts, times)
     store_data, in_var, times, esvy
 
 
 ;---Spin-axis data.
-    if ~keep_spin_axis then esvy[*,2] = 0
-    store_data, in_var, times, esvy
-
+    if ~keyword_set(keep_spin_axis) then begin
+        esvy[*,2] = 0
+        store_data, in_var, times, esvy
+    endif
+    
 
 ;---Convert vector from UVW to wanted coord.
     rgb = [6,4,2]
@@ -113,7 +117,56 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
         ytitle:prefix+'burst_efield!C[mV/m]', $
         labels:strupcase(coord)+' E'+xyz, $
         colors:rgb }
-
+        
+    ; Load shadow flag.
+    if ~keyword_set(keep_shadow_spike) then begin
+        shadow_trs = rbsp_efw_phasef_read_shadow_spike_time(time_range, probe=probe)
+        index = where(shadow_trs[*,0] le max(times) and shadow_trs[*,1] ge min(times), ntr)
+        if ntr ne 0 then begin
+            get_data, out_var, times, esvy
+            shadow_trs = shadow_trs[index,*]
+            for ii=0,ntr-1 do begin
+                index = lazy_where(times, '[]', shadow_trs[ii,0]+[-1,1]*0.3, count=count)
+                if count eq 0 then continue
+                esvy[index,0] = !values.f_nan
+            endfor
+            store_data, out_var, times, esvy
+        endif
+    endif
+    
+    ; Load flags.
+    if keyword_set(apply_dc_flag) then begin
+        rbsp_efw_phasef_read_flag_25, time_range, probe=probe
+        get_data, out_var, times, esvy
+        global_flags = get_var_data(prefix+'flag_25', at=times)
+        index = where(global_flags ne 0, count)
+        if count ne 0 then begin
+            esvy[index,*] = !values.f_nan
+            store_data, out_var, times, esvy
+        endif
+    endif
+    
+    
+    vars = prefix+'efw_eb1'+['','_mgse']
+    options, vars, 'colors', constant('rgb')
+    tplot_options, 'labflag', -1
+    options, vars[0], 'labels', 'UVW E'+['u','v','w']
+    options, vars, 'ytitle', ' '
+    options, vars, 'ysubtitle', '(mV/m)'
+    tplot_options, 'version', 1
+    plot_file = join_path([homedir(),'fig_rbsp_efw_phasef_example_shadow_spike_removal.pdf'])
+;plot_file = 0
+    sgopen, plot_file, xsize=6, ysize=4
+    poss = sgcalcpos(2,margins=[8,4,8,1], xchsz=xchsz, ychsz=ychsz)
+    tplot, vars, trange=['2013-06-07/02:17:40','2013-06-07/02:18:20'], position=poss
+    timebar, shadow_trs[*,0], color=sgcolor('yellow')
+    tpos = poss[*,0]
+    tx = tpos[0]+xchsz*1
+    ty = tpos[3]-ychsz*1
+    xyouts, tx,ty, normal=1, strupcase('RBSP-'+probe)+' Burst1 E field'
+    sgclose
+    stop
+    
 end
 
 
@@ -126,7 +179,7 @@ probe = 'a'
 
 ; Load the spinfit data.
 rbsp_efw_read_l1_burst_efield, time_range, probe=probe, $
-    datatype='vb1', coord='mgse'
+    datatype='vb1-split', coord='mgse', keep_spin_axis=1, apply_dc_flag=1
 
 prefix = 'rbsp'+probe+'_efw_'
 vars = prefix+[$
@@ -136,4 +189,7 @@ vars = prefix+[$
 
 ; Plot the variables.
 tplot, vars, trange=time_range
+
+
+
 end

@@ -3,7 +3,7 @@
 ;-
 
 probes = ['a','b']
-root_dir = join_path([default_local_root(),'data','rbsp'])
+root_dir = join_path([default_local_root(),'rbsp'])
 log_file = join_path([homedir(),'rbsp_efw_phasef_check_spin_phase_data_quality.txt'])
 ftouch, log_file
 tab = '    '

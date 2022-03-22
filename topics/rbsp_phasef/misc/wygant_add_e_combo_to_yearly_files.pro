@@ -6,7 +6,7 @@
 
     probes = ['a','b']
     years = [2015,2016,2017,2018,2019]
-    local_root = join_path([default_local_root(),'data','rbsp','prelim_yearly_files'])
+    local_root = join_path([default_local_root(),'rbsp','prelim_yearly_files'])
     pairs = ['13','14','23','24']
     time_var = 'epoch'
     foreach year, years do begin

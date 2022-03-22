@@ -38,7 +38,7 @@ pro rbsp_efw_phasef_find_l1_time_tag_irregularity, probe=probe, filename=file, e
 
 
 ;---The L1 data are supposed to be available on the local disk.
-    local_root = join_path([default_local_root(),'data','rbsp'])
+    local_root = join_path([default_local_root(),'rbsp'])
     version = 'v*'
     foreach l1_type, ['esvy','vsvy'] do begin
         lprmsg, 'Processing L1 data: '+l1_type+' ...', log_file

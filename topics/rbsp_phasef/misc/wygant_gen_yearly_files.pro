@@ -8,7 +8,7 @@
 
     probes = ['a','b']
     years = make_bins([2012,2019],1)
-    local_root = join_path([default_local_root(),'data','rbsp','prelim_yearly_files'])
+    local_root = join_path([default_local_root(),'rbsp','prelim_yearly_files'])
     foreach year, years do begin
         time_range = time_double(string(year+[0,1],format='(I4)'))
         foreach probe, probes do begin

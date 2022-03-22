@@ -16,7 +16,7 @@ pro rbsp_efw_read_l4, time, probe=probe, files=files, get_file=get_file, version
 ;---Check inputs.
     sync_threshold = 0
     if n_elements(probe) eq 0 then probe = 'x'
-    if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'data','rbsp'])
+    if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'rbsp'])
     if n_elements(remote_root) eq 0 then remote_root = join_path([rbsp_efw_phasef_get_server()])
     if n_elements(version) eq 0 then version = 'v02'
     if n_elements(datatype) eq 0 then datatype = 'l4'

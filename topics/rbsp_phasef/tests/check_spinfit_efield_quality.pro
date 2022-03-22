@@ -50,7 +50,7 @@
             in_vars = ['flags_charging_bias_eclipse'+'_'+boom_pairs,'position_gse']
             out_vars = prefix+['flags_'+boom_pairs,'r_gse']
             if check_if_update(out_vars[0], time_range, dtime=dtime) then begin
-                if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'data','rbsp'])
+                if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'rbsp'])
                 if n_elements(version) eq 0 then version = 'v02'
 
                 valid_range = (probe eq 'a')? time_double(['2012-09-08','2019-10-15']): time_double(['2012-09-08','2019-07-17'])

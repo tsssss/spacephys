@@ -13,7 +13,7 @@ function rbsp_phasef_read_fit_coef_v02, time_range, probe=probe
     xyz = constant('xyz')
 
     rbspx = 'rbsp'+probe
-    root_dir = join_path([default_local_root(),'data','rbsp',rbspx,'e_fit'])
+    root_dir = join_path([default_local_root(),'rbsp',rbspx,'e_fit'])
     ; The file to save data.
     sav_file = join_path([root_dir, prefix+'efit_coef_v02.sav'])
     if file_test(sav_file) eq 1 then begin

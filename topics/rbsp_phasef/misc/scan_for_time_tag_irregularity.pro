@@ -16,7 +16,7 @@ dt = 1d/32
 day_list = dblarr(nday)
 dtime_list = dblarr(nday)
 
-local_root = join_path([default_local_root(),'data','rbsp'])
+local_root = join_path([default_local_root(),'rbsp'])
 version = 'v*'
 
 file_time_ranges = dblarr(nday+1,2)

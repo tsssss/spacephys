@@ -1,5 +1,7 @@
 ;+
 ; Pflux detais on E, B, S, E/B ratio, ewogram.
+;
+; Test referee's suggestion on using Eo and Bw.
 ;-
 
 
@@ -17,7 +19,7 @@
 test = 1
 
     perp = '!9'+string(94b)+'!X'
-    labfac = ['||',perp+',West',perp+',Out']
+    labfac = ['||',perp+',west',perp+',out']
     rgb = constant('rgb')
     xyz = ['x','y','z']
     label_size = 0.8
@@ -118,13 +120,25 @@ test = 1
 
 
 ;----E/B spectrogram.
-    vars = [e_var,b_var]
+    options, e_var, 'labels', 'dE!D'+labfac
+    options, e_var, 'colors', rgb
+    fac_text_labels = ['para','west','out']
+    stplot_split, e_var, newnames=e_var+'_'+fac_text_labels
+    stplot_split, b_var, newnames=b_var+'_'+fac_text_labels
+    spec_vars = [e_var+'_out',b_var+'_west']
+;    spec_vars = [e_var+'_west',b_var+'_out']
+    spec_vars = [e_var,b_var]+'_mag'
+    foreach var, [e_var,b_var] do begin
+        get_data, var, uts, vec
+        store_data, var+'_mag', uts, snorm(vec[*,1:2])
+    endforeach
     ndim = 3
 
     ; settings for wavelet transform.
     s0 = 4d*dr0
     dj = 1d/8
     s1 = 2000
+s1 = 600d
     j1 = floor(alog(s1/s0)/alog(2)/dj)
     s1 = s0*2d^(dj*j1)
     ns = j1+1
@@ -132,9 +146,14 @@ test = 1
     cdelta = 0.776d
     psi0 = !dpi^(-0.25)
 
-    foreach tvar, vars do begin
+    suff = '_'+[fac_text_labels,'mag']
+    all_spec_vars = [e_var+suff,b_var+suff]
+    foreach tvar, all_spec_vars do begin
         get_data, tvar, uts, dat
-        dat = snorm(dat)
+        index = lazy_where(uts, '[]', time_range)
+        uts = uts[index]
+        dat = dat[index,*]
+;        dat = snorm(dat)
         index = where(finite(dat,/nan), count)
         if count ne 0 then dat[index] = 0
         mor = wavelet(dat, dr0, /pad, $
@@ -148,7 +167,7 @@ test = 1
     endforeach
 
 
-    plot_file = join_path([srootdir(),'2015_0218_fig_pflux_detail.pdf'])
+    plot_file = join_path([srootdir(),'2015_0218_fig_pflux_detail_for_referee.pdf'])
     if test eq 1 then plot_file = 0
 
     sgopen, plot_file, xsize=5, ysize=6, /inch
@@ -182,7 +201,6 @@ test = 1
     options, tvar, 'yticks', 2
     options, tvar, 'yminor', 3
     options, tvar, 'constant', 0
-
 
     tvar = b_var
     options, tvar, 'ystyle', 1
@@ -218,7 +236,7 @@ test = 1
     nvar = n_elements(vars)
     poss = sgcalcpos(nvar+1,position=posu, ypans=[2,fltarr(nvar)+1])
     letters = letters(nvar+2)
-    figlabs = letters[0:nvar-1]+'. '+['Ewogram', 'dE west', 'dE out', 'S']
+    figlabs = letters[0:nvar-1]+') '+['Ewogram', 'dE west', 'dE out', 'S']
 
 
     tpos = poss[*,0:nvar-1]
@@ -331,22 +349,33 @@ test = 1
         ytickv=lims.ytickv/cmap0*1e3, yminor=lims.yminor, yticklen=-0.01, ytickformat='(F5.1)'
 
     ; pflux spec.
-    vars = prefix+'pf_para_mor_spec_tmp'
+    spec_var = prefix+'pf_para_mor_spec_tmp'
     tpos = poss[*,nvar]
     cbpos = tpos
     cbpos[0] = cbpos[2]+xchsz*1
     cbpos[2] = cbpos[0]+xchsz*1
-    options, vars, 'zposition', cbpos
-    tplot, vars, position=tpos, /noerase, trange=time_range, /novtitle
-    xyouts, tpos[0]-xchsz*12, tpos[3]-ychsz*0.5, /normal, letters[nvar]+'. S!D||!N PSD'
+    options, spec_var, 'zposition', cbpos
+    tplot, spec_var, position=tpos, /noerase, trange=time_range, /novtitle
+    xyouts, tpos[0]-xchsz*12, tpos[3]-ychsz*0.5, /normal, letters[nvar]+') S!D||!N PSD'
+    get_data, spec_var, limits=lim
+    plot, time_range, lim.yrange, $
+        xstyle=5, $
+        ystyle=5, ylog=1, $
+        nodata=1, noerase=1, position=tpos
+    fb = 0.015  ; hz.
+    oplot, time_range, fb+[0,0], linestyle=1
+    tx = tpos[0]+xchsz*0.5
+    ty = (convert_coord(0,fb, data=1, to_normal=1))[1]+ychsz*0.3
+    msg = 'f!Dbead!N = '+string(fb,format='(F5.3)')+' Hz'
+;    xyouts, tx,ty, normal=1, msg;, charsize=label_size
+
 
 
 ;--plot spectrums.
     poss = sgcalcpos(1,3, position=posl, xpad=8)
+    xticklen = -0.02
+    yticklen = -0.02
 
-    vars = [e_var,b_var]
-    get_data, vars[0]+'_tmp', ps, edat
-    get_data, vars[1]+'_tmp', ps, bdat
 
 ;    xrange = [0.1,10000]
 ;    xtickv = 10^smkarthm(-1,4,1,'dx')
@@ -355,8 +384,10 @@ test = 1
 ;    xminor = 10
 ;    xtitle = 'Period (sec)'
 
+
     ; convert to frequency.
-    ps = 1d/ps
+    get_data, e_var+'_mag_tmp', ps
+    fs = 1d/ps
     xrange = minmax(1d/[0.1,10000])
     xtickv = 10^smkarthm(-4,1,1,'dx')
     xtickn = '10!U'+string(alog10(xtickv),format='(I0)') & xtickn[1:*:2] = ' '
@@ -368,25 +399,63 @@ test = 1
     tpos = poss[*,0]
     yrange = 5*[1e-6,0.1]
     ytickv = 10^smkarthm(-4,1,1,'dx')
+    yrange = minmax([ytickv,yrange])
     ytickn = '10!U'+string(alog10(ytickv),format='(I0)') & ytickn[1:*:2]=' '
+    index = where(ytickn eq '10!U0', count)
+    if count ne 0 then ytickn[index] = '1'
     yticks = n_elements(ytickv)-1
     yminor = 10
     ytitle = '(mV/m)!U2!N'
-    plot, ps, edat[*,0], /noerase, position=tpos, $
-        /xlog, xstyle=1, xrange=xrange, xtitle=xtitle, $
-        xtickv=xtickv, xticks=xticks, xminor=xminor, xtickname=xtickn, xticklen=ticklen, $
-        /ylog, ystyle=1, yrange=yrange, ytitle=ytitle, $
-        ytickv=ytickv, yticks=yticks, yminor=yminor, ytickname=ytickn, yticklen=ticklen
+
+    ; Draw power spectrum.
+    plot, xrange, yrange, $
+        xstyle=1, xlog=1, xrange=xrange, xtitle=xtitle, xtickname=xtickn, $
+        xticklen=xticklen, xtickv=xtickv, xticks=xticks, xminor=xminor, $
+        ystyle=1, ylog=1, yrange=yrange, ytitle=ytitle, ytickname=ytickn, $
+        yticklen=yticklen, ytickv=ytickv, yticks=yticks, yminor=yminor, $
+        noerase=1, position=tpos, nodata=1
+
+    f_spin = 2d/10.8
+    plots, f_spin+[0,0], yrange, linestyle=1
+    tmp = convert_coord(f_spin, yrange[0], data=1, to_normal=1)
+    tx = tmp[0]-xchsz*0.2
+    ty = tmp[1]+ychsz*0.35
+    msg = '2f!Dspin!N'
+    xyouts, tx,ty,normal=1, msg, alignment=0.5;, charsize=label_size
+    
+    ; f_bead.
+    plots, fb+[0,0], yrange, linestyle=1
+
+
+    e_vars = e_var+['_west','_out','_mag']+'_tmp'
+    labels = ['E!D'+labfac[[1,2]],'|E|']
+    e_vars = e_var+['_out','_mag']+'_tmp'
+    labels = ['E!D'+labfac[2],'|E|']
+    e_vars = e_var+['_out','_west']+'_tmp'
+    labels = ['E!D'+labfac[2],'E!D'+labfac[1]]
+    colors = sgcolor(['black','green','red'])
+    foreach var, e_vars, var_id do begin
+        get_data, var, ps, dat
+        plots, fs, dat, color=colors[var_id]
+        tx = tpos[2]-xchsz*4
+        ty = tpos[3]-ychsz*(var_id+0.9)
+        msg = labels[var_id]
+        xyouts, tx,ty,normal=1, msg, color=colors[var_id];, charsize=label_size
+    endforeach
+
+    ; Add label.
     xyouts, tpos[0]-xchsz*7, tpos[3]-ychsz*0.3, /normal, $
-        letters[-1]+'-1. |E|!U2!N'
-    ; add line fit.
-    idx = where(ps ge min(ps), tns)
-    tps = ps[idx]
-    res = linfit(alog10(tps), alog10(edat[idx,0]))
-    tys = 10^(alog10(tps)*res[1]+res[0])
-    plots, ps[idx], tys, color=red, linestyle=0
-    tmp = convert_coord(tps[tns/2], tys[tns/2], /data, /to_normal)
-    xyouts, tmp[0]+xchsz*1, tmp[1]+ychsz*0.5, color=red, /normal, 'f!U '+sgnum2str(res[1],ndec=2)
+        letters[-1]+'-1) E PS'
+
+
+;    ; add line fit.
+;    idx = where(ps ge min(ps), tns)
+;    tps = ps[idx]
+;    res = linfit(alog10(tps), alog10(edat[idx,0]))
+;    tys = 10^(alog10(tps)*res[1]+res[0])
+;    plots, ps[idx], tys, color=red, linestyle=0
+;    tmp = convert_coord(tps[tns/2], tys[tns/2], /data, /to_normal)
+;    xyouts, tmp[0]+xchsz*1, tmp[1]+ychsz*0.5, color=red, /normal, 'f!U '+sgnum2str(res[1],ndec=2)
 
 
     ; B spectrogram.
@@ -394,57 +463,113 @@ test = 1
     yrange = 5*[1e-8,10]
     ytickv = 10^smkarthm(-6,1,1,'dx')
     ytickn = '10!U'+string(alog10(ytickv),format='(I0)') & ytickn[1:*:2]=' '
+    index = where(ytickn eq '10!U0', count)
+    if count ne 0 then ytickn[index] = '1'
     yticks = n_elements(ytickv)-1
     yminor = 10
     ytitle = '(nT)!U2!N'
-    plot, ps, bdat[*,0], /noerase, position=tpos, $
-        /xlog, xstyle=1, xrange=xrange, xtitle=xtitle, $
-        xtickv=xtickv, xticks=xticks, xminor=xminor, xtickname=xtickn, xticklen=ticklen, $
-        /ylog, ystyle=1, yrange=yrange, ytitle=ytitle, $
-        ytickv=ytickv, yticks=yticks, yminor=yminor, ytickname=ytickn, yticklen=ticklen
+
+    ; Draw power spectrum.
+    plot, xrange, yrange, $
+        xstyle=1, xlog=1, xrange=xrange, xtitle=xtitle, xtickname=xtickn, $
+        xticklen=xticklen, xtickv=xtickv, xticks=xticks, xminor=xminor, $
+        ystyle=1, ylog=1, yrange=yrange, ytitle=ytitle, ytickname=ytickn, $
+        yticklen=yticklen, ytickv=ytickv, yticks=yticks, yminor=yminor, $
+        noerase=1, position=tpos, nodata=1
+
+    b_vars = b_var+['_out','_west','_mag']+'_tmp'
+    labels = ['B!D'+labfac[[2,1]],'|B|']
+    b_vars = b_var+['_west','_mag']+'_tmp'
+    labels = ['B!D'+labfac[[1]],'|B|']
+    b_vars = b_var+['_west']+'_tmp'
+    labels = ['B!D'+labfac[[1]]]
+    foreach var, b_vars, var_id do begin
+        get_data, var, ps, dat
+        plots, fs, dat, color=colors[var_id]
+        tx = tpos[2]-xchsz*4
+        ty = tpos[3]-ychsz*(var_id+0.9)
+        msg = labels[var_id]
+        xyouts, tx,ty,normal=1, msg, color=colors[var_id];, charsize=label_size
+    endforeach
+
+    ; Add label.
     xyouts, tpos[0]-xchsz*6, tpos[3]-ychsz*0.3, /normal, $
-        letters[-1]+'-2. |B|!U2!N'
-    ; add line fit.
-    idx = where(ps ge min(ps), tns)
-    tps = ps[idx]
-    res = linfit(alog10(tps), alog10(bdat[idx,0]))
-    tys = 10^(alog10(tps)*res[1]+res[0])
-    plots, ps[idx], tys, color=red, linestyle=0
-    tmp = convert_coord(tps[tns/2], tys[tns/2], /data, /to_normal)
-    xyouts, tmp[0]+xchsz*1, tmp[1]+ychsz*0.5, color=red, /normal, 'f!U '+sgnum2str(res[1],ndec=2)
+        letters[-1]+'-2) B PS'
+        
+    ; f_bead.
+    plots, fb+[0,0], yrange, linestyle=1
+
+
+;    ; add line fit.
+;    idx = where(ps ge min(ps), tns)
+;    tps = ps[idx]
+;    res = linfit(alog10(tps), alog10(bdat[idx,0]))
+;    tys = 10^(alog10(tps)*res[1]+res[0])
+;    plots, ps[idx], tys, color=red, linestyle=0
+;    tmp = convert_coord(tps[tns/2], tys[tns/2], /data, /to_normal)
+;    xyouts, tmp[0]+xchsz*1, tmp[1]+ychsz*0.5, color=red, /normal, 'f!U '+sgnum2str(res[1],ndec=2)
 
 
     ; E/B in km/s.
     tpos = poss[*,2]
-    yrange = 1*[1e1,1e4]
-    ytickv = 10^smkarthm(1,4,1,'dx')
+    yrange = 1*[50,5e4]
+    ytickv = 10^smkarthm(2,4,1,'dx')
     ytickn = '10!U'+string(alog10(ytickv),format='(I0)')
-    ytickn[-1] = ' '
+ ;   ytickn[-1] = ' '
     yticks = n_elements(ytickv)-1
     yminor = 10
     ytitle = '(km/s)'
-    plot, ps, sqrt(edat[*,0]/bdat[*,0])*1e3, /noerase, position=tpos, $
-        /xlog, xstyle=1, xrange=xrange, xtitle=xtitle, $
-        xtickv=xtickv, xticks=xticks, xminor=xminor, xtickname=xtickn, xticklen=ticklen, $
-        /ylog, ystyle=1, yrange=yrange, ytitle=ytitle, $
-        ytickv=ytickv, yticks=yticks, yminor=yminor, ytickname=ytickn, yticklen=ticklen
-    xyouts, tpos[0]-xchsz*6, tpos[3]-ychsz*0.3, /normal, letters[-1]+'-3. E/B'
 
-    mu0 = 4*!dpi*1e-7
-    sigma_pedersens = [1,10]
-    vpedersens = 1e-3/(mu0*sigma_pedersens)
-    vplot = minmax(vpedersens>yrange[0])
-    polyfill, xrange[[0,1,1,0,0]],vplot[[0,0,1,1,0]], color=sgcolor('silver')
-    tmp1 = convert_coord(xrange[1],vplot[0], /data, /to_normal)
-    tmp2 = convert_coord(xrange[1],vplot[1], /data, /to_normal)
-    ty = ((tmp1[1]+tmp2[1])*0.5-ychsz*0.5)>tmp1[1]
-    tx = tmp1[0]+xchsz*0.5
-    xyouts, tx, ty, /normal, '1/'+strmu+'!D0!N'+strsigma+'!DP!N!C1-10 S'
-    plot, ps, sqrt(edat[*,0]/bdat[*,0])*1e3, /noerase, position=tpos, $
-        /xlog, xstyle=1, xrange=xrange, xtitle=xtitle, $
-        xtickv=xtickv, xticks=xticks, xminor=xminor, xtickname=xtickn, xticklen=ticklen, $
-        /ylog, ystyle=1, yrange=yrange, ytitle=ytitle, $
-        ytickv=ytickv, yticks=yticks, yminor=yminor, ytickname=ytickn, yticklen=ticklen
+    ; Draw power spectrum.
+    plot, xrange, yrange, $
+        xstyle=5, xlog=1, xrange=xrange, xtitle=xtitle, xtickname=xtickn, $
+        xticklen=xticklen, xtickv=xtickv, xticks=xticks, xminor=xminor, $
+        ystyle=5, ylog=1, yrange=yrange, ytitle=ytitle, ytickname=ytickn, $
+        yticklen=yticklen, ytickv=ytickv, yticks=yticks, yminor=yminor, $
+        noerase=1, position=tpos, nodata=1
+
+    f_spin = 2d/10.8
+    plots, f_spin+[0,0], yrange, linestyle=1
+
+
+;    ; Add Pedersen conductivity.
+;    mu0 = 4*!dpi*1e-7
+;    sigma_pedersens = [1,10]
+;    vpedersens = 1e-3/(mu0*sigma_pedersens)
+;    vplot = minmax(vpedersens>yrange[0])
+;    polyfill, xrange[[0,1,1,0,0]],vplot[[0,0,1,1,0]], color=sgcolor('silver')
+;    tmp1 = convert_coord(xrange[1],vplot[0], /data, /to_normal)
+;    tmp2 = convert_coord(xrange[1],vplot[1], /data, /to_normal)
+;    ty = ((tmp1[1]+tmp2[1])*0.5-ychsz*0.5)>tmp1[1]
+;    tx = tmp1[0]+xchsz*0.5
+;    xyouts, tx, ty, /normal, '1/'+strmu+'!D0!N'+strsigma+'!DP!N!C1-10 S'
+
+
+    e_vars = e_var+['_out','_mag']+'_tmp'
+    b_vars = b_var+['_west','_mag']+'_tmp'
+    labels = ['E!D'+labfac[2]+'!N/B!D'+labfac[1],'|E|/|B|']
+    for var_id=0,1 do begin
+        e_var = e_vars[var_id]
+        b_var = b_vars[var_id]
+        get_data, e_var, ps, edat
+        get_data, b_var, ps, bdat
+        plots, fs, sqrt(edat[*,0]/bdat[*,0])*1e3, color=colors[var_id]
+        tx = tpos[0]+xchsz*0.5
+        ty = tpos[3]-ychsz*(var_id+0.9)
+        msg = labels[var_id]
+        xyouts, tx,ty,normal=1, msg, color=colors[var_id];, charsize=label_size
+    endfor
+
+    ; Draw power spectrum.
+    plot, xrange, yrange, $
+        xstyle=1, xlog=1, xrange=xrange, xtitle=xtitle, xtickname=xtickn, $
+        xticklen=xticklen, xtickv=xtickv, xticks=xticks, xminor=xminor, $
+        ystyle=1, ylog=1, yrange=yrange, ytitle=ytitle, ytickname=ytickn, $
+        yticklen=yticklen, ytickv=ytickv, yticks=yticks, yminor=yminor, $
+        noerase=1, position=tpos, nodata=1
+
+    ; Add label.
+    xyouts, tpos[0]-xchsz*6, tpos[3]-ychsz*0.3, /normal, letters[-1]+'-3) E/B'
 
 
 
@@ -454,19 +579,18 @@ test = 1
         omega_i = event_info['fg'+suf]
         vi = event_info['vi'+suf]
         vf = event_info['vf'+suf]
-        ebr = va*sqrt(1+(ps/omega_i*(vi/vf))^2)
-        plots, ps, ebr, color=red
+        ebr = va*sqrt(1+(fs/omega_i*(vi/vf))^2)
+        plots, fs, ebr, color=red
 
-        index = n_elements(ps)*0.2
-        tmp = convert_coord(ps[index], ebr[index], /data, /to_normal)
-        xyouts, tmp[0]-xchsz*1.5, tmp[1]-ychsz*1.5, color=red, /normal, 'KAW'
+        index = n_elements(fs)*0.2
+        tmp = convert_coord(fs[index], ebr[index], /data, /to_normal)
+        xyouts, tmp[0]-xchsz*1.5, tmp[1]-ychsz*1.8, color=red, /normal, 'KAW'
     endforeach
 
+;    plots, fb+[0,0], yrange, linestyle=1
     ;plots, minmax(ps), vao+[0,0], color=blue, linestyle=1
 
     ;plots, 1d/filter, vao*1.05, color=sgcolor('red')
-
-
 
     sgclose
 

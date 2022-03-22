@@ -29,9 +29,9 @@ test = 0
     tplot_options, 'ticklen', ticklen
     tplot_options, 'zticklen', -0.1
     tplot_options, 'thick', 1
-    tplot_options, 'charsize', 1
-    tplot_options, 'xcharsize', 1
-    tplot_options, 'ycharsize', 1
+    tplot_options, 'charsize', 1d
+    tplot_options, 'xcharsize', 1d
+    tplot_options, 'ycharsize', 1d
 
 
 ;---Calc fig size.
@@ -43,7 +43,7 @@ test = 0
     dy = 0.7
     plot_ypans = [1,dy,dy,1,1]
     nvar = n_elements(plot_vars)
-    fig_labels = (letters(nvar+1))[1:*]+'. '+['Ele','n','T','P',tex2str('beta')]
+    fig_labels = (letters(nvar+1))[1:*]+') '+['Ele','n','T','P',tex2str('beta')]
     the_poss = panel_pos(0, pansize=fig_size, margins=[0,0,0,0], ypans=[1,nvar*0.6], fig_size=fig_size)
 
     plot_file = join_path([srootdir(),'fig_ele_pa.pdf'])
@@ -248,7 +248,7 @@ test = 0
     store_data, prefix+'o_full_density', times, dens*o_dens/(p_dens+o_dens), limits=o_lim
 
     foreach species, ['e','p','o'] do begin
-        rbsp_read_hope_moments, time_range, probe=probe, species=species
+        rbsp_calc_hope_moments, time_range, probe=probe, species=species
         dens = get_var_data(prefix+species+'_density', at=times)
         tavg = get_var_data(prefix+species+'_t_avg', at=times)
         p_thermal = dens*tavg*1e6*1.6e-19*1e9 ; nPa.

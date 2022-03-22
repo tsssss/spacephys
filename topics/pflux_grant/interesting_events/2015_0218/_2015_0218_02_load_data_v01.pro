@@ -648,8 +648,8 @@ pro _2015_0218_02_load_hope_moments, event_info
             old_var = prefix+species_name+'_t_avg'
             new_var = prefix+species_name+'_temp'
             rename_var, old_var, to=new_var
-            old_var = prefix+species_name+'_vbulk'
-            new_var = prefix+species_name+'_v_gsm'
+            old_var = prefix+species_name+'_vbulk_gse'
+            new_var = prefix+species_name+'_v_gse'
             rename_var, old_var, to=new_var
         endforeach
 

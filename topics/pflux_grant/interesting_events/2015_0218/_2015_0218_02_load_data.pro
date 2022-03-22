@@ -649,9 +649,13 @@ pro _2015_0218_02_load_hope_moments, event_info
             old_var = prefix+species_name+'_t_avg'
             new_var = prefix+species_name+'_temp'
             rename_var, old_var, to=new_var
-            old_var = prefix+species_name+'_vbulk'
-            new_var = prefix+species_name+'_v_gsm'
+            old_var = prefix+species_name+'_vbulk_gse'
+            new_var = prefix+species_name+'_v_gse'
             rename_var, old_var, to=new_var
+            get_data, new_var, times, v_gse, limits=lim
+            v_gsm = cotran(v_gse, times, 'gse2gsm')
+            store_data, gsm_var, times, v_gsm, limits=lim
+            options, gsm_var, 'coord', 'GSM'
         endforeach
 
         foreach species_name, species do begin
@@ -755,7 +759,8 @@ pro _2015_0218_02_load_hope_info, event_info
     event_info['efw_num_dens'] = avg_num_dens
 
     emfisis_var = prefix+'emfisis_density'
-    rbsp_read_emfisis_density, time_range, probe=probe
+    if check_if_update(emfisis_var, time_range) then $
+        rbsp_read_emfisis_density, time_range, probe=probe
     num_dens = get_var_data(prefix+'emfisis_density', in=time_range)
     avg_num_dens = mean(num_dens,/nan)
     event_info['emfisis_num_dens'] = avg_num_dens
@@ -791,7 +796,7 @@ pro _2015_0218_02_load_hope_info, event_info
     event_info['omega_o'] = f_g0*avg_bmag*o_mass*2*!dpi
     event_info['fg'] = f_g0*avg_bmag*avg_mass
     event_info['fg_p'] = f_g0*avg_bmag*p_mass
-    event_info['fg_o'] = f_g0*avg_bmag*o_mass    
+    event_info['fg_o'] = f_g0*avg_bmag*o_mass
 
     ; Ion thermal vel, v_i.
     ; MHD: v = sqrt(P/rho), where P = total (P_s), rho = n*mass, P = n*kb*T.
@@ -804,13 +809,13 @@ pro _2015_0218_02_load_hope_info, event_info
     event_info['vi_p'] = 310*sqrt(p_temp*1e-3)
     event_info['vi_o'] = 310*sqrt(o_temp*1e-3)
     event_info['vi'] = 310*sqrt((p_temp*p_ratio+o_temp*o_ratio)*1e-3/avg_mass)
-    
+
     event_info['v_e'] = 310*sqrt(e_temp*1e-3*1836)
 
 
     ; Plasma bulk velocity, v_f
     ; MHD: U = (n_s*m_s*U_s)/rho    Eq (2.64)
-    p_v_gsm = get_var_data(prefix+'p_v_gsm', in=time_range)
+    p_v_gsm = get_var_data(prefix+'p_v_gsm', in=time_range, times=times)
     o_v_gsm = get_var_data(prefix+'o_v_gsm', in=time_range)
     vf_p = mean(snorm(p_v_gsm))
     vf_o = mean(snorm(o_v_gsm))
@@ -818,8 +823,34 @@ pro _2015_0218_02_load_hope_info, event_info
     event_info['vf_o'] = vf_o
     v_gsm = (p_ratio*p_mass*p_v_gsm+o_ratio*o_mass*o_v_gsm)/avg_mass
     event_info['vf'] = mean(snorm(v_gsm))
-    
-    
+    store_data, prefix+'vf_gsm', times, v_gsm
+    add_setting, prefix+'vf_gsm', smart=1, dictionary($
+        'display_type', 'vector', $
+        'unit', 'km/s', $
+        'short_name', 'MHD V', $
+        'coord', 'GSM', $
+        'coord_labels', ['x','y','z'] )
+    q_gsm2fac_var = prefix+'q_gsm2fac'
+    to_fac, prefix+'vf_gsm', to=prefix+'vf_fac', q_var=q_gsm2fac_var
+    var = prefix+'vf_fac'
+    options, var, 'colors', constant('rgb')
+    options, var, 'labels', 'MHD V!D'+['||','west','out']+'!N'
+    get_data, var, times, v_fac, limits=lim
+    event_info['vf'] = abs(mean(v_fac[*,1]))
+
+    store_data, var+'2', times, [[v_fac],[-snorm(v_fac)]], limits=lim
+    options, var+'2', 'colors', [constant('rgb'),sgcolor('black')]
+    options, var+'2', 'labels', ['MHD V_'+['||','west','out']+'!N','-|V|']
+    options, var+'2', 'yrange', [-30,20]
+
+    store_data, var+'_mag', times, snorm(v_fac)
+    add_setting, var+'_mag', smart=1, dictionary($
+        'ynozero', 1, $
+        'yrange', [20,30], $
+        'display_type', 'scalar', $
+        'unit', 'km/s', $
+        'short_name', 'MHD |V|' )
+
     ; Plasma beta.
     mu0 = !dpi*4e-7
     p_b = (event_info['bmag'])^2/(2*mu0)*1e-9   ; nPa.
@@ -848,7 +879,7 @@ pro _2015_0218_02_load_hope_info, event_info
     w_i = event_info['omega']/2/!dpi
     rho_i = c_s/w_i*1e-3    ; km.
     event_info['rho_i'] = rho_i
-    
+
     ; Gyro radius.
     r_p = event_info['vi_p']*1.67e-27/1.6e-19/event_info['bmag']*1e3/1e-9*1e-3  ; km.
     r_o = event_info['vi_o']*16*1.67e-27/1.6e-19/event_info['bmag']*1e3/1e-9*1e-3  ; km.
@@ -957,7 +988,7 @@ end
 function _2015_0218_02_load_data, filename=data_file
 
     if n_elements(data_file) eq 0 then begin
-        data_file = join_path([googledir(),'works','works','pflux_grant','data','2015_0218_02_conjunction.cdf'])
+        data_file = join_path([googledir(),'works','pflux_grant','data','2015_0218_02_conjunction.cdf'])
     endif
 
     if file_test(data_file) eq 0 then begin

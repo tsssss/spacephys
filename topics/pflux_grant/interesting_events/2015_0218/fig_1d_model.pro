@@ -137,9 +137,9 @@ end
 
     plot_file = join_path([srootdir(),'fig_1d_model.pdf'])
     if keyword_set(test) then plot_file = 0
-    sgopen, plot_file, xsize=4, ysize=4
+    sgopen, plot_file, xsize=4, ysize=4, xchsz=xchsz, ychsz=ychsz
     nvar = 6
-    lmarg = 2
+    lmarg = 1
     margins = [10,4,2,1]
     poss = sgcalcpos(nvar, margins=margins)
 
@@ -175,7 +175,7 @@ end
         position=tpos, noerase=1
     tx = xchsz*lmarg
     ty = tpos[3]-ychsz*0.7
-    msg = 'a. |B|'
+    msg = 'a) |B|'
     xyouts, tx,ty,msg, normal=1
 
 ;    tx = tpos[0]+xchsz*1
@@ -210,7 +210,7 @@ end
         position=tpos, noerase=1
     tx = xchsz*lmarg
     ty = tpos[3]-ychsz*0.7
-    msg = 'b. n'
+    msg = 'b) n'
     xyouts, tx,ty,msg, normal=1
 
 
@@ -239,7 +239,7 @@ end
 ;    oplot, z+1, t_e2, color=color2, linestyle=linestyle2
     tx = xchsz*lmarg
     ty = tpos[3]-ychsz*0.7
-    msg = 'c. T!De'
+    msg = 'c) T!De'
     xyouts, tx,ty,msg, normal=1
 
 
@@ -268,7 +268,7 @@ end
 ;    oplot, z+1, v_eth2, color=color2, linestyle=linestyle2
     tx = xchsz*lmarg
     ty = tpos[3]-ychsz*0.7
-    msg = 'd. v!DTe'
+    msg = 'd) v!DTe'
     xyouts, tx,ty,msg, normal=1
 
     tpos = poss[*,4]
@@ -295,7 +295,7 @@ end
         position=tpos, noerase=1
     tx = xchsz*lmarg
     ty = tpos[3]-ychsz*0.7
-    msg = 'e. v!DA'
+    msg = 'e) v!DA'
     xyouts, tx,ty,msg, normal=1
 
     tpos = poss[*,5]
@@ -324,9 +324,9 @@ end
     oplot, minmax(z)+1, [1,1], linestyle=1
     tx = xchsz*lmarg
     ty = tpos[3]-ychsz*0.7
-    msg = 'f. v!DTe!N/v!DA'
+    msg = 'f) v!DTe!N/v!DA'
     xyouts, tx,ty,msg, normal=1
-    
+
     if keyword_set(test) then stop
     sgclose
 

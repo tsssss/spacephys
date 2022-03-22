@@ -5,7 +5,7 @@
 
 ;---Load data and settings.
     event_info = _2015_0218_02_load_data()
-    test = 0
+test = 0
 
 
     probe = event_info['probe']
@@ -65,6 +65,7 @@
         yrange: [1,5e3], $
         ystyle: 1, $
         ylog: 1 }
+    store_data, var, dlimit=0
 ;    var = prefix+'density'
 ;    stplot_merge, [efw_var,emfisis_var], newname=var
 ;    store_data, var, limits={$
@@ -131,10 +132,17 @@
     options, vars, 'xticklen', xticklen
     options, vars, 'yticklen', yticklen
 
+    tplot_options, 'charsize', 1d
+    tplot_options, 'xcharsize', 1d
+    tplot_options, 'ycharsize', 1d
+    tplot_options, 'zcharsize', 1d
+    tplot_options, 'thick', 1d
+    tplot_options, 'zticklen', 0
+
 
     tplot, vars, trange=long_time_range, position=poss
 
-    fig_labels = letters(nvar)+'. '+['AE','e-','H+','N']
+    fig_labels = letters(nvar)+') '+['AE','e-','H+','N']
     for ii=0,nvar-1 do begin
         tpos = poss[*,ii]
         tx = tpos[0]-xchsz*10
@@ -475,7 +483,7 @@
 
     tx = tpos[0]+xchsz*0.5
     ty = tpos[3]-ychsz*1
-    msg = fig_labels2[0]+'. Orbit'
+    msg = fig_labels2[0]+') Orbit'
     xyouts, tx,ty,/normal, msg
 
 
@@ -509,7 +517,7 @@
     cbpos[3] = cbpos[1]+ychsz*0.5
 
     zrange = [0,250]
-    ztitle = 'Photon count (#)'
+    ztitle = 'Count (#)'
     zzs = bytscl(mltimg, min=zrange[0],max=zrange[1], top=top_color)
     sgtv, zzs, ct=asi_ct, position=tpos, resize=1
     sgcolorbar, findgen(top_color), horizontal=1, ztitle=ztitle, zrange=zrange, ct=asi_ct, position=cbpos
@@ -546,7 +554,7 @@
     ; Add labels.
     tx = tpos[0]+xchsz*0.5
     ty = tpos[3]-ychsz*1
-    msg = fig_labels2[1]+'. Auroral beads'
+    msg = fig_labels2[1]+') Auroral beads'
     xyouts, tx,ty,/normal, msg, color=sgcolor('white')
 
     ty = tpos[1]+ychsz*0.2

@@ -57,7 +57,7 @@ function root_data_dir,verbose=verbose
   ; use my default directory.
   case susrhost(/usr) of
     'tshen': def_root = sdiskdir('Research')+'/data/'
-    'shengtian': def_root = sdiskdir('Research')+'/data/'
+    'shengtian': def_root = sdiskdir('data')+'/'
     'Sheng Tian': def_root = sdiskdir('Research')+'/data/'
     else: def_root = join_path([homedir(),'data'])
   endcase

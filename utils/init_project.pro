@@ -27,7 +27,7 @@ function init_project, project_name, errmsg=errmsg, no_save=no_save
     project = dictionary()
     project['name'] = strlowcase(project_name[0])
     project['var'] = project.name+'_project_info'
-    project['root_dir'] = join_path([googledir(),'works','works',project.name])
+    project['root_dir'] = join_path([googledir(),'works',project.name])
     project['data_dir'] = join_path([project.root_dir,'data'])
     project['plot_dir'] = join_path([project.root_dir,'plot'])
     project['code_dir'] = join_path([homedir(),'Projects','idl','spacephys','topics',project.name])

@@ -638,6 +638,8 @@ if ~keyword_set(novtitle) then begin                 ; finish var_labels
   if xcharsz eq 0 then xcharsz = 1d
   if charsz eq 0 then charsz = 1d
   vchsz = double(xcharsz*charsz)
+  xcharsz = double(xcharsz)
+  chsize = double(chsize)
   xspace = vchsz * !d.x_ch_size / !d.x_size
   yspace = chsize * !d.y_ch_size / !d.y_size
   xlmarg = def_opts.xmargin[0] & r = 2d/3

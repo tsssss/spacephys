@@ -29,7 +29,7 @@ function load_project, project_info
     
     ; GoogleDrive appears as different names in different OS.
     if ~file_test(project.root_dir,/directory) then begin
-        project.root_dir = join_path([googledir(),'works','works',project.name])
+        project.root_dir = join_path([googledir(),'works',project.name])
         project.data_dir = join_path([project.root_dir,'data'])
         project.plot_dir = join_path([project.root_dir,'plot'])
         project.code_dir = join_path([homedir(),'Project','idl','spacephys','topics',project.name])

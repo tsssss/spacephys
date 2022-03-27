@@ -42,7 +42,7 @@ pro polar_vs_fac_read_polar_mltimg_time_ranges_gen_file, polar_mltimg_avail_file
 
     for section_id=0,ntime_range-1 do begin
         the_time_range = reform(polar_uvi_time_ranges[section_id,*])
-        polar_read_mltimg, the_time_range
+        polar_read_mlt_image, the_time_range
 
         ; Raw flags.
         get_data, 'po_mltimg', times, mltimgs

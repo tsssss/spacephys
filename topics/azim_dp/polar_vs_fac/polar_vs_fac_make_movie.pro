@@ -23,7 +23,7 @@ foreach time_range, event_list do begin
     movie_file = join_path([root_dir,'polar_vs_fac_movie_'+event_id+'.mp4'])
 
     themis_read_current_mltimg, time_range
-    polar_read_mltimg, time_range
+    polar_read_mlt_image, time_range
 
     uvi_var = 'po_mltimg'
     get_data, uvi_var, times, uvis, limits=lim

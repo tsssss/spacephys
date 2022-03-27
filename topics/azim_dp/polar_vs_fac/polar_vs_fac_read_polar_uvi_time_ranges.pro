@@ -20,7 +20,7 @@ pro polar_vs_fac_read_polar_uvi_time_ranges_gen_file, project_time_range, file=p
             day_time_range = day+[0,secofday]
             lprmsg, strjoin(time_string(day_time_range), ' to '), log_file
 
-            ; Adopted from polar_read_mltimg.
+            ; Adopted from polar_read_mlt_image.
             del_data, uvi_var
             polar_read_uvi, day_time_range, id='l1'
             get_data, uvi_var, ut1s, rate

@@ -38,7 +38,7 @@ pro rbsp_efw_phasef_read_b1_time_rate, tr, probe=probe, datatype=datatype, trang
     local_root = !rbsp_efw.local_data_dir
     local_path = [local_root,rbspx,'efw','l1',datatype+'-split',base]
     remote_root = rbsp_efw_remote_root()
-    remote_path = [remote_root,rbspx,(rbsp_efw_remote_sub_dirs(level='l1',datatype=datatype+'_split'))[0:-2],base]  ; remove YYYY.
+    remote_path = [remote_root,rbspx,(rbsp_efw_remote_sub_dirs(level='l1',datatype=datatype+'-split'))[0:-2],base]  ; remove YYYY.
     local_file = join_path(local_path)
     remote_file = join_path(remote_path)
 

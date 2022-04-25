@@ -98,7 +98,7 @@ endforeach
 
 stop
 
-; **** chop the data according to the spikes at half spin cadance.
+; **** chop the data according to the spikes at half spin cadence.
 
 maxdv0 = 10
 padt0 = 0.05

@@ -2,7 +2,7 @@
 ; Generate L2 burst1 data (E and B fields) v01 cdfs.
 ;-
 
-pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, log_file=log_file
+pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, log_file=log_file, errmsg=errmsg
 
     on_error, 0
     errmsg = ''
@@ -39,7 +39,10 @@ pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, l
     foreach var, vars do begin
         if check_if_update(var) then nodata = 1
     endforeach
-    if nodata then return
+    if nodata then begin
+        errmsg = 'No data ...'
+        return
+    endif
 
     ; Save data to file.
     vars = prefix+'efw_'+['eb1','mscb1']+'_mgse'
@@ -67,7 +70,7 @@ pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, l
         'Generation_date', time_string(systime(1)), $
         'Logical_file_id', prefix+'_efw-l2_burst1_'+time_string(time_range[0],tformat='YYYYMMDDthhmmss')+'_'+version, $
         'Descriptor', 'EFW>Electric Field and Waves', $
-        'TEXT', 'Contacts:  Tami.J.Kovalick@nasa.gov, Rita.C.Johnson@nasa.gov. Burst electric and magneti fields in the M-GSE coordinate system - see the EFW-FAQ (http://rbsp.space.umn.edu/efw_faq.html) for a description of the and the M-GSE coordinate system. The X-component of the E-field estimate, corresponding to the axial component in the spacecraft coordinate system, may contain DC offsets that are not physical. The nominal dynamic range of the E-field estimate is +/- 1 V/m in any component.', $
+        'TEXT', 'Contacts:  Tami.J.Kovalick@nasa.gov, Rita.C.Johnson@nasa.gov. Burst electric and magnetic fields in the M-GSE coordinate system - see the EFW-FAQ (http://rbsp.space.umn.edu/efw_faq.html) for a description of the and the M-GSE coordinate system. The X-component of the E-field estimate, corresponding to the axial component in the spacecraft coordinate system, may contain DC offsets that are not physical. The nominal dynamic range of the E-field estimate is +/- 1 V/m in any component.', $
         'Project', 'RBSP>Radiation Belt Storm Probes' )
     cdf_save_setting, setting, filename=file
 
@@ -178,6 +181,33 @@ pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, l
 end
 
 
+stop
+
+probes = ['a','b']
+b1_time_ranges = time_double(['2013-06-01','2013-06-10'])
+time_step = 15d*60
+
+root_dir = join_path([rbsp_efw_phasef_local_root()])
+secofday = constant('secofday')
+foreach probe, probes do begin
+    prefix = 'rbsp'+probe+'_'
+    rbspx = 'rbsp'+probe
+
+    times = make_bins(minmax(b1_time_ranges),time_step)
+    foreach time, times do begin
+        time_range = time+[0,time_step]
+        base = prefix+'efw-l2_burst1_'+time_string(time,tformat='YYYYMMDDthhmmss')+'_v01.cdf'
+        year_str = time_string(time,tformat='YYYY')
+        file = join_path([root_dir,'l2','burst1_v01',year_str,base])
+if file_test(file) eq 1 then continue
+        rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, errmsg=errmsg
+        print, errmsg
+    endforeach
+stop
+endforeach
+stop
+
+
 date = '2013-06-07'
 probe = 'a'
 
@@ -190,5 +220,5 @@ probe = 'a'
 time_range = time_double(['2013-06-07/02:15','2013-06-07/02:30'])
 file = join_path([homedir(),'test_l2_burst1_v01.cdf'])
 if file_test(file) eq 1 then file_delete, file
-rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file
+rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, errmsg=errmsg
 end

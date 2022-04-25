@@ -132,7 +132,7 @@ foreach tprobe, probes do begin
     nccdt = n_elements(ccdts)
     
     
-; **** chop data according to spikes at half-spin cadance.
+; **** chop data according to spikes at half-spin cadence.
 ; then loop through each half-spin period.
     
     dvb1 = abs(vb1[*,4]-vb1[*,5])

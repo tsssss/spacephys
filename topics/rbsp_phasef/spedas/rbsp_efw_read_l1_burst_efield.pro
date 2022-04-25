@@ -146,7 +146,8 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
         endif
     endif
     
-    
+
+if keyword_set(test) then begin
     vars = prefix+'efw_eb1'+['','_mgse']
     options, vars, 'colors', constant('rgb')
     tplot_options, 'labflag', -1
@@ -166,6 +167,7 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
     xyouts, tx,ty, normal=1, strupcase('RBSP-'+probe)+' Burst1 E field'
     sgclose
     stop
+endif
     
 end
 

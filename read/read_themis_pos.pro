@@ -1,6 +1,6 @@
 ;+
 ; Read themis position in GSM into tplot.
-; Read data at 3 sec cadance.
+; Read data at 3 sec cadence.
 ; deal with single probe: a-e.
 ; set newname to change the name of the tplot var.
 ; set varlist to add the produced tplot vars.

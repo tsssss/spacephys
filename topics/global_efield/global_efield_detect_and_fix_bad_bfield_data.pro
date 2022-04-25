@@ -2,7 +2,7 @@
 ; Detect bad bfield data in the combined_file.
 ;
 ; Check for:
-;   1. Missing data point, should be 1 min cadance.
+;   1. Missing data point, should be 1 min cadence.
 ;   2. Check for discontinuities, through checking large velocity.
 ;-
 

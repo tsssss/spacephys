@@ -25,7 +25,7 @@ foreach time_range, event_list do begin
     themis_read_current_mltimg, time_range
     polar_read_mlt_image, time_range
 
-    uvi_var = 'po_mltimg'
+    uvi_var = 'po_mlt_image'
     get_data, uvi_var, times, uvis, limits=lim
     uvi_npx = n_elements(reform(uvis[0,*,0]))
     fac_var = 'thg_j_ver_mltimg'
@@ -305,9 +305,9 @@ foreach time_range, event_list do begin
         sgclose
     endforeach
 
-stop
+;stop
     if keyword_set(test) then stop
-    spic2movie, movie_file, plot_files=plot_files
+    fig2movie, movie_file, fig_files=plot_files
 
 endforeach
 

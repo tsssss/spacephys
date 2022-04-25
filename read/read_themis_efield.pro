@@ -1,6 +1,6 @@
 ;+
 ; Read themis E field into tplot.
-; Read EFS, which is at 3 sec cadance. EFF is at 1/8 sec but contains gaps.
+; Read EFS, which is at 3 sec cadence. EFF is at 1/8 sec but contains gaps.
 ; deal with single probe: a-e.
 ; set newname to change the name of the tplot var.
 ; set varlist to add the produced tplot vars.

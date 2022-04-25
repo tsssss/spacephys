@@ -1,6 +1,6 @@
 ;+
 ; Read themis B field into tplot.
-; Read FGS, which is at 3 sec cadance.
+; Read FGS, which is at 3 sec cadence.
 ; deal with single probe: a-e.
 ; set newname to change the name of the tplot var.
 ; set varlist to add the produced tplot vars.

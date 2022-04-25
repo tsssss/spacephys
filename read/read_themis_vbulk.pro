@@ -1,6 +1,6 @@
 ;+
 ; Read themis bulk velocity into tplot.
-; Read ESA, which is at 3 sec cadance.
+; Read ESA, which is at 3 sec cadence.
 ; deal with single probe: a-e.
 ; set varlist to add the produced tplot vars.
 ; set times to interpolate all vars to that time.

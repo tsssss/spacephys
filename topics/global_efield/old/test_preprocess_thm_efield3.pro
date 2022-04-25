@@ -1,5 +1,5 @@
 ;+
-; Use L2 EFS spinfit data at 3 sec cadance.
+; Use L2 EFS spinfit data at 3 sec cadence.
 ;-
 
 

@@ -58,7 +58,7 @@ pro plot_uvw2gse_correction, time_range, probe=probe, plot_time=plot_time
     tplot_options, 'labflag', -1
     tplot_options, 'ynozero', 1
 
-    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','plot_uvw2gse_correction'])
+    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','plot_uvw2gse_correction'])
     plot_file = join_path([plot_dir,'plot_uvw2gse_correction_'+prefix+strjoin(time_string(plot_time,tformat='YYYY_MMDD_hhmm_ss'),'_')+'_v01.pdf'])
     if keyword_set(test) then plot_file = 0
 

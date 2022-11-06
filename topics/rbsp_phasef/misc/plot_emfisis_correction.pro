@@ -70,7 +70,7 @@ pro plot_emfisis_correction, time_range, probe=probe, plot_time=plot_time, test=
     tplot_options, 'xticklen', -0.03
 
 
-    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','plot_emfisis_correction'])
+    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','plot_emfisis_correction'])
     plot_file = join_path([plot_dir,'plot_emfisis_correction_'+prefix+strjoin(time_string(plot_time,tformat='YYYY_MMDD_hhmm_ss'),'_')+'_v01.pdf'])
     if keyword_set(test) then plot_file = 0
 

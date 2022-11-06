@@ -66,6 +66,18 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
         errmsg = 'No data ...'
         return
     endif
+    times = dd.x
+    ntime = n_elements(times)
+    if ntime le 2 then begin
+        errmsg = 'Not enough data ...'
+        return
+    endif
+    dtime = times[1:-1]-times[0:-2]
+    index = where(dtime lt 0, count)
+    if count ne 0 then begin
+        errmsg = 'Non monotonic time ...'
+        return
+    endif    
     store_data, v_var, dlimits={data_att:{units:'ADC'}}
     time_range = time_double(tr)
     timespan, time_range[0], total(time_range*[-1,1]), second=1
@@ -78,7 +90,15 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
 ;    boom_shorting_factor = cp.boom_shorting_factor
 
     get_data, v_var, times, vsvy
+    index = uniq(times, sort(times))
+    times = times[index]
+    vsvy = vsvy[index,*]
     ntime = n_elements(times)
+    if ntime le 2 then begin
+        errmsg = 'Not enough data ...'
+        return
+    endif
+    
     ndim = 3
     esvy = dblarr(ntime,ndim)
     for eid=0,ndim-1 do begin
@@ -94,7 +114,8 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
 
 ;---Remove DC offset, use E UVW.
     survey_time_range = minmax(times)+[-1,1]*30
-    rbsp_efw_phasef_read_dc_offset, survey_time_range, probe=probe
+    rbsp_efw_phasef_read_dc_offset, survey_time_range, probe=probe, errmsg=errmsg
+    if errmsg ne '' then return
     get_data, prefix+'efw_e_uvw_dc_offset', uts, euvw_offset
     esvy -= sinterpol(euvw_offset, uts, times)
     store_data, in_var, times, esvy
@@ -111,17 +132,40 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
     rgb = [6,4,2]
     xyz = ['x','y','z']
     get_data, in_var, times, vec, limits=lim
+    ntime = n_elements(times)
+    if ntime le 2 then begin
+        errmsg = 'Not enough data ...'
+        return
+    endif
     vec = cotran(vec, times, 'uvw2'+coord[0], probe=probe, use_orig_quaternion=1)
     out_var = in_var+'_'+coord[0]
-    store_data, out_var, times, vec, limits={$
+;    store_data, out_var, times, vec, limits={$
+;        ytitle:prefix+'burst_efield!C[mV/m]', $
+;        labels:strupcase(coord)+' E'+xyz, $
+;        colors:rgb }
+    
+;---Remove DC background.
+    rbsp_read_e_model, time_range, probe=probe
+    emod_var = prefix+'emod_mgse'
+    get_data, emod_var, uts, vec_bg
+    if ~keyword_set(keep_spin_axis) then vec_bg[*,0] = 0
+    if coord ne 'mgse' then begin
+        vec_bg = cotran(vec_bg, uts, 'mgse2'+coord[0], probe=probe, use_orig_quaternion=1)
+    endif
+    vec_bg = sinterpol(vec_bg, uts, times)
+    store_data, out_var, times, vec-vec_bg, limits={$
         ytitle:prefix+'burst_efield!C[mV/m]', $
         labels:strupcase(coord)+' E'+xyz, $
         colors:rgb }
+    
+    
         
     ; Load shadow flag.
     if ~keyword_set(keep_shadow_spike) then begin
         shadow_trs = rbsp_efw_phasef_read_shadow_spike_time(time_range, probe=probe)
-        index = where(shadow_trs[*,0] le max(times) and shadow_trs[*,1] ge min(times), ntr)
+        if n_elements(shadow_trs) eq 0 then ntr = 0 else begin
+            index = where(shadow_trs[*,0] le max(times) and shadow_trs[*,1] ge min(times), ntr)
+        endelse
         if ntr ne 0 then begin
             get_data, out_var, times, esvy
             shadow_trs = shadow_trs[index,*]
@@ -179,9 +223,12 @@ probe = 'b'
 time_range = ['2013-06-07/02:17:40','2013-06-07/02:19:20']
 probe = 'a'
 
+time_range = ['2016-06-22/21:30','2016-06-22/21:45']
+probe = 'a'
+
 ; Load the spinfit data.
 rbsp_efw_read_l1_burst_efield, time_range, probe=probe, $
-    datatype='vb1-split', coord='mgse', keep_spin_axis=1, apply_dc_flag=1
+    datatype='vb1-split', coord='mgse', keep_spin_axis=1, apply_dc_flag=1, errmsg=errmsg
 
 prefix = 'rbsp'+probe+'_efw_'
 vars = prefix+[$

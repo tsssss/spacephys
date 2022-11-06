@@ -25,7 +25,7 @@ pro stplot_merge, vars, newname = newname, ytitle = ytitle, labels = labels, $
     if ndim eq 0 then message, 'no variables ...'
     if ndim eq 1 then return    ; do nothing.
     get_data, vars[0], t0, f0
-    nrec = n_elements(f0)
+    nrec = n_elements(t0)
     
     ; ytitle and colors.
     if n_elements(ytitle) eq 0 then ytitle = ''
@@ -49,8 +49,7 @@ pro stplot_merge, vars, newname = newname, ytitle = ytitle, labels = labels, $
     ; combined signal.
     s0 = make_array(nrec, ndim, type = size(f0[0],/type))
     for i = 0, ndim-1 do begin
-        get_data, vars[i], t0, f0
-        s0[*,i] = f0
+        s0[*,i] = get_var_data(vars[i], at=t0)
     endfor
 
     store_data, newname, t0, s0, limits = lm

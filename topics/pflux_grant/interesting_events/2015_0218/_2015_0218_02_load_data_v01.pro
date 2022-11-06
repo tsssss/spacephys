@@ -892,7 +892,7 @@ end
 function _2015_0218_02_load_data_v01, filename=data_file
 
     if n_elements(data_file) eq 0 then begin
-        data_file = join_path([googledir(),'works','works','pflux_grant','data','2015_0218_02_conjunction.cdf'])
+        data_file = join_path([googledir(),'works','pflux_grant','data','2015_0218_02_conjunction.cdf'])
     endif
 
     if file_test(data_file) eq 0 then begin

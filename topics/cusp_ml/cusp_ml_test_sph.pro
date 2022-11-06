@@ -4,7 +4,7 @@
 
 pro cusp_ml_test_sph, filename=filename
 
-    root_dir = join_path([googledir(),'works','works','cusp_ml','data'])
+    root_dir = join_path([googledir(),'works','cusp_ml','data'])
     filename = join_path([root_dir,'test_sph.cdf'])
     if n_elements(filename) eq 0 then stop
 

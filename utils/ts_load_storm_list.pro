@@ -10,7 +10,7 @@
 ; max_duration=. A number in sec for the duration above max_value.
 ;-
 
-function find_storm, time_range, pad_time=pad_time, $
+function ts_load_storm_list, time_range, pad_time=pad_time, $
     min_value=min_value, min_duration=min_duration, $
     max_value=max_value, max_duration=max_duration
 
@@ -21,6 +21,7 @@ function find_storm, time_range, pad_time=pad_time, $
         errmsg = handle_error('No input time_range ...')
         return, retval
     endif
+    time_range = time_double(time_range)
 
     default_duration = 3600.
     the_var = 'dst'
@@ -112,7 +113,7 @@ end
 
 time_range = time_double(['2007-03-01','2009-09-01'])
 ;time_range = time_double(['2012','2017'])
-time_ranges = find_storm(time_range)
+time_ranges = ts_load_storm_list(time_range)
 ntime_range = n_elements(time_ranges)/2
 for ii=0, ntime_range-1 do print, strjoin(time_string(reform(time_ranges[ii,*]), tformat='YYYY-MM-DD/hh:mm'), ' ')
 end

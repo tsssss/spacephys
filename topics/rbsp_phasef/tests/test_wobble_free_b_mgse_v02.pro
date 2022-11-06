@@ -78,7 +78,7 @@ prefix = 'rbsp'+probe+'_'
 xyz = constant('xyz')
 rgb = constant('rgb')
 
-path = join_path([googledir(),'works','works','scottthaller','solene_efield_comparison','GSE'])
+path = join_path([googledir(),'works','scottthaller','solene_efield_comparison','GSE'])
 base = apply_time_to_pattern(strupcase(probe)+'_ExBGSE_0andT_BGSE_SCPOT_XGSE_VGSE_%y%m%d.txt', time_range[0])
 file = join_path([path,base])
 if ~file_test(file) then message, 'File does not exist ...'

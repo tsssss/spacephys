@@ -38,7 +38,7 @@ pro rbsp_efw_phasef_read_e_diagonal_spinfit_gen_file, time, probe=probe, filenam
     prefix = 'rbsp'+probe+'_'
     timespan, tr[0], total(tr*[-1,1]), /seconds
 
-    rbsp_load_spice_cdf_file, probe
+    rbsp_efw_read_spice_var, tr, probe=probe
     rbsp_efw_phasef_read_sunpulse_time, tr, probe=probe
     get_data, prefix+'sunpulse_times', common_times
 

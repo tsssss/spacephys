@@ -7,7 +7,7 @@ pro cusp_ml_polar_test_preprocess_density
     probe = 'polar'
 
 ;---Read data.
-    root_dir = join_path([googledir(),'works','works','global_efield','data'])
+    root_dir = join_path([googledir(),'works','global_efield','data'])
 
     files = join_path([root_dir,'density',probe+'_density_*.tplot'])
     files = file_search(files[0])

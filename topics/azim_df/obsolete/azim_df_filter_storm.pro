@@ -47,7 +47,7 @@ pro azim_df_filter_storm, project=project
             prefix = mission_info.prefix
             rvar = prefix+'r_gsm'
 
-            data_file = join_path([googledir(),'works','works','global_efield','data','combined_data',$
+            data_file = join_path([googledir(),'works','global_efield','data','combined_data',$
                 'global_efield_'+mission_probe+'_combined_data_v01.cdf'])
             cdf_load_var, rvar, filename=data_file, time_var='ut_sec'
             ; Should do this but it's faster to use what I already got.

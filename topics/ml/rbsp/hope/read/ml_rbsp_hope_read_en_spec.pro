@@ -3,7 +3,7 @@
 ;-
 
 function ml_rbsp_hope_read_en_spec, input_time_range, probe=probe, $
-    species=input_species, to=out_var, errmsg=errmsg, get_name=get_name
+    species=input_species, to=out_var, errmsg=errmsg, get_name=get_name, resolution=resolution
 
     errmsg = ''
     retval = ''
@@ -43,7 +43,7 @@ function ml_rbsp_hope_read_en_spec, input_time_range, probe=probe, $
 
 
 ;---Read files.
-    files = ml_rbsp_hope_load_en_spec(time_range, probe=probe, errmsg=errmsg)
+    files = ml_rbsp_hope_load_en_spec(time_range, probe=probe, errmsg=errmsg, resolution=resolution)
     if errmsg ne '' then return, retval
 
 ;---Read vars.

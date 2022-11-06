@@ -17,7 +17,7 @@ function azim_dp_vs_fac_search_mlt, roi_list, $
 
 
 ;---Settings.
-    root_dir = join_path([googledir(),'works','works','azim_dp_vs_fac','data'])
+    root_dir = join_path([googledir(),'works','azim_dp_vs_fac','data'])
     if file_test(root_dir) eq 0 then file_mkdir, root_dir
     log_file = join_path([root_dir,'azim_dp_vs_fac_search_mlt.log'])
     out_file = join_path([root_dir,'azim_dp_vs_fac_search_mlt.txt'])

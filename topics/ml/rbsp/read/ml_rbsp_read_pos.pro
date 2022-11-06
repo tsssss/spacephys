@@ -1,8 +1,11 @@
 ;+
 ; Read R in Re.
+; 
+; resolution=. A number for cadence, 5*60 or 60 sec.
 ;-
 
-function ml_rbsp_read_pos, input_time_range, probe=probe, coord=input_coord, errmsg=errmsg, get_name=get_name
+function ml_rbsp_read_pos, input_time_range, probe=probe, $
+    coord=input_coord, errmsg=errmsg, get_name=get_name, resolution=resolution
 
     errmsg = ''
     retval = ''
@@ -32,7 +35,7 @@ function ml_rbsp_read_pos, input_time_range, probe=probe, coord=input_coord, err
     time_range = time_double(input_time_range)
 
 ;---Read files.
-    files = ml_rbsp_load_orbit_var(time_range, probe=probe, errmsg=errmsg)
+    files = ml_rbsp_load_orbit_var(time_range, probe=probe, errmsg=errmsg, resolution=resolution)
     if errmsg ne '' then return, retval
 
 ;---Read vars.

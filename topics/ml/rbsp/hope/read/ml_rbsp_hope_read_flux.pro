@@ -3,7 +3,7 @@
 ;-
 
 function ml_rbsp_hope_read_flux, input_time_range, probe=probe, $
-    species=input_species, energy=input_energy, to=out_var, errmsg=errmsg, get_name=get_name
+    species=input_species, energy=input_energy, to=out_var, errmsg=errmsg, get_name=get_name, resolution=resolution
 
     errmsg = ''
     retval = ''
@@ -16,7 +16,7 @@ function ml_rbsp_hope_read_flux, input_time_range, probe=probe, $
     energy = float(input_energy)
 
 ;---Check input species and probe.
-    en_spec_var = ml_rbsp_hope_read_en_spec(probe=probe, species=input_species, get_name=1)
+    en_spec_var = ml_rbsp_hope_read_en_spec(probe=probe, species=input_species, get_name=1, resolution=resolution)
     if en_spec_var eq '' then begin
         errmsg = 'Invalid input probe, or species ...'
         return, retval
@@ -48,7 +48,7 @@ function ml_rbsp_hope_read_flux, input_time_range, probe=probe, $
 
     time_step = ml_time_step()
     if check_if_update(en_spec_var, time_range, dtime=time_step) then begin
-        en_spec_var = ml_rbsp_hope_read_en_spec(time_range, probe=probe, species=input_species)
+        en_spec_var = ml_rbsp_hope_read_en_spec(time_range, probe=probe, species=input_species, resolution=resolution)
     endif
 
     get_data, en_spec_var, times, en_specs

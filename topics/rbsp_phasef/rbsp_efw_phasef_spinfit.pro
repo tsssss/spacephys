@@ -181,6 +181,8 @@ endif
     phase_mask_ends=phase_mask_ends, $
     sun2sensor=sun2sensor
 
+  print, 'N points stats (mean, median, min, max):'
+  print, mean(n), median(n), min(n), max(n)
 
 
   t2 = systime(/sec)

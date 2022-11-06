@@ -144,7 +144,7 @@ pro azim_df_search_candidate_search_storm, project=project
     foreach key, default_settings.keys() do if ~settings.haskey(key) then settings[key] = default_settings[key]
 
     lprmsg, 'Find storms from '+strjoin(time_string(settings.time_range),' to ')+' ...'
-    storm_times = find_storm(settings.time_range, $
+    storm_times = ts_load_storm_list(settings.time_range, $
         pad_time=settings.storm_pad_time, $
         min_value=settings.min_dst, min_duration=settings.min_dst_duration, $
         max_value=settings.max_dst)

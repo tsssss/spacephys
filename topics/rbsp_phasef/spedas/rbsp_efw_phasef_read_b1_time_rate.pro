@@ -35,19 +35,21 @@ pro rbsp_efw_phasef_read_b1_time_rate, tr, probe=probe, datatype=datatype, trang
 
     rbspx = 'rbsp'+probe
     base = rbspx+'_efw_l1_'+datatype+'_time_rate_v01.cdf'
+    base_remote = rbspx+'_l1_'+datatype+'_time_rate_v01.cdf'
     local_root = !rbsp_efw.local_data_dir
     local_path = [local_root,rbspx,'efw','l1',datatype+'-split',base]
     remote_root = rbsp_efw_remote_root()
-    remote_path = [remote_root,rbspx,(rbsp_efw_remote_sub_dirs(level='l1',datatype=datatype+'-split'))[0:-2],base]  ; remove YYYY.
+;    remote_path = [remote_root,rbspx,(rbsp_efw_remote_sub_dirs(level='l1',datatype=datatype+'-split'))[0:-2],base]  ; remove YYYY.
+    remote_path = [remote_root,'documents','efw',base_remote]  ; remove YYYY.
     local_file = join_path(local_path)
     remote_file = join_path(remote_path)
 
     url = remote_file
     spd_download_expand, url, last_version=1, $
-        ssl_verify_peer=ssl_verify_peer, ssl_verify_host=ssl_verify_host, _extra=_extra
+        ssl_verify_peer=0, ssl_verify_host=0, _extra=_extra
     base = file_basename(url)
     local_file = join_path([file_dirname(local_file),base])
-    tmp = spd_download_file(url=url, filename=local_file)
+    tmp = spd_download_file(url=url, filename=local_file, ssl_verify_peer=0, ssl_verify_host=0)
 
     time_ranges = cdf_read_var('time_range', filename=local_file)
     sample_rate = cdf_read_var('median_sample_rate', filename=local_file)

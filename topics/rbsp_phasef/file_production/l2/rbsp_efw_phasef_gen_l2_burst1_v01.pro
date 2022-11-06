@@ -2,7 +2,8 @@
 ; Generate L2 burst1 data (E and B fields) v01 cdfs.
 ;-
 
-pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, log_file=log_file, errmsg=errmsg
+pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, $
+    log_file=log_file, errmsg=errmsg, keep_spin_axis=keep_spin_axis, keep_shadow_spike=keep_shadow_spike
 
     on_error, 0
     errmsg = ''
@@ -27,13 +28,15 @@ pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, l
         lprmsg, errmsg, log_file
         return
     endif
+    if n_elements(keep_spin_axis) eq 0 then keep_spin_axis = 1
+    if n_elements(keep_shadow_spike) eq 0 then keep_shadow_spike = 1
     prefix = 'rbsp'+probe+'_'
     rbspx = 'rbsp'+probe
 
 
     vars = prefix+'efw_'+['eb1','mscb1']+'_mgse'
     del_data, vars
-    rbsp_efw_read_l1_burst_efield, time_range, probe=probe, keep_spin_axis=1
+    rbsp_efw_read_l1_burst_efield, time_range, probe=probe, keep_spin_axis=keep_spin_axis, keep_shadow_spike=keep_shadow_spike
     rbsp_efw_read_l1_burst_bfield, time_range, probe=probe
     nodata = 0
     foreach var, vars do begin
@@ -97,7 +100,7 @@ pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, l
 
     cdf_save_var, e_var, value=float(e_mgse), filename=file
     setting = dictionary($
-        'VAR_NOTES', 'Electric field in the MGSE coordinate system, DC offset removed', $
+        'VAR_NOTES', 'Electric field in the MGSE coordinate system, DC offset removed, in the frame of the corotating plasma, shadow spikes in the spin-axis component are not removed', $
         'FIELDNAM', 'Efield(MGSE)', $
         'SCALETYP', 'linear', $
         'DEPEND_0', time_var, $
@@ -181,44 +184,122 @@ pro rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, l
 end
 
 
+;time_range = time_double(['2013-06-07/09:45','2013-06-07/10:00'])
+;time_range = time_double(['2013-06-07/04:45','2013-06-07/05:00'])
+;probe = 'b'
+;file = join_path([homedir(),'test_l2_burst1_v01.cdf'])
+;if file_test(file) eq 1 then file_delete, file
+;rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, errmsg=errmsg, keep_spin_axis=0, keep_shadow_spike=0
+;
+;rbsp_efw_read_l3, time_range, probe=probe
+;
+;prefix = 'rbsp'+probe+'_'
+;vars = prefix+['efw_eb1_mgse','efw_esvy','e_uvw','efw_efield_in_corotation_frame_spinfit_mgse']
+;var = prefix+'efw_esvy'
+;get_data, var, times, vec
+;vec[*,2] = 0
+;store_data, var, times, vec
 stop
 
-probes = ['a','b']
-b1_time_ranges = time_double(['2013-06-01','2013-06-10'])
-time_step = 15d*60
+; This is a batch run over long time period.
+; Be very careful to check if you need to run this.
 
-root_dir = join_path([rbsp_efw_phasef_local_root()])
-secofday = constant('secofday')
+
+; Settings on m472e, need to download all B1 data first.
+spawn, 'hostname', host
+case host of
+    'm472e.space.umn.edu': begin
+        in_local_root = '/Volumes/data/rbsp'
+        out_local_root = in_local_root
+        end
+    'xwaves7.space.umn.edu': begin
+        in_local_root = '/Volumes/DataA/RBSP/data/rbsp'
+        out_local_root = '/Volumes/UserA/user_volumes/kersten/data_external/rbsp'
+        end
+    else: begin
+        out_local_root = '/Volumes/data/rbsp'
+        end
+endcase
+root_dir = out_local_root
+
+
+probes = ['b','a']
+mission_time_range = time_double(['2018-12-30','2020'])
+;mission_time_range = time_double(['2012','2015'])
+;mission_time_range = time_double(['2012','2012-10-01'])
+time_step = 15d*60
+; Loop through each probe.
 foreach probe, probes do begin
     prefix = 'rbsp'+probe+'_'
     rbspx = 'rbsp'+probe
-
-    times = make_bins(minmax(b1_time_ranges),time_step)
-    foreach time, times do begin
-        time_range = time+[0,time_step]
-        base = prefix+'efw-l2_burst1_'+time_string(time,tformat='YYYYMMDDthhmmss')+'_v01.cdf'
-        year_str = time_string(time,tformat='YYYY')
-        file = join_path([root_dir,'l2','burst1_v01',year_str,base])
+    
+    rbsp_efw_phasef_read_b1_time_rate, mission_time_range, probe=probe
+    var = prefix+'efw_vb1_time_rate'
+    b1_time_ranges = get_var_data(var)
+    index = where(b1_time_ranges[*,0] ge mission_time_range[0] and b1_time_ranges[*,1] le mission_time_range[1], count)
+    if count eq 0 then continue
+    b1_time_ranges = b1_time_ranges[index,*]
+    nb1_time_range = n_elements(b1_time_ranges)*0.5
+    ; Loop through each b1 time range.
+    for time_range_id=0,nb1_time_range-1 do begin
+        the_time_range = reform(b1_time_ranges[time_range_id,*])
+        times = make_bins(the_time_range, time_step)
+        ; Breakdown b1 time range into the wanted cadence.
+        foreach time, times do begin
+            ; Process the b1 data for the given time range.
+            time_range = time+[0,time_step]
+            base = prefix+'efw-l2_burst1_'+time_string(time,tformat='YYYYMMDDthhmmss')+'_v01.cdf'
+            year_str = time_string(time,tformat='YYYY')
+            file = join_path([root_dir,rbspx,'l2','burst1_v01',year_str,base])
+print, file
 if file_test(file) eq 1 then continue
-        rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, errmsg=errmsg
-        print, errmsg
-    endforeach
-stop
+del_data, '*'
+            rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, errmsg=errmsg
+            print, errmsg
+        endforeach
+    endfor
+    stop
 endforeach
+
 stop
+;
+;;probes = ['a','b']
+;;b1_time_ranges = time_double(['2013-06-01','2013-06-10'])
+;;time_step = 15d*60
+;;
+;;root_dir = join_path([rbsp_efw_phasef_local_root()])
+;;secofday = constant('secofday')
+;;foreach probe, probes do begin
+;;    prefix = 'rbsp'+probe+'_'
+;;    rbspx = 'rbsp'+probe
+;;
+;;    times = make_bins(minmax(b1_time_ranges),time_step)
+;;    foreach time, times do begin
+;;        time_range = time+[0,time_step]
+;;        base = prefix+'efw-l2_burst1_'+time_string(time,tformat='YYYYMMDDthhmmss')+'_v01.cdf'
+;;        year_str = time_string(time,tformat='YYYY')
+;;        file = join_path([root_dir,'l2','burst1_v01',year_str,base])
+;;if file_test(file) eq 1 then continue
+;;        rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, errmsg=errmsg
+;;        print, errmsg
+;;    endforeach
+;;stop
+;;endforeach
+;;stop
+;
+;
+;date = '2013-06-07'
+;probe = 'a'
+;
+;;secofday = constant('secofday')
+;;the_date = time_double(date)
+;;time_step = 15*60d
+;;the_times = make_bins(the_date+[0,secofday], time_step)
+;;ntime = n_elements(the_times)-1
+;
+;time_range = time_double(['2013-06-07/02:15','2013-06-07/02:30'])
+;file = join_path([homedir(),'test_l2_burst1_v01.cdf'])
+;if file_test(file) eq 1 then file_delete, file
+;rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, errmsg=errmsg
 
-
-date = '2013-06-07'
-probe = 'a'
-
-;secofday = constant('secofday')
-;the_date = time_double(date)
-;time_step = 15*60d
-;the_times = make_bins(the_date+[0,secofday], time_step)
-;ntime = n_elements(the_times)-1
-
-time_range = time_double(['2013-06-07/02:15','2013-06-07/02:30'])
-file = join_path([homedir(),'test_l2_burst1_v01.cdf'])
-if file_test(file) eq 1 then file_delete, file
-rbsp_efw_phasef_gen_l2_burst1_v01, time_range, probe=probe, filename=file, errmsg=errmsg
 end

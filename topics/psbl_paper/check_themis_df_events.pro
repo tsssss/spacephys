@@ -10,76 +10,95 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
 ;---Events.
     event_list = list()
 
+
+    ; Streamer event.
+    event_list.add, dictionary($
+        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
+        'onset_time_range', time_double(['2008-01-21/07:40','2008-01-21/07:50']), $
+        'probes', ['a'] )
+    event_list.add, dictionary($
+        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
+        'onset_time_range', time_double(['2008-01-21/07:10','2008-01-21/07:20']), $
+        'probes', ['a'] )
+    event_list.add, dictionary($
+        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
+        'onset_time_range', time_double(['2008-01-21/07:22','2008-01-21/07:28']), $
+        'probes', ['a'] )
+    event_list.add, dictionary($
+        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
+        'onset_time_range', time_double(['2008-01-21/07:28','2008-01-21/07:38']), $
+        'probes', ['a'] )
+
 ;    ; Angeloupolos 2008.
 ;    event_list.add, dictionary($
 ;        'time_range', ['2007-03-23/11:17','2007-03-23/11:22'], $
 ;        'probes', ['a','b','c','d','e'] )
 
-    ; Ogasawara+ 2011.
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-02-26/03:50','2008-02-26/04:20']), $
-        'onset_time_range', time_double(['2008-02-26/04:00','2008-02-26/04:10']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2009-04-14/08:50','2009-04-14/09:20']), $
-        'onset_time_range', time_double(['2009-04-14/09:07','2009-04-14/09:12']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($    ; Duplicated events?
-        'time_range', time_double(['2009-03-23/05:50','2009-03-23/06:20']), $
-        'onset_time_range', time_double(['2009-03-23/06:03','2009-03-23/06:10']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2009-03-14/04:50','2009-03-14/05:20']), $
-        'onset_time_range', time_double(['2009-03-14/05:05','2009-03-14/05:12']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2009-03-14/03:50','2009-03-14/04:20']), $
-        'onset_time_range', time_double(['2009-03-14/04:03','2009-03-14/04:10']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2009-03-14/01:20','2009-03-14/01:50']), $
-        'onset_time_range', time_double(['2009-03-14/01:35','2009-03-14/01:40']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2009-02-28/05:20','2009-02-28/05:50']), $
-        'onset_time_range', time_double(['2009-02-28/05:34','2009-02-28/05:44']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($    ; E field bad on e.
-        'time_range', time_double(['2009-02-22/08:10','2009-02-22/08:45']), $
-        'onset_time_range', time_double(['2009-02-22/08:25','2009-02-22/08:35']), $
-        'probes', ['d'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-03-30/06:15','2008-03-30/06:45']), $
-        'onset_time_range', time_double(['2008-03-30/06:28','2008-03-30/06:33']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-03-27/07:20','2008-03-27/07:45']), $
-        'onset_time_range', time_double(['2008-03-27/07:28','2008-03-27/07:32']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-03-11/05:40','2008-03-11/06:10']), $
-        'onset_time_range', time_double(['2008-03-11/05:53','2008-03-11/06:00']), $
-        'probes', ['d','e'] )
-;    event_list.add, dictionary($    ; E field bad.
-;        'time_range', time_double(['2008-03-03/07:50','2008-03-03/08:30']), $
-;        'onset_time_range', time_double(['2008-03-03/08:00','2008-03-03/08:10']), $
+;    ; Ogasawara+ 2011.
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-02-26/03:50','2008-02-26/04:20']), $
+;        'onset_time_range', time_double(['2008-02-26/04:00','2008-02-26/04:10']), $
 ;        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-03-02/06:40','2008-03-02/07:20']), $
-        'onset_time_range', time_double(['2008-03-02/06:58','2008-03-02/07:05']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-02-27/02:10','2008-02-27/03:30']), $
-        'onset_time_range', time_double(['2008-02-27/02:42','2008-02-27/02:55']), $
-        'probes', ['d','e'] )
-    event_list.add, dictionary($    ; E field bad on e
-        'time_range', time_double(['2008-02-05/11:50','2008-02-05/12:30']), $
-        'onset_time_range', time_double(['2008-02-05/12:07','2008-02-05/12:13']), $
-        'probes', ['d'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-01-26/10:00','2008-01-26/10:50']), $
-        'onset_time_range', time_double(['2008-01-26/10:20','2008-01-26/10:30']), $
-        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2009-04-14/08:50','2009-04-14/09:20']), $
+;        'onset_time_range', time_double(['2009-04-14/09:07','2009-04-14/09:12']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($    ; Duplicated events?
+;        'time_range', time_double(['2009-03-23/05:50','2009-03-23/06:20']), $
+;        'onset_time_range', time_double(['2009-03-23/06:03','2009-03-23/06:10']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2009-03-14/04:50','2009-03-14/05:20']), $
+;        'onset_time_range', time_double(['2009-03-14/05:05','2009-03-14/05:12']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2009-03-14/03:50','2009-03-14/04:20']), $
+;        'onset_time_range', time_double(['2009-03-14/04:03','2009-03-14/04:10']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2009-03-14/01:20','2009-03-14/01:50']), $
+;        'onset_time_range', time_double(['2009-03-14/01:35','2009-03-14/01:40']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2009-02-28/05:20','2009-02-28/05:50']), $
+;        'onset_time_range', time_double(['2009-02-28/05:34','2009-02-28/05:44']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($    ; E field bad on e.
+;        'time_range', time_double(['2009-02-22/08:10','2009-02-22/08:45']), $
+;        'onset_time_range', time_double(['2009-02-22/08:25','2009-02-22/08:35']), $
+;        'probes', ['d'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-03-30/06:15','2008-03-30/06:45']), $
+;        'onset_time_range', time_double(['2008-03-30/06:28','2008-03-30/06:33']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-03-27/07:20','2008-03-27/07:45']), $
+;        'onset_time_range', time_double(['2008-03-27/07:28','2008-03-27/07:32']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-03-11/05:40','2008-03-11/06:10']), $
+;        'onset_time_range', time_double(['2008-03-11/05:53','2008-03-11/06:00']), $
+;        'probes', ['d','e'] )
+;;    event_list.add, dictionary($    ; E field bad.
+;;        'time_range', time_double(['2008-03-03/07:50','2008-03-03/08:30']), $
+;;        'onset_time_range', time_double(['2008-03-03/08:00','2008-03-03/08:10']), $
+;;        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-03-02/06:40','2008-03-02/07:20']), $
+;        'onset_time_range', time_double(['2008-03-02/06:58','2008-03-02/07:05']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-02-27/02:10','2008-02-27/03:30']), $
+;        'onset_time_range', time_double(['2008-02-27/02:42','2008-02-27/02:55']), $
+;        'probes', ['d','e'] )
+;    event_list.add, dictionary($    ; E field bad on e
+;        'time_range', time_double(['2008-02-05/11:50','2008-02-05/12:30']), $
+;        'onset_time_range', time_double(['2008-02-05/12:07','2008-02-05/12:13']), $
+;        'probes', ['d'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-01-26/10:00','2008-01-26/10:50']), $
+;        'onset_time_range', time_double(['2008-01-26/10:20','2008-01-26/10:30']), $
+;        'probes', ['d','e'] )
 
 
 
@@ -99,8 +118,8 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
         foreach probe, probes do begin
             prefix = 'th'+probe+'_'
             themis_read_efield, time_range, probe=probe
-            themis_read_bfield, time_range, probe=probe
-            themis_read_orbit, time_range, probe=probe
+            b_var = themis_read_bfield(time_range, probe=probe)
+            r_var = themis_read_orbit(time_range, probe=probe)
             themis_read_density, time_range, probe=probe
 
             get_data, prefix+'b_gsm', times

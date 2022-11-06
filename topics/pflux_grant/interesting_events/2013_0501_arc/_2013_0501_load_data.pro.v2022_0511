@@ -27,16 +27,16 @@ pro _2013_0501_load_data
     dfuts = time_double(['2013-05-01/07:38'])  ; DF time.
 
 
-    rootdir = shomedir()+'/Google Drive/works/works/rbsp_psbl1'
-    datdir = rootdir+'/data'
+    rootdir = join_path([googledir(),'works','pflux_grant','2013_0501_arc'])
+    datdir = join_path([rootdir,'data'])
     if file_test(datdir,/directory) eq 0 then file_mkdir, datdir
-    datfn = datdir+'/2013_0501_all_data.tplot'
+    datfn = join_path([datdir,'2013_0501_all_data.tplot'])
     if file_test(datfn) eq 1 then tplot_restore, filename=datfn
 
     ; control loading behavior.
     reload_pos = 0
     reload_map = 0
-    reload_info = 1
+    reload_info = 0
     reload_eb = 0
     reload_pf = 0
     reload_asi = 0
@@ -322,11 +322,8 @@ pro _2013_0501_load_data
             muvw2gsm = transpose(qtom(quvw2gsm))
 
             ; load B.
-            emfisis = sread_rbsp_emfisis_l3(utr0, type='hires', probe=tprobe, coord='gsm')
-            tuts = sfmepoch(emfisis.epoch,'unix')
-            bgsm = sinterpol(emfisis.mag,tuts,uts)
-            store_data, pre0+'b_gsm', uts, bgsm, $
-                limits = {ytitle:'(nT)', labels:'GSM B'+xyz, colors:rgb}
+            rbsp_read_bfield, utr0, probe=tprobe, resolution='hires'
+            get_data, pre0+'b_gsm', uts, bgsm
             b0gsm = bgsm
             for i=0,2 do b0gsm[*,i] = scalcbg(bgsm[*,i])
             store_data, pre0+'b0_gsm', uts, b0gsm, $

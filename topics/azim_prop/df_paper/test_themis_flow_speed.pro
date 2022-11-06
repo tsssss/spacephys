@@ -38,7 +38,7 @@ pro plot_themis_flow_along_orbit, time_range, probes=probes
     colors = [constant('rgb'),sgcolor('purple'),sgcolor('orange')]
     rs = list()
     us = list()
-    root_dir = join_path([googledir(),'works','works','global_efield','data'])
+    root_dir = join_path([googledir(),'works','global_efield','data'])
     foreach probe, probes, probe_id do begin
         prefix = 'th'+probe+'_'
         color = colors[probe_id]

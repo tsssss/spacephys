@@ -64,7 +64,7 @@ end
 
 function azim_prop_load_project
 
-    root_dir = join_path([googledir(),'works','works','azim_prop','ten_event_paper'])
+    root_dir = join_path([googledir(),'works','azim_prop','ten_event_paper'])
 
 ;---Basic info.
     project = dictionary()

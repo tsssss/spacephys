@@ -10,18 +10,21 @@ function azim_dp_vs_fac_search_roi, time_range, probes=probes, $
 ;---Check input.
     roi_list = list()
     if n_elements(time_range) ne 2 then return, roi_list
-    if n_elements(roi_min_count) eq 0 then roi_min_count = 6    ; #.
+    if n_elements(roi_min_count) eq 0 then roi_min_count = 5    ; #.
     if n_elements(probes) lt roi_min_count then probes = ['th'+letters('e'),'rbsp'+letters('b'),'mms1','g'+string(make_bins([10,17],1),format='(I0)')]
     if n_elements(mlt_range) ne 2 then mlt_range = [-1,1]*9     ; hr.
     if n_elements(rxy_range) ne 2 then rxy_range = [4.,30]      ; Re.
     if n_elements(pdyn) eq 0 then pdyn = 10.    ; nPa.
+    if n_elements(roi_min_duration) eq 0 then roi_min_duration = 1800.  ; sec.
+    errmsg = ''
 
 
 ;---Settings.
-    root_dir = join_path([googledir(),'works','works','azim_dp_vs_fac','data'])
+    root_dir = join_path([googledir(),'works','azim_dp_vs_fac','data'])
     if file_test(root_dir) eq 0 then file_mkdir, root_dir
-    log_file = join_path([root_dir,'azim_dp_vs_fac_search_roi.log'])
-    out_file = join_path([root_dir,'azim_dp_vs_fac_search_roi.txt'])
+    base = 'azim_dp_vs_fac_search_roi_'+time_string(mean(time_range),tformat='YYYY')
+    log_file = join_path([root_dir,base+'.log'])
+    out_file = join_path([root_dir,base+'.txt'])
     if keyword_set(test) then begin
         log_file = -1
         out_file = -1
@@ -43,7 +46,6 @@ function azim_dp_vs_fac_search_roi, time_range, probes=probes, $
     foreach file, files do if file_test(file) eq 0 then ftouch, file
 
 ;---Search for ROI times.
-    roi_min_duration = 3600.    ; sec.
     tab = constant('4space')
 
     lprmsg, 'Search roi_list for azim_dp_vs_fac', log_file
@@ -132,9 +134,12 @@ function azim_dp_vs_fac_search_roi, time_range, probes=probes, $
 end
 
 time_range = time_double(['2008-01-01','2018-01-01'])
-;time_range = time_double(['2013-06-06','2013-06-09'])
-;time_range = time_double(['2016-10-12','2016-10-14'])
-roi_list = azim_dp_vs_fac_search_roi(time_range, reset=1)
+years = 2012
+pad_time = 3600d
+foreach year, years, year_id do begin
+    time_range = time_double(string(year+[0,1],format='(I4)'))+[-1,1]*pad_time
+    roi_list = azim_dp_vs_fac_search_roi(time_range, reset=1)
+endforeach
 
 
 end

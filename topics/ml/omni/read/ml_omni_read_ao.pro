@@ -23,7 +23,7 @@ function ml_omni_read_ao, input_time_range, get_name=get_name
     al_var = ml_omni_read_param_var(input_time_range, var='al')
     get_data, au_var, times, au
     get_data, al_var, times, al
-    store_data, var, times, (au+al*0.5
+    store_data, var, times, (au+al)*0.5
     add_setting, var, smart=1, dictionary($
         'display_type', 'scalar', $
         'short_name', 'AO', $

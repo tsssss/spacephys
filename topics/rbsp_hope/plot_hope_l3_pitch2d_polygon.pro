@@ -194,11 +194,65 @@ pro plot_hope_l3_pitch2d_polygon, t0, type0, probe = probe, unit = unit0, $
 ;    sgpsclose, /pdf
 end
 
-utr = time_double(['2013-05-01/07:35','2013-05-01/07:50'])
+time_range = time_double(['2013-05-01/07:25','2013-05-01/07:50'])
+probe = 'b'
+
+prefix = 'rbsp'+probe+'_'
+rbsp_read_hope_moments, time_range, probe=probe
+r_var = rbsp_read_orbit(time_range, probe=probe, coord='gse')
+rbsp_read_bfield, time_range, probe=probe
+b_var = prefix+'b_gse'
+get_data, prefix+'b_gsm', times, vec, limits=lim
+vec = cotran(vec, times, 'gsm2gse')
+store_data, b_var, times, vec, limits=lim
+options, b_var, 'coord', 'GSE'
+
+define_fac, b_var, r_var, time_var=r_var
+
+vars = prefix+['p','o']+'_vbulk'
+foreach var, vars do begin
+    in_var = var+'_gse'
+    options, in_var, 'coord', 'GSE'
+    options, in_var, 'short_name', 'V'
+    options, in_var, 'unit', 'km/s'
+    to_fac, var+'_gse', to=var+'_fac'
+endforeach
+
+_2013_0501_load_data
+
+
+get_data, 'rbb_de_fac', times, de_fac
+get_data, 'rbb_b0_gsm', uts, b0_gsm
+b0 = interpol(snorm(b0_gsm),uts, times)
+ntime = n_elements(times)
+ndim = 3
+b0_fac = fltarr(ntime,ndim)
+b0_fac[*,0] = b0
+v_fac = vec_cross(de_fac,b0_fac)
+for ii=0,ndim-1 do v_fac[*,ii] /= (b0^2*1e-3)
+store_data, prefix+'vexb_fac', times, v_fac
+add_setting, prefix+'vexb_fac', smart=1, dictionary($
+    'unit', 'km/s', $
+    'display_type', 'vector', $
+    'short_name', 'ExB V', $
+    'coord', 'FAC', $
+    'coord_labels', ['b','w','o'] )
+
+
+vars = [prefix+['b_gse','p_vbulk_gse','o_vbulk_gse','vexb_fac'],'rbb_'+['de_fac','db_fac']]
+options, vars, 'colors', constant('rgb')
+
+v1_fac = get_var_data(prefix+'vexb_fac', times=times, in=time_range)
+v2_fac = get_var_data(prefix+'p_vbulk_fac', at=times)
+
+    
+stop
+
+utr = time_double(['2013-05-01/07:25','2013-05-01/07:50'])
 uts = smkarthm(utr[0],utr[1],12,'dx')
 ;uts = time_double(['2013-05-01/07:36:43'])
-log = 0
-unit = 'velocity'
+log = 1
+unit = 'energy'
 types = ['electron','proton','oxygen','helium']
 probes = ['b']
 

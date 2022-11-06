@@ -61,6 +61,18 @@ pro rbsp_efw_read_l1_burst_bfield, tr, probe=probe, $
         errmsg = 'No data ...'
         return
     endif
+    times = dd.x
+    ntime = n_elements(times)
+    if ntime le 2 then begin
+        errmsg = 'Not enough data ...'
+        return
+    endif
+    dtime = times[1:-1]-times[0:-2]
+    index = where(dtime lt 0, count)
+    if count ne 0 then begin
+        errmsg = 'Non monotonic time ...'
+        return
+    endif
     store_data, in_var, dlimits={data_att:{units:'ADC'}}
     time_range = time_double(tr)
     timespan, time_range[0], total(time_range*[-1,1]), second=1
@@ -71,6 +83,15 @@ pro rbsp_efw_read_l1_burst_bfield, tr, probe=probe, $
     rgb = [6,4,2]
     xyz = ['x','y','z']
     get_data, in_var, times, vec, limits=lim
+    index = uniq(times, sort(times))
+    times = times[index]
+    vec = vec[index,*]
+    ntime = n_elements(times)
+    if ntime le 2 then begin
+        errmsg = 'Not enough data ...'
+        return
+    endif
+    
     vec = cotran(vec, times, 'uvw2'+coord[0], probe=probe, use_orig_quaternion=1)
     out_var = in_var+'_'+coord[0]
     store_data, out_var, times, vec, limits={$

@@ -97,7 +97,7 @@ pro test_raw_perigee_correction, time_range, probe=probe
         'ystyle', 1 )
 
 
-    root_dir = join_path([googledir(),'works','works','rbsp_phase_f','data','raw_perigee_residue'])
+    root_dir = join_path([googledir(),'works','rbsp_phase_f','data','raw_perigee_residue'])
     base_name = prefix+'raw_perigee_residue_'+time_string(time_range[0],tformat='YYYY')+'.cdf'
     cdf_file = join_path([root_dir, base_name])
     if file_test(cdf_file) then file_delete, cdf_file

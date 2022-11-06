@@ -2,7 +2,7 @@
 ; Read all substorm_list.
 ;-
 
-root_dir = join_path([googledir(),'works','works','azim_dp_vs_fac'])
+root_dir = join_path([googledir(),'works','azim_dp_vs_fac'])
 file = join_path([root_dir,'data','azim_dp_vs_fac_substorm_list.txt'])
 plot_dir = join_path([root_dir,'plot'])
 candidate_list = azim_dp_candidate_read(filename=file)

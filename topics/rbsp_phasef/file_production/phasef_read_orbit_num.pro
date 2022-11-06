@@ -1,6 +1,6 @@
 ;+
 ; Read orbit number.
-; Adopted fromrbsp_read_ect_mag_ephem.
+; Adopted from rbsp_read_ect_mag_ephem.
 ;
 ; date. A string or double (unix time) for the wanted date.
 ; probe=. A string 'a' or 'b'.

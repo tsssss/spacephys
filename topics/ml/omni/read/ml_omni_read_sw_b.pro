@@ -13,7 +13,7 @@ function ml_omni_read_sw_b, input_time_range, get_name=get_name, coord=input_coo
 
 ;---Return if only name is needed.
     prefix = 'omni_'
-    coord_var = prefix+'sw_'+coord
+    coord_var = prefix+'sw_b_'+coord
     if keyword_set(get_name) then return, coord_var
 
 ;---Check input time range.

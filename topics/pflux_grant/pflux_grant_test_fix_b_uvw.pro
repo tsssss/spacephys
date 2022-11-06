@@ -175,7 +175,7 @@ stop
         store_data, var, times, yy-yfit, limits={ytitle:'(mV/m)', labels:'dE'+xyz[ii]}
     endforeach
     
-;    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','test_perigee_new_b_correction'])
+;    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','test_perigee_new_b_correction'])
 ;    plot_file = join_path([plot_dir,'fig_test_regression_'+prefix+strjoin(time_string(the_time_range,tformat='YYYY_MMDD_hhmm'),'_')+'_v01.pdf'])
     test = 1
     if keyword_set(test) then plot_file = test

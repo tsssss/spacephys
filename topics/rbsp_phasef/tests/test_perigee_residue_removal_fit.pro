@@ -170,7 +170,7 @@ pro test_perigee_residue_removal_fit, day, probe=probe
 
 ;---Plot.
 test = 0
-    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','test_perigee_residue_removal_fit'])
+    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','test_perigee_residue_removal_fit'])
     plot_file = join_path([plot_dir,'fig_test_perigee_residue_removal_fit_'+prefix+strjoin(time_string(perigee_time_range,tformat='YYYY_MMDD_hhmm'),'_')+'_v01.pdf'])
     plot_file = join_path([plot_dir,'fig_test_perigee_residue_removal_fit_'+prefix+time_string(time_range[0],tformat='YYYY_MMDD')+'_v01.pdf'])
     if keyword_set(test) then plot_file = 0

@@ -16,7 +16,7 @@ test = 0
     prefix = 'rbsp'+probe+'_'
     perigee_shell = 4.  ; Re.
     time_range = test_time+[0,secofday*2]
-    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','test_perigee_emgse_change_vel'])
+    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','test_perigee_emgse_change_vel'])
 
 
 ;---Load basic data.

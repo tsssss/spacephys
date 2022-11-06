@@ -32,6 +32,8 @@ pro rbsp_read_e_model, time, probe=probe, id=datatype, $
     ; E model only.
     type_dispatch['e_model'] = dictionary($
         'pattern', dictionary($
+            'remote_file', join_path([remote_path,base_name]), $
+            'remote_index_file', join_path([remote_path,default_index_file()]), $
             'local_file', join_path([local_path,base_name]), $
             'local_index_file', join_path([local_path,default_index_file()])), $
         'valid_range', time_double(valid_range), $

@@ -50,7 +50,7 @@ test = 0
 
 
 ;---Load ion velocity.
-    root_dir = join_path([googledir(),'works','works','global_efield','data'])
+    root_dir = join_path([googledir(),'works','global_efield','data'])
     time_step = 1*60d
     common_times = make_bins(long_time_range, time_step)
     ntime = n_elements(common_times)

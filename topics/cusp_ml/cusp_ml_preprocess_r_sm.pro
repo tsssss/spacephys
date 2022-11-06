@@ -11,7 +11,7 @@ pro cusp_ml_preprocess_r_sm
     if ~cdf_has_var(var, filename=data_file) then begin
     ;---Read data.
         if check_if_update(var, time_range) then begin
-            root_dir = join_path([googledir(),'works','works','global_efield','data'])
+            root_dir = join_path([googledir(),'works','global_efield','data'])
 
             probe = 'polar'
             files = join_path([root_dir,'orbit',probe+'_orbit_*.tplot'])

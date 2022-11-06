@@ -3,7 +3,7 @@
 ;-
 
 pro rbsp_efw_phasef_save_orb_num_to_file, date, probe=probe, filename=file, $
-    errmsg=errmsg, log_file=log_file, saved_vars=new_vars
+    errmsg=errmsg, log_file=log_file, saved_vars=new_vars, time_var=time_var
 
 
     errmsg = ''
@@ -71,11 +71,22 @@ pro rbsp_efw_phasef_save_orb_num_to_file, date, probe=probe, filename=file, $
         tplot_var = tplot_vars[var_id]
         new_var = new_vars[var_id]
         get_data, tplot_var, times, data
+        index = where(times ge 0)
+        times = times[index]
+        data = data[index]
         ntime = n_elements(times)
 
         ; Check if need to write epoch.
-        vatts = cdf_read_setting(new_var, filename=file)
-        time_var = vatts['DEPEND_0']
+        if ~cdf_has_var(new_var, filename=file) then begin
+            vatts = dictionary($
+                'DEPEND_0', time_var, $
+                'UNITS', '#', $
+                'VAR_NOTES', 'Orbit number (change at perigee)' )
+        endif else begin
+            vatts = cdf_read_setting(new_var, filename=file)
+        endelse
+        
+        time_var = vatts['DEPEND_0']        
         epochs = cdf_read_var(time_var, filename=file)
         if n_elements(epochs) eq 0 then begin
             ;epochs = tplot_time_to_epoch(times, epoch16=1)

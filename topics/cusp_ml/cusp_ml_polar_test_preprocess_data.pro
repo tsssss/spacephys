@@ -6,7 +6,7 @@ pro cusp_mlt_polar_test_preprocess_data
 
 
 ;---Check data file.
-    root_dir = join_path([googledir(),'works','works','cusp_ml','data'])
+    root_dir = join_path([googledir(),'works','cusp_ml','data'])
     file = join_path([root_dir,'polar_test_data.cdf'])
 
 

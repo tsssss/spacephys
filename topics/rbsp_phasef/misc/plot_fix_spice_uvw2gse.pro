@@ -14,7 +14,7 @@ pro plot_fix_spice_uvw2gse, day, probe=probe, test=test
     xyz = constant('xyz')
     uvw = constant('uvw')
     ndim = 3
-    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','test_fix_spice_uvw2gse'])
+    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','test_fix_spice_uvw2gse'])
 
 
 ;---Load quaternion and spin phase.

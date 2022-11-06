@@ -135,7 +135,7 @@
                 ;if max(snorm(data)) eq 0 then continue
                 if max(abs(data),/nan) lt de_threshold then continue
 
-                plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','large_perigee_residue'])
+                plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','large_perigee_residue'])
                 plot_base = prefix+'perigee_'+strjoin(time_string(perigee_time_range,tformat='YYYY_MMDD_hhmm_ss'),'_')+'.pdf'
                 plot_file = join_path([plot_dir,plot_base])
                 if keyword_set(test) then plot_file = 0

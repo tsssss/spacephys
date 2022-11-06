@@ -15,7 +15,7 @@ pro test_perigee_correction_with_hires_spice_vel, test_time, probe=probe
     prefix = 'rbsp'+probe+'_'
     perigee_shell = 4.  ; Re.
     time_range = test_time+[0,secofday*1]
-    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','test_perigee_emgse_with_hires_spice_vel'])
+    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','test_perigee_emgse_with_hires_spice_vel'])
 
 
 

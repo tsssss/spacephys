@@ -4,7 +4,7 @@
 ; Store data to tplot var: rbspx_efw_e_uvw_dc_offset.
 ;-
 
-pro rbsp_efw_phasef_read_dc_offset, time_range, probe=probe
+pro rbsp_efw_phasef_read_dc_offset, time_range, probe=probe, errmsg=errmsg
 
     secofday = 86400d
     errmsg = ''
@@ -28,6 +28,11 @@ pro rbsp_efw_phasef_read_dc_offset, time_range, probe=probe
 
     l1_efw_var = prefix+'efw_esvy'
     get_data, l1_efw_var, times, e_uvw
+    ntime = n_elements(times)
+    if ntime le 1 then begin
+        errmsg = 'No esvy data ...'
+        return
+    endif
     foreach mask, mask_list do begin
         if mask.probe ne probe then continue
         index = lazy_where(times, '[]', mask.time_range, count=count)
@@ -117,7 +122,7 @@ pro rbsp_efw_phasef_read_dc_offset, time_range, probe=probe
     store_data, l1_efw_var, times, e_uvw
 
 
-;---Read euvw.
+;---Read euvw (DC offset removed).
     rbsp_efw_phasef_read_e_uvw, time_range, probe=probe
     var2 = prefix+'e_uvw'
     interp_time, l1_efw_var, to=var2

@@ -13,6 +13,6 @@ pro test_spice_jump_and_eclipse, day, probe=probe
     xyz = constant('xyz')
     uvw = constant('uvw')
     ndim = 3
-    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','test_spice_jump_and_eclipse'])
+    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','test_spice_jump_and_eclipse'])
 
 end

@@ -3,7 +3,7 @@
 ;-
 
 
-    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot'])
+    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot'])
     versions = 'test_perigee_emgse'+['','_change_vel','_change_adhoc']
     map_names = ['raw','vel_pos','fit_vxb']
 

@@ -44,6 +44,12 @@ pro azim_dp_read_themis_bfield, time_range, probe=probe, errmsg=errmsg
 
         ; Check out L1 data with eclipse correction.
         thm_load_fgm, probe=probe, level=1, type='calibrated', use_eclipse_corrections=1, trange=time_range
+        the_var = prefix+'fgl'
+        get_data, the_var, data=dd
+        if size(dd,type=1) ne 8 then begin
+            errmsg = 'No data ...'
+            return
+        endif
         dsl2gse, prefix+'fgl', prefix+'state_spinras', prefix+'state_spindec', prefix+'l1_b_gse'
         get_data, prefix+'l1_b_gse', l1_times, b_gse
         l1_b_gsm = cotran(b_gse, l1_times, 'gse2gsm')

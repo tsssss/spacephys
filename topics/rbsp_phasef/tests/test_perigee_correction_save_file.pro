@@ -257,10 +257,10 @@ pro test_perigee_residue_correction_save_file, day, probe=probe
     save_vars = save_vars.toarray()
 
     base_name = prefix+'test_perigee_correction_'+time_string(time_range[0],tformat='YYYY_MMDD')+'_v01'
-    ;tplot_file = join_path([googledir(),'works','works','rbsp_phase_f','data','wygant_maneuver',base_name+'.tplot'])
+    ;tplot_file = join_path([googledir(),'works','rbsp_phase_f','data','wygant_maneuver',base_name+'.tplot'])
     ;tplot_save, save_vars, filename=tplot_file
 
-    cdf_file = join_path([googledir(),'works','works','rbsp_phase_f','data','rbsp'+probe,$
+    cdf_file = join_path([googledir(),'works','rbsp_phase_f','data','rbsp'+probe,$
         time_string(time_range[0],tformat='YYYY'),base_name+'.cdf'])
     epochs = stoepoch(common_times,'unix')
     time_var = 'Epoch'
@@ -287,7 +287,7 @@ pro test_perigee_residue_correction_save_file, day, probe=probe
 
 ;;---Plot.
 ;test = 1
-;    plot_dir = join_path([googledir(),'works','works','rbsp_phase_f','plot','test_perigee_residue_removal_fit'])
+;    plot_dir = join_path([googledir(),'works','rbsp_phase_f','plot','test_perigee_residue_removal_fit'])
 ;    plot_file = join_path([plot_dir,'fig_test_perigee_residue_removal_fit_'+prefix+strjoin(time_string(perigee_time_range,tformat='YYYY_MMDD_hhmm'),'_')+'_v01.pdf'])
 ;    plot_file = join_path([plot_dir,'fig_test_perigee_residue_removal_fit_'+prefix+time_string(time_range[0],tformat='YYYY_MMDD')+'_v01.pdf'])
 ;    if keyword_set(test) then plot_file = 0

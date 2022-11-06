@@ -161,7 +161,7 @@ pro azim_dp_read_level1_data_gen_file, time, probe=probe, filename=file, test=te
         day_time_range = date+[0,secofday]
         day_times = make_bins(day_time_range, time_step)
         del_data, the_var
-        call_procedure, routine_name, day_time_range, probe=probe_info.probe, errmsg=errmsg, coord='gsm'
+        var = call_function(routine_name, day_time_range, probe=probe_info.probe, errmsg=errmsg, coord='gsm')
 
         ; Check if have data.
         have_data = 1
@@ -190,6 +190,7 @@ pro azim_dp_read_level1_data_gen_file, time, probe=probe, filename=file, test=te
                 'depend_0', dummy_time_var)
 
             foreach var, [bfield_var,orbit_var] do begin
+                dummy_data = fltarr(2,3)+!values.f_nan
                 cdf_save_var, var, value=float(dummy_data), filename=cdf_id
                 cdf_save_setting, setting, varname=var, filename=cdf_id
             endforeach

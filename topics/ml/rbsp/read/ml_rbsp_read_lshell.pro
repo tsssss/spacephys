@@ -47,5 +47,5 @@ end
 
 time_range = ['2013-06-07','2013-06-08']
 probe = 'a'
-vars = ml_rbsp_read_orbit(time_range, probe=probe)
+vars = ml_rbsp_read_lshell(time_range, probe=probe)
 end

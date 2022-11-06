@@ -43,6 +43,7 @@ function rbsp_efw_phasef_read_shadow_spike_time, time_range, probe=probe
     remote_files = file_dailynames(file_format=join_path(remote_path), trange=time_range)
 
     local_files = rbsp_efw_read_xxx_download_files(local_files, remote_files)
+    if n_elements(local_files) eq 0 then return, []
     times = []
     duras = []
     foreach local_file, local_files do begin

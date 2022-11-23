@@ -4,7 +4,7 @@
 ; Check if RBSP observed any E field changes. 
 ;-
 
-test = 0
+test = 1
 time_range = time_double(['2013-03-17/05:00','2013-03-17/15:00'])
 
 probes = ['a','b']
@@ -66,7 +66,7 @@ foreach probe, probes do begin
         'yminor', 6, $
         'yrange', [-1,1]*12 )
     
-    e_var = prefix+'efield_in_corotation_frame_spinfit_mgse'
+    e_var = prefix+'efield_in_corotation_frame_spinfit_edotb_mgse'
     add_setting, e_var, smart=1, dictionary($
         'short_name', 'E', $
         'display_type', 'vector', $
@@ -74,11 +74,23 @@ foreach probe, probes do begin
         'yrange', [-1,1]*10, $
         'unit', 'mV/m' )
     
+    ; convert E from mGSE to SM
+    get_data, e_var, times, e_mgse, limits=lim
+    e_sm = cotran(e_mgse, times, 'mgse2sm', probe=probe)
+    e_var = prefix+'efield_in_corotation_frame_spinfit_edotb_sm'
+    store_data, e_var, times, e_sm
+    add_setting, e_var, smart=1, dictionary($
+        'short_name', 'E', $
+        'display_type', 'vector', $
+        'coord', 'SM', $
+        'yrange', [-1,1]*10, $
+        'constant', 0, $
+        'unit', 'mV/m' )
     ;plot_vars = [plot_vars, [dis_var,mlt_var,e_var]]
     plot_vars = [plot_vars, [e_var]]
 endforeach
 
-plot_file = join_path([srootdir(),'check_efield_for_tec_event_'+time_string(time_range[0],tformat='YYYY_MMDD_hh')+'_v01.pdf'])
+plot_file = join_path([srootdir(),'check_efield_for_tec_event_'+time_string(time_range[0],tformat='YYYY_MMDD_hh')+'_v02.pdf'])
 if keyword_set(test) then plot_file = 0
 
 margins = [10,4,8,1]
@@ -98,7 +110,18 @@ label_size = 0.8
 
     
 tplot_options, 'labflag', -1
-tplot, plot_vars, trange=time_range, position=poss[*,1:nvar-1], noerase=1
+tposs = poss[*,1:nvar-1]
+tplot, plot_vars, trange=time_range, position=tposs, noerase=1
+
+pan_letters = letters(3)
+foreach plot_var, plot_vars, ii do begin
+    tpos = tposs[*,ii]
+    tx = tpos[0]-xchsz*8
+    ty = tpos[3]-ychsz*0.7
+    probe = strmid(plot_var, 4,1)
+    msg = pan_letters[ii+1]+') RB-'+strupcase(probe)
+    xyouts, tx, ty, normal=1, msg
+endforeach
 
 tpos = poss[*,1]
 tpos[1] = poss[1,nvar-1]
@@ -107,6 +130,7 @@ yrange = [0,1]
 plot, xrange, yrange, nodata=1, noerase=1, position=tpos, $
     xstyle=5, ystyle=5, xrange=xrange, yrange=yrange
 
+    
 foreach event_time, event_times, event_id do begin
     color = event_colors[event_id]
 
@@ -191,6 +215,12 @@ plot, xrange, yrange, $
     xticks=xticks, yticks=yticks, $
     xminor=xminor, yminor=yminor, $
     nodata=1, noerase=1, position=tpos
+
+tx = tpos[0]-xchsz*6
+ty = tpos[3]-ychsz*0.7
+msg = pan_letters[0]+')'
+xyouts, tx, ty, normal=1, msg
+
 
 sgclose
 

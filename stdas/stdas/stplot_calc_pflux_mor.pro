@@ -23,8 +23,8 @@
 ;-
 pro stplot_calc_pflux_mor, dename, dbname, pfname, $
     power=power, filter=filter, dump_spec=dump_spec, $
-    tscale = tscales, scaleinfo = scaleinfo, $
-    labels = labels, ytitle = ytitle, colors = colors
+    tscale=tscales, scaleinfo = scaleinfo, $
+    labels=labels, ytitle=ytitle, colors=colors
 
 ;----decompose field into components, check dimension.
     ; input: [de,db,pf]name.

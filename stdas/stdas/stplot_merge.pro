@@ -5,7 +5,7 @@
 ;   vars, in, strarr[m], req. Individual components.
 ; Keyword:
 ;   delete, in, boolean, opt. Delete old vars.
-;   newname, in, string, req. Combined tplot var name.
+;   output, in, string, req. Combined tplot var name.
 ;   ytitle, in, string, opt. Default is ''.
 ;   labels, in, strarr[m], opt. Default is combining components' labels.
 ;   colors, in, intarr[m], opt. Colors for components.
@@ -16,14 +16,14 @@
 ;   2013-11-21, Sheng Tian, create.
 ;-
 
-pro stplot_merge, vars, newname = newname, ytitle = ytitle, labels = labels, $
-    colors = colors, limits = lm, delete = delete
+function stplot_merge, vars, output=newname, ytitle=ytitle, labels=labels, $
+    colors=colors, limits=lm, delete=delete
     
     if n_elements(newname) eq 0 then message, 'no newname ...'
 
     ndim = n_elements(vars)    
     if ndim eq 0 then message, 'no variables ...'
-    if ndim eq 1 then return    ; do nothing.
+    if ndim eq 1 then return, ''    ; do nothing.
     get_data, vars[0], t0, f0
     nrec = n_elements(t0)
     
@@ -57,4 +57,6 @@ pro stplot_merge, vars, newname = newname, ytitle = ytitle, labels = labels, $
         idx = where(vars eq newname, cnt)       ; ensure newname is different.
         if cnt eq 0 then store_data, vars, /delete
     endif
+    
+    return, newname
 end

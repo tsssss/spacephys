@@ -107,6 +107,8 @@ function trace_injection_backward, r_gsm0, backward_times, energy, ion=ion, time
 
         ; Update position.
         r_gsm += v_drift*re1*time_step
+        index = where(finite(v_drift),count)
+        if count ne 3 then stop
     endforeach
 
     return, r_gsm_back

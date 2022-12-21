@@ -604,10 +604,17 @@ probes = ['tha','thd','the','g11','g12','g13']
 time_range = time_double(['2008-02-15/04:00','2008-02-15/11:00'])
 mlt_range = [-1,1]*10
 
-; Snaha's event.
+; Sneha's event.
 time_range = time_double(['2014-11-16/01:00','2014-11-16/06:00'])
 mlt_range = [-1,1]*10
 probes = ['th'+['a','d','e'],'rbsp'+['a','b'],'g'+['13','15']]
+rxy_range = [3,20]
+
+; Sneha's STEVE event.
+time_range = time_double(['2019-03-28/07:00','2019-03-28/10:00'])
+mlt_range = [-2,1]
+probes = ['th'+['a','e'],'rbsp'+['a','b'],'g'+['17','15','14']]
+probes = ['th'+['a','e'],'g'+['15','17']]
 rxy_range = [3,20]
 
 fig_ewogram_of_dp_and_up_down_current2, time_range, test=1, mlt_range=mlt_range, rxy_range=rxy_range, $

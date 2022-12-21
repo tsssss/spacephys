@@ -65,7 +65,7 @@ pro rbsp_efw_read_flags, time, probe=probe, errmsg=errmsg, $
         'display_type', 'stack', $
         'yrange', [-0.2,1.2], $
         'labels', flag_names )
-    rename_var, var, to=prefix+'efw_phasef_flags'
+    var = rename_var(var, output=prefix+'efw_phasef_flags')
 
 end
 

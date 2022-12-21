@@ -35,7 +35,7 @@ function ml_rbsp_read_pos, input_time_range, probe=probe, $
     time_range = time_double(input_time_range)
 
 ;---Read files.
-    files = ml_rbsp_load_orbit_var(time_range, probe=probe, errmsg=errmsg, resolution=resolution)
+    files = ml_rbsp_load_orbit_var(time_range, probe=probe, errmsg=errmsg, resolution=60)
     if errmsg ne '' then return, retval
 
 ;---Read vars.

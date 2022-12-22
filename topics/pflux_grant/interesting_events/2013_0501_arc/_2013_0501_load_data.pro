@@ -24,8 +24,12 @@ function _2013_0501_load_data_hope_moments, event_info
     endforeach
 
     if load_data then begin
-        rbsp_read_en_spec, time_range, probe=probe
-        rbsp_read_pa_spec, time_range, probe=probe
+        foreach species_name, species do begin
+            var = rbsp_read_en_spec(time_range, probe=probe, species=species_name)
+            var = rbsp_read_pa_spec(time_range, probe=probe, species=species_name)
+            
+        endforeach
+        
         stop
     endif
 end
@@ -316,7 +320,7 @@ function _2013_0501_load_data, filename=data_file
     density_var = _2013_0501_load_data_density(event_info)
     
 ;---HOPE vars.
-    hope_vars = _2013_0501_load_data_hope_moments(event_info)
+    ;hope_vars = _2013_0501_load_data_hope_moments(event_info)
     
 
 

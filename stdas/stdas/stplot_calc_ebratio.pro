@@ -1,7 +1,7 @@
 ;+
 ; Calculate E/B ratio.
 ;-
-function stplot_calc_ebratio, input_time_range, e_var=e_var, b_var=b_var, scaleinfo=scaleinfo, output=ebr_var
+function stplot_calc_ebratio, input_time_range, e_var=e_var, b_var=b_var, scale_info=scale_info, output=ebr_var
 
     foreach var, [e_var,b_var] do begin
         get_data, var, times, vec
@@ -25,10 +25,11 @@ function stplot_calc_ebratio, input_time_range, e_var=e_var, b_var=b_var, scalei
         dj = 1d/8
         s0 = 4d*dr0
         s1 = 1800
-        if n_elements(scaleinfo) ne 0 then begin
-            if scaleinfo.haskey('s0') then s0 = scaleinfo['s0']
-            if scaleinfo.haskey('s1') then s0 = scaleinfo['s1']
-            if scaleinfo.haskey('dj') then s0 = scaleinfo['dj']
+        if n_elements(scale_info) ne 0 then begin
+            if size(scale_info,type=1) eq 8 then scale_info = dictionary(scale_info)
+            if scale_info.haskey('s0') then s0 = scale_info['s0']
+            if scale_info.haskey('s1') then s1 = scale_info['s1']
+            if scale_info.haskey('dj') then dj = scale_info['dj']
         endif
 
         j1 = floor(alog(s1/s0)/alog(2)/dj)

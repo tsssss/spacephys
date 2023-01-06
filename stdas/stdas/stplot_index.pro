@@ -1,5 +1,5 @@
 ;+
-; Type: procedure.
+; Type: function.
 ; Purpose: Save certain dimensions of given var to a new var.
 ; Parameter: var0, in, string, required. Original m-dim tplot var.
 ;   index, in, intarr[m], required. Index for the wanted dimensions. 0-based.
@@ -14,12 +14,14 @@
 ; Author: Sheng Tian.
 ; History: 2013-11-21, Sheng Tian, create.
 ;-
-pro stplot_index, var0, idx, newnames = vnames, ytitles = ytitles, $
-    labels = labels, colors = colors, nosplit = nosplit
+function stplot_index, var0, idx, output=vnames, ytitles=ytitles, $
+    labels=labels, colors=colors, nosplit=nosplit
 
+    retval = !null
+    
     vname = tnames(var0[0])
     get_data, vname, t0, f0, limits = lm
-    if size(f0,/n_dimensions) ne 2 then return
+    if size(f0,/n_dimensions) ne 2 then return, retval
     if n_elements(idx) eq 0 then idx = indgen((size(f0,/dimensions))[1])
     ndim = n_elements(idx)
     idstrs = string(idx+1,format='(I0)')
@@ -33,10 +35,21 @@ pro stplot_index, var0, idx, newnames = vnames, ytitles = ytitles, $
         if stagexist('labels',lm) then labels = lm.labels[idx] $
         else labels = idstrs
     
-    if keyword_set(nosplit) then $
-        store_data, vnames[0], t0, f0[*,idx], $
-            limits = {ytitle:ytitles[0], labels:labels[0], colors:colors} $
-    else for i = 0, ndim-1 do $
-        store_data, vnames[i], t0, f0[*,idx[i]], $
-            limits = {ytitle:ytitles[i], labels:labels[i], colors:colors[i]}
+
+    if keyword_set(nosplit) then begin
+        store_data, vnames[0], t0, f0[*,idx], limit=lm
+        options, vnames[0], 'ytitle', ytitles[0]
+        options, vnames[0], 'labels', labels
+        options, vnames[0], 'colors', colors
+    endif else begin
+        for i = 0, ndim-1 do begin
+            store_data, vnames[i], t0, f0[*,idx[i]], limits=lm
+            options, vnames[i], 'ytitle', ytitles[i]
+            options, vnames[i], 'labels', labels[i]
+            options, vnames[i], 'colors', colors[i]
+        endfor
+    endelse
+    
+    
+    return, vnames
 end

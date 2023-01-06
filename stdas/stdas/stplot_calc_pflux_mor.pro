@@ -175,7 +175,7 @@ pro stplot_calc_pflux_mor, dename, dbname, pfname, $
     if n_elements(ytitle) eq 0 then ytitle = '(mW/m!U2!N)'
     if n_elements(labels) ne ndim then labels = ['x','y','z']
     if n_elements(colors) ne ndim then $
-        colors = (ndim eq 1)? 0: [6,4,2]
+        colors = (ndim eq 1)? 0: constant('rgb')
     lims = {ytitle:ytitle, labels:labels, colors:colors}
 
     store_data, pfname, uts, pfxyz, limits = lims

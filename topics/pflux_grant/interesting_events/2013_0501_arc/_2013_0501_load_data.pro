@@ -1,3 +1,60 @@
+function _2013_0501_load_data_pflux_setting, event_info
+
+    key = 'pflux_setting'
+    if ~event_info.haskey(key) then begin
+        filter = [0.25d,1200]    ; sec.
+        scale_info = {s0:min(filter), s1:max(filter), dj:1d/8, ns:0d}
+        event_info[key] = dictionary($
+            'filter', filter, $
+            'scale_info', scale_info )
+    endif
+    return, event_info[key]
+
+end
+
+
+function _2013_0501_load_data_field_ut, event_info, time_var=var, get_name=get_name
+
+    if n_elements(var) eq 0 then var = 'field_ut'
+    if keyword_set(get_name) then return, var
+
+    data_file = event_info['data_file']
+    if ~cdf_has_var(var, filename=data_file) then begin
+        time_range = event_info['field_time_range']
+        time_step = event_info['field_time_step']
+        times = make_bins(time_range, time_step)
+        cdf_save_var, var, value=times, filename=data_file
+        settings = dictionary($
+            'time_step', time_step, $
+            'data_time_range', time_range )
+        cdf_save_setting, settings, filename=data_file, varname=var
+    endif
+    return, cdf_read_var(var, filename=data_file)
+
+end
+
+function _2013_0501_load_data_orbit_ut, event_info, time_var=var, get_name=get_name
+
+    if n_elements(var) eq 0 then var = 'orbit_ut'
+    if keyword_set(get_name) then return, var
+
+    data_file = event_info['data_file']
+    if ~cdf_has_var(var, filename=data_file) then begin
+        time_range = event_info['orbit_time_range']
+        time_step = event_info['orbit_time_step']
+        times = make_bins(time_range, time_step)
+        cdf_save_var, var, value=times, filename=data_file
+        settings = dictionary($
+            'time_step', time_step, $
+            'data_time_range', time_range )
+        cdf_save_setting, settings, filename=data_file, varname=var
+    endif
+    return, cdf_read_var(var, filename=data_file)
+
+end
+
+
+
 function _2013_0501_load_data_hope_moments, event_info
 
     species = ['e','p','o']
@@ -43,9 +100,9 @@ function _2013_0501_load_data_density, event_info
     secofday = constant('secofday')
     time_range = time_range[0]-(time_range[0] mod secofday)+[0,secofday]
 
-    density_emfisis_var = rbsp_read_density_emfisis(time_range, probe=probe)
-    density_efw_var = rbsp_read_density_efw(time_range, probe=probe)
-    density_hope_var = rbsp_read_density_hope(time_range, probe=probe)
+    density_emfisis_var = rbsp_read_density_emfisis(time_range, probe=probe, get_name=1)
+    density_efw_var = rbsp_read_density_efw(time_range, probe=probe, get_name=1)
+    density_hope_var = rbsp_read_density_hope(time_range, probe=probe, get_name=1)
 
     vars = [density_emfisis_var,density_efw_var,density_hope_var]
     labels = ['EMFISIS','EFW','HOPE']
@@ -64,20 +121,20 @@ function _2013_0501_load_data_density, event_info
     endif
 
 
-    foreach var, vars do begin
-        if cdf_has_var(var, filename=data_file) then begin
-            cdf_load_var, var, filename=data_file
-        endif else begin
+    foreach var, vars, var_id do begin
+        if ~cdf_has_var(var, filename=data_file) then begin
+            routine = 'rbsp_read_density_'+strlowcase(labels[var_id])
+            var = call_function(routine, time_range, probe=probe)
             if n_elements(times) eq 0 then times = cdf_read_var(time_var, filename=data_file)
             interp_time, var, times
             
             cdf_save_var, var, value=get_var_data(var, limits=limits), filename=data_file
-
             settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
             settings['depend_0'] = time_var
             settings['var_type'] = 'data'
             cdf_save_setting, settings, filename=data_file, varname=var
-        endelse
+        endif
+        if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
     endforeach
 
     var = prefix+'density_combo'
@@ -150,24 +207,49 @@ function _2013_0501_load_data_b_gsm, event_info, time_var=field_time_var
     return, var
 end
 
+function _2013_0501_load_data_r_gsm, event_info, time_var=time_var
 
-function _2013_0501_load_data_field_ut, event_info, time_var=var, get_name=get_name
-
-    if n_elements(var) eq 0 then var = 'field_ut'
-    if keyword_set(get_name) then return, var
-
+    prefix = event_info['prefix']
+    probe = event_info['probe']
     data_file = event_info['data_file']
+
+    if n_elements(time_var) eq 0 then time_var = _2013_0501_load_data_orbit_ut(get_name=1)
+    times = _2013_0501_load_data_orbit_ut(event_info)
+    time_range = event_info['orbit_time_range']
+
+    coord = 'gsm'
+    var = rbsp_read_orbit(time_range, probe=probe, coord=coord, get_name=1)
     if ~cdf_has_var(var, filename=data_file) then begin
-        time_range = event_info['field_time_range']
-        time_step = event_info['field_time_step']
-        times = make_bins(time_range, time_step)
-        cdf_save_var, var, value=times, filename=data_file
-        settings = dictionary($
-            'time_step', time_step, $
-            'data_time_range', time_range )
+        var = rbsp_read_orbit(time_range+[-1,1]*60, probe=probe, coord=coord)
+        interp_time, var, times
+        data = get_var_data(var, limits=limits)
+        cdf_save_var, var, value=data, filename=data_file
+        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
+        settings['depend_0'] = time_var
+        settings['var_type'] = 'data'
         cdf_save_setting, settings, filename=data_file, varname=var
     endif
-    return, cdf_read_var(var, filename=data_file)
+    if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
+    return, var
+
+end
+
+function _2013_0501_load_data_load_model_setting, event_info
+
+    key = 'model_setting'
+    if ~event_info.haskey(key) then begin
+        model_setting = dictionary($
+            'external_model', 't89', $
+            'models', ['t89','t96','t01','t04s'], $
+            't89_par', 2, $
+            'igrf', 0, $
+            'refine', 1, $
+            'direction', 'north' )
+        internal_model = (model_setting['igrf'] eq 0)? 'dipole': 'igrf'
+        model_setting['internal_model'] = internal_model
+        event_info[key] = model_setting
+    endif
+    return, event_info[key]
 
 end
 
@@ -176,21 +258,22 @@ function _2013_0501_load_data_load_model_vars, event_info, time_var=time_var
 
     if n_elements(time_var) eq 0 then time_var = _2013_0501_load_data_orbit_ut(get_name=1)
     data_file = event_info['data_file']
-
-    model_setting = dictionary($
-        'model', 't01', $
-        'igrf', 0, $
-        'refine', 1, $
-        'direction', -1 )
-    models = ['t89','t96','t01','t04s']
-    event_info['model_setting'] = model_setting
-    event_info['models'] = models
-    
     prefix = event_info['prefix']
-    vars = prefix+['fmlt','fmlon','fmlat','bf_gsm_'+models]
+
+    model_setting = _2013_0501_load_data_load_model_setting(event_info)
+    models = model_setting['models']
     direction = model_setting['direction']
+    if direction eq 'north' then begin
+        north = 1
+        south = 0
+    endif else begin
+        north = 0
+        south = 1
+    endelse
+    refine = model_setting['refine']
 
     model_vars = []
+    vars = prefix+['fmlt','fmlon','fmlat','bf_gsm_'+models]
     foreach internal_model, ['igrf','dipole'] do begin
         load_data = 0
         the_vars = vars+'_'+internal_model
@@ -205,7 +288,7 @@ function _2013_0501_load_data_load_model_vars, event_info, time_var=time_var
             r_var = _2013_0501_load_data_r_gsm(event_info, time_var=time_var)
             igrf = (internal_model eq 'igrf')? 1: 0
             vinfo = geopack_trace_to_ionosphere(r_var, models=models, $
-                igrf=igrf, direction=direction, suffix='_'+internal_model)
+                igrf=igrf, south=south, north=north, refine=refine, suffix='_'+internal_model)
             foreach var, the_vars do begin
                 if tnames(var) eq '' then stop
                 data = get_var_data(var, limits=limits)
@@ -226,22 +309,97 @@ function _2013_0501_load_data_load_model_vars, event_info, time_var=time_var
 
 end
 
-
-function _2013_0501_load_data_r_gsm, event_info, time_var=time_var
-
-    prefix = event_info['prefix']
-    probe = event_info['probe']
-    data_file = event_info['data_file']
+function _2013_0501_load_data_bmod_gsm, event_info, time_var=time_var
 
     if n_elements(time_var) eq 0 then time_var = _2013_0501_load_data_orbit_ut(get_name=1)
-    times = _2013_0501_load_data_orbit_ut(event_info)
-    time_range = event_info['orbit_time_range']
+    data_file = event_info['data_file']
+    prefix = event_info['prefix']
 
+    model_setting = _2013_0501_load_data_load_model_setting(event_info)
+    models = model_setting['models']
+    t89_par = model_setting['t89_par']
     coord = 'gsm'
-    var = rbsp_read_orbit(time_range, probe=probe, coord=coord, get_name=1)
+
+    bmod_vars = []
+    vars = prefix+'bmod_gsm_'+models
+    foreach internal_model, ['igrf','dipole'] do begin
+        load_data = 0
+        the_vars = vars+'_'+internal_model
+        bmod_vars = [bmod_vars,the_vars]
+        foreach var, the_vars do begin
+            if ~cdf_has_var(var, filename=data_file) then begin
+                load_data = 1
+                break
+            endif
+        endforeach
+        if load_data then begin
+            r_var = _2013_0501_load_data_r_gsm(event_info, time_var=time_var)
+            igrf = (internal_model eq 'igrf')? 1: 0
+            vinfo = geopack_read_bfield(r_var, models=models, igrf=igrf, suffix='_'+internal_model, t89_par=t89_par, coord=coord)
+            
+            foreach var, the_vars do begin
+                if tnames(var) eq '' then stop
+                data = get_var_data(var, limits=limits)
+                cdf_save_var, var, value=data, filename=data_file
+                settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
+                settings['depend_0'] = time_var
+                settings['var_type'] = 'data'
+                cdf_save_setting, settings, filename=data_file, varname=var
+            endforeach
+        endif
+    endforeach
+
+    foreach var, bmod_vars do begin
+        if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
+    endforeach
+
+    return, bmod_vars
+
+end
+
+
+function _2013_0501_load_data_b0_gsm, event_info, time_var=time_var
+
+    prefix = event_info['prefix']
+    data_file = event_info['data_file']
+    time_range = event_info['field_time_range']
+
+    if n_elements(time_var) eq 0 then time_var = _2013_0501_load_data_field_ut(get_name=1)
+
+    var = prefix+'b0_gsm'
     if ~cdf_has_var(var, filename=data_file) then begin
-        var = rbsp_read_orbit(time_range, probe=probe, coord=coord)
-        interp_time, var, times
+        b_gsm_var = _2013_0501_load_data_b_gsm(event_info, time_var=time_var)
+        bmod_gsm_vars = _2013_0501_load_data_bmod_gsm(event_info)
+        
+        model = 't89'
+        igrf = 0
+        internal_model = (igrf eq 1)? 'igrf': 'dipole'
+        suffix = '_'+internal_model
+        bmod_gsm_var = prefix+'bmod_gsm_'+model+suffix
+
+        b_gsm = get_var_data(b_gsm_var, times=times)
+        bmod_gsm = get_var_data(bmod_gsm_var, at=times)
+        b1_gsm = b_gsm-bmod_gsm
+        ndim = 3
+        time_step = total(times[0:1]*[-1,1])
+        window = event_info['b0_window']
+        width = window/time_step
+        for ii=0,ndim-1 do begin
+            b1_gsm[*,ii] -= smooth(b1_gsm[*,ii], width, edge_mirror=1, nan=1)
+        endfor
+        
+        b0_gsm = b_gsm-b1_gsm
+        store_data, var, times, b0_gsm
+        add_setting, var, smart=1, dictionary($
+            'display_type', 'vector', $
+            'short_name', strupcase(model)+' B', $
+            'unit', 'nT', $
+            'coord', 'GSM', $
+            'coord_labels', constant('xyz'), $
+            'model', model, $
+            'internal_model', internal_model )
+
+        
         data = get_var_data(var, limits=limits)
         cdf_save_var, var, value=data, filename=data_file
         settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
@@ -250,21 +408,271 @@ function _2013_0501_load_data_r_gsm, event_info, time_var=time_var
         cdf_save_setting, settings, filename=data_file, varname=var
     endif
     if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
+
+    return, var
+
+end
+
+function _2013_0501_load_data_b1_gsm, event_info
+
+    prefix = event_info['prefix']
+    data_file = event_info['data_file']
+
+    b_gsm_var = _2013_0501_load_data_b_gsm(event_info)
+    b0_gsm_var = _2013_0501_load_data_b0_gsm(event_info)
+    b_gsm = get_var_data(b_gsm_var, times=times)
+    b0_gsm = get_var_data(b0_gsm_var, at=times)
+    b1_gsm = b_gsm-b0_gsm
+
+    b1_gsm_var = prefix+'b1_gsm'
+    store_data, b1_gsm_var, times, b1_gsm
+    add_setting, b1_gsm_var, smart=1, dictionary($
+        'display_type', 'vector', $
+        'short_name', 'dB', $
+        'unit', 'nT', $
+        'coord', 'GSM', $
+        'coord_labels', constant('xyz') )
+    return, b1_gsm_var
+
+end
+
+
+function _2013_0501_load_data_edot0_mgse, event_info, time_var=time_var
+
+    prefix = event_info['prefix']
+    probe = event_info['probe']
+    data_file = event_info['data_file']
+    time_range = event_info['time_range']
+
+    if n_elements(time_var) eq 0 then time_var = _2013_0501_load_data_field_ut(get_name=1)
+
+    var = prefix+'edot0_mgse'
+    if ~cdf_has_var(var, filename=data_file) then begin
+        e_mgse_var = _2013_0501_load_data_e_mgse(event_info, time_var=time_var)
+        b0_gsm_var = _2013_0501_load_data_b0_gsm(event_info)
+        common_times = _2013_0501_load_data_field_ut(event_info)
+        e_mgse = get_var_data(e_mgse_var, at=common_times)
+        b0_gsm = get_var_data(b0_gsm_var, at=common_times)
+        b0_mgse = cotran(b0_gsm, common_times, 'gsm2mgse', probe=probe)
+        e_mgse[*,0] = -(e_mgse[*,1]*b0_mgse[*,1]+e_mgse[*,2]*b0_mgse[*,2])/b0_mgse[*,0]
+
+        store_data, var, common_times, e_mgse
+        add_setting, var, smart=1, dictionary($
+            'display_type', 'vector', $
+            'short_name', 'Edot0', $
+            'unit', 'mV/m', $
+            'coord', 'mGSE', $
+            'coord_labels', constant('xyz') )
+            
+
+        data = get_var_data(var, limits=limits)
+        cdf_save_var, var, value=data, filename=data_file
+        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
+        settings['depend_0'] = time_var
+        settings['var_type'] = 'data'
+        cdf_save_setting, settings, filename=data_file, varname=var
+    endif
+
+    if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
     return, var
 
 end
 
 
-function _2013_0501_load_data_orbit_ut, event_info, time_var=var, get_name=get_name
+function _2013_0501_load_data_ebr_vars, event_info, fac_vars
 
-    if n_elements(var) eq 0 then var = 'orbit_ut'
+    prefix = event_info['prefix']
+    probe = event_info['probe']
+    data_file = event_info['data_file']
+    time_range = event_info['ebr_time_range']
+
+    pflux_setting = _2013_0501_load_data_pflux_setting(event_info)
+    scale_info = pflux_setting['scale_info']
+
+    e_index = 2
+    b_index = 1
+    fac_labels = ['b','w','o']
+    vars = list()
+    foreach type, ['','dot0'] do begin
+        ; |E| and |B1|
+        e_var = prefix+'e'+type+'_fac'
+        b_var = prefix+'b1_fac'
+        ebr_var = prefix+'ebr_total'
+        vars.add, stplot_calc_ebratio(time_range, $
+            e_var=e_var, b_var=b_var, $
+            scale_info=scale_info, output=ebr_var)
+        vars.add, [e_var,b_var]+'_mor', extract=1
+        
+        ; E_out and B_west.
+        e_var = stplot_index(e_var, e_index, output=prefix+'e'+type+fac_labels[e_index])
+        b_var = stplot_index(b_var, b_index, output=prefix+'b'+fac_labels[b_index])
+        ebr_var = prefix+'ebr_component'
+        vars.add, stplot_calc_ebratio(time_range, $
+            e_var=e_var, b_var=b_var, $
+            scale_info=scale_info, output=ebr_var)
+        vars.add, [e_var,b_var]+'_mor', extract=1
+    endforeach
+
+    vars = vars.toarray()
+    return, vars
+
+end
+
+
+function _2013_0501_load_data_fac_vars, event_info
+
+    prefix = event_info['prefix']
+    probe = event_info['probe']
+    data_file = event_info['data_file']
+    time_range = event_info['time_range']
+
+    fac_labels = ['||',tex2str('perp')+','+['west','out']]
+    event_info['fac_labels'] = fac_labels
+
+    b0_gsm_var = _2013_0501_load_data_b0_gsm(event_info)
+    r_gsm_var = _2013_0501_load_data_r_gsm(event_info)
+    define_fac, b0_gsm_var, r_gsm_var, time_var=r_gsm_var
+    
+    b1_gsm_var = _2013_0501_load_data_b1_gsm(event_info)
+    e_mgse_var = _2013_0501_load_data_e_mgse(event_info)
+    edot0_mgse_var = _2013_0501_load_data_edot0_mgse(event_info)
+    
+    mgse_vars = [e_mgse_var,edot0_mgse_var]
+    e_gsm_var = prefix+'e_gsm'
+    edot0_gsm_var = prefix+'edot0_gsm'
+    gsm_vars = [e_gsm_var,edot0_gsm_var]
+    foreach mgse_var, mgse_vars, var_id do begin
+        get_data, mgse_var, times, vec_mgse
+        vec_gsm = cotran(vec_mgse, times, 'mgse2gsm', probe=probe)
+        gsm_var = gsm_vars[var_id]
+        store_data, gsm_var, times, vec_gsm
+        add_setting, gsm_var, smart=1, dictionary($
+            'display_type', 'vector', $
+            'short_name', get_setting(mgse_var,'short_name'), $
+            'unit', 'mV/m', $
+            'coord', 'GSM', $
+            'coord_labels', constant('xyz') )
+    endforeach
+
+    vars = [b1_gsm_var,e_gsm_var,edot0_gsm_var]
+    b1_fac_var = prefix+'b1_fac'
+    e_fac_var = prefix+'e_fac'
+    edot0_fac_var = prefix+'edot0_fac'
+    fac_vars = [b1_fac_var,e_fac_var,edot0_fac_var]
+    foreach var, vars, var_id do begin
+        to_fac, var, to=fac_vars[var_id]
+        add_setting, fac_vars[var_id], smart=1, dictionary($
+            'display_type', 'vector', $
+            'short_name', get_setting(var,'short_name'), $
+            'unit', get_setting(var,'unit'), $
+            'coord', 'FAC', $
+            'coord_labels', fac_labels)
+    endforeach
+
+    return, fac_vars
+
+end
+
+
+
+function _2013_0501_load_data_pflux, event_info, fac_vars
+
+    prefix = event_info['prefix']
+
+    pflux_setting = _2013_0501_load_data_pflux_setting(event_info)
+    scale_info = pflux_setting['scale_info']
+    if n_elements(fac_vars) eq 0 then begin
+        fac_vars = _2013_0501_load_data_fac_vars(event_info)
+    endif
+    
+    pf_fac_vars = []
+    pf_spec_vars = []
+    spec_unit = tex2str('mu')+'W/m!U2!N'
+    spec_ct = 66
+    spec_zrange = [-1,1]*50
+    spec_zstep = 50
+    spec_zminor = 5
+    spec_ztickv = make_bins(spec_zrange, spec_zstep, inner=1)
+    spec_zticks = n_elements(spec_ztickv)-1
+    spec_zticklen = -0.3
+    types = ['','dot0']
+    
+    model_setting = event_info['model_setting']
+    model = model_setting['external_model']
+    internal_model = model_setting['internal_model']
+    bf_var = prefix+'bf_gsm_'+model+'_'+internal_model
+    b0_var = prefix+'b0_gsm'
+    b0_gsm = get_var_data(b0_var, times=times)
+    bf_gsm = get_var_data(bf_var, at=times)
+    cmap = snorm(bf_gsm)/snorm(b0_gsm)
+    ndim = 3
+    
+    foreach type, types do begin
+        b1_fac_var = fac_vars[0]
+        e1_fac_var = prefix+'e'+type+'_fac'
+        pf_fac_var = prefix+'pf'+type+'_fac'
+        stplot_calc_pflux_mor, e1_fac_var, b1_fac_var, pf_fac_var, scaleinfo=scale_info
+        add_setting, pf_fac_var, smart=1, dictionary($
+            'display_type', 'vector', $
+            'short_name', 'S', $
+            'unit', 'mW/m!U2!N', $
+            'coord', 'FAC', $
+            'coord_labels', event_info['fac_labels'] )
+        pf_fac_vars = [pf_fac_vars,pf_fac_var]
+
+        ; Normalize to 100 km.
+        pf_fac_map_var = pf_fac_var+'_map'
+        pf_fac = get_var_data(pf_fac_var, times=times)
+        pf_fac_map = pf_fac
+        for ii=0,ndim-1 do pf_fac_map[*,ii] = cmap*pf_fac[*,ii]
+        store_data, pf_fac_map_var, times, pf_fac_map
+        add_setting, pf_fac_map_var, smart=1, dictionary($
+            'display_type', 'vector', $
+            'short_name', 'S', $
+            'unit', 'mW/m!U2!N', $
+            'model', model, $
+            'internal_model', internal_model, $
+            'coord', 'FAC', $
+            'coord_labels', event_info['fac_labels'] )
+        pf_fac_vars = [pf_fac_vars,pf_fac_map_var]
+
+        ; Spec.
+        pf_spec_var = prefix+'pf'+type+'_fac_mor_spec_1'
+        get_data, pf_spec_var, times, pfspec, ps
+        fs = 1d3/ps
+        store_data, pf_spec_var, times, pfspec*1e3, fs
+        add_setting, pf_spec_var, smart=1, dictionary($
+            'display_type', 'spec', $
+            'short_name', 'S!D||!N', $
+            'unit', spec_unit, $
+            'ytitle', 'Freq!C(mHz)', $
+            'yrange', minmax(fs), $
+            'ylog', 1, $
+            'zlog', 0, $
+            'zrange', spec_zrange, $
+            'ztickv', spec_ztickv, $
+            'zticks', spec_zticks, $
+            'zminor', spec_zminor, $
+            'zticklen', spec_zticklen, $
+            'color_table', spec_ct )
+        pf_spec_vars = [pf_spec_vars,pf_spec_var]
+    endforeach
+    
+    return, pf_spec_vars
+    
+end
+
+
+function _2013_0501_load_data_asi_ut, event_info, time_var=var, get_name=get_name
+
+    if n_elements(var) eq 0 then var = 'asi_ut'
     if keyword_set(get_name) then return, var
 
     data_file = event_info['data_file']
     if ~cdf_has_var(var, filename=data_file) then begin
-        time_range = event_info['orbit_time_range']
-        time_step = event_info['orbit_time_step']
-        times = make_bins(time_range, time_step)
+        time_range = event_info['asi_time_range']
+        time_step = event_info['asi_time_step']
+        times = make_bins(time_range+[0,-1]*time_step, time_step)
         cdf_save_var, var, value=times, filename=data_file
         settings = dictionary($
             'time_step', time_step, $
@@ -276,11 +684,89 @@ function _2013_0501_load_data_orbit_ut, event_info, time_var=var, get_name=get_n
 end
 
 
+function _2013_0501_load_data_asi, event_info, filename=data_file, time_var=time_var
+
+
+    asi_setting = dictionary($
+        'sites', ['atha'], $
+        'best_site', 'atha', $
+        'min_elev', 5d, $
+        'mlt_range', [-2d,0.5], $
+        'mlat_range', [55d,70] )
+    event_info['asi_setting'] = asi_setting
+    data_file = event_info['data_file']
+    prefix = event_info['prefix']
+    time_range = event_info['asi_time_range']
+    if n_elements(time_var) eq 0 then time_var = _2013_0501_load_data_asi_ut(event_info, get_name=1)
+
+    mlt_image_var = themis_read_asf_mlt_image(time_range, get_name=1)
+    if ~cdf_has_var(mlt_image_var, filename=data_file) then begin
+        sites = asi_setting['sites']
+        min_elev = asi_setting['min_elev']
+        mlt_image_var = themis_read_asf_mlt_image(time_range, sites=sites, min_elev=min_elev)
+        data = get_var_data(mlt_image_var, limits=limits)
+        cdf_save_var, mlt_image_var, value=data, filename=data_file
+
+        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
+        settings['depend_0'] = time_var
+        settings['var_type'] = 'data'
+        cdf_save_setting, settings, filename=data_file, varname=mlt_image_var
+    endif
+    if check_if_update(mlt_image_var, time_range) then begin
+        cdf_load_var, mlt_image_var, filename=data_file
+    endif
+
+    mlt_image_rect_var = themis_read_asf_mlt_image_rect(time_range, get_name=1)
+    if ~cdf_has_var(mlt_image_rect_var, filename=data_file) then begin
+        sites = asi_setting['sites']
+        min_elev = asi_setting['min_elev']
+        mlt_range = asi_setting['mlt_range']
+        mlat_range = asi_setting['mlat_range']
+        mlt_image_rect_var = themis_read_asf_mlt_image_rect(time_range, sites=sites, min_elev=min_elev, mlt_range=mlt_range, mlat_range=mlat_range)
+        data = get_var_data(mlt_image_rect_var, limits=limits)
+
+        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
+        settings['depend_0'] = time_var
+        settings['var_type'] = 'data'
+        cdf_save_setting, settings, filename=data_file, varname=mlt_image_var
+    endif
+
+
+;---Ewogram.
+    
+
+;---Keogram.
+    fmlt_vars = prefix+'fmlt_'+['dipole','igrf']
+;    mlt_range = []
+;    foreach var, fmlt_vars do begin
+;        mlt_range = [mlt_range,minmax(get_var_data(var,in=time_range))]
+;    endforeach
+;    mlt_range = minmax(mlt_range)
+    mlt_range = []
+    model_setting = _2013_0501_load_data_load_model_setting(event_info)
+    internal_model = model_setting['internal_model']
+    mlt_var = prefix+'fmlt_'+internal_model
+    models = model_setting['models']
+    external_model = model_setting['external_model']
+    model_index = where(models eq external_model)
+    mlt_range = reform((get_var_data(mlt_var,at=time_range))[*,model_index])
+    mlt_range = round(mlt_range*10)*0.1
+    mlat_range = [60,67]
+    keo_var = themis_read_mlt_image_keo(mlt_image_var=mlt_image_var, $
+        mlt_range=mlt_range, mlat_range=mlat_range)
+    zlim, keo_var, 1,1e4, 0
+
+    return, [mlt_image_var,mlt_image_rect_var,keo_var]
+
+end
+
+
 function _2013_0501_load_data, filename=data_file
 
     if n_elements(data_file) eq 0 then begin
         data_file = join_path([googledir(),'works','pflux_grant','2013_0501_arc','data','2013_0501_all_data_v02.cdf'])
     endif
+    
 
     if file_test(data_file) eq 0 then begin
         probe = 'b'
@@ -295,6 +781,8 @@ function _2013_0501_load_data, filename=data_file
     time_range = event_info['time_range']
     probe = event_info['probe']
     prefix = event_info['prefix']
+    
+    
 
 ;---Orbit related vars.
     orbit_time_var = 'orbit_ut'
@@ -318,16 +806,73 @@ function _2013_0501_load_data, filename=data_file
     b_gsm_var = _2013_0501_load_data_b_gsm(event_info, time_var=field_time_var)
     e_mgse_var = _2013_0501_load_data_e_mgse(event_info, time_var=field_time_var)
     density_var = _2013_0501_load_data_density(event_info)
-    
-;---HOPE vars.
-    ;hope_vars = _2013_0501_load_data_hope_moments(event_info)
-    
 
+    ; Seperate B0 and B1.
+    event_info['b0_window'] = 20.*60
+    var = _2013_0501_load_data_b0_gsm(event_info, time_var=field_time_var)
+    b1_gsm_var = _2013_0501_load_data_b1_gsm(event_info)
+    
+    ; Calculate Edot0.
+    edot0_mgse_var = _2013_0501_load_data_edot0_mgse(event_info, time_var=field_time_var)
+    
+    ; Convert data to FAC.
+    fac_vars = _2013_0501_load_data_fac_vars(event_info)
+    
+    ; Calc fields PS and E/B ratio.
+    event_info['ebr_time_range'] = time_range
+;    event_info['ebr_time_range'] = time_double(['2013-05-01/07:35','2013-05-01/07:42'])
+    ebr_vars = _2013_0501_load_data_ebr_vars(event_info, fac_vars)
+
+    ; Calculae pflux.
+    pf_vars = _2013_0501_load_data_pflux(event_info, fac_vars)
+
+
+
+;---ASI vars.
+    asi_time_var = 'asi_ut'
+    asi_time_step = 3d
+    event_info['asi_time_var'] = asi_time_var
+    event_info['asi_time_step'] = asi_time_step
+    event_info['asi_time_range'] = time_range
+    times = _2013_0501_load_data_asi_ut(event_info, time_var=asi_time_var)
+    asi_vars = _2013_0501_load_data_asi(event_info, time_var=asi_time_var)
+
+    
+;;---HOPE vars.
+;    ;hope_vars = _2013_0501_load_data_hope_moments(event_info)
+;    the_time = time_double('2013-05-01/07:38:03')
+;    poss = sgcalcpos(2, margins=[10,4,12,1])
+;    keo_var = asi_vars[1]
+;    pf_var = prefix+'pf_fac_map'
+;    tplot, [keo_var,pf_var], trange=time_range, position=poss
+;    timebar, the_time, color=sgcolor('red')
+;    xrange = time_range
+;    yrange = get_setting(keo_var, 'mlat_range')
+;    tpos = poss[*,0]
+;    plot, xrange, yrange, $
+;        xstyle=5, ystyle=5, position=tpos, nodata=1, noerase=1
+;    vars = prefix+'fmlat_'+['dipole','igrf']
+;    linestyles = findgen(n_elements(vars))
+;    foreach var, vars, var_id do begin
+;        get_data, var, times, fmlats, limits=lim
+;        linestyle = linestyles[var_id]
+;        for ii=0,n_elements(fmlats[0,*])-1 do begin
+;            color = lim.colors[ii]
+;            oplot, times, fmlats[*,ii], color=color, linestyle=linestyle
+;            xyouts, xrange[0], fmlats[0,ii], data=1, lim.labels[ii]
+;        endfor
+;    endforeach
+;stop
+    
+    plot_dir = join_path([googledir(),'works','pflux_grant','2013_0501_arc','plot'])
+    event_info['plot_dir'] = plot_dir
+
+
+    return, event_info
 
 end
 
 
 
-
-tmp = _2013_0501_load_data()
+pinfo = _2013_0501_load_data()
 end

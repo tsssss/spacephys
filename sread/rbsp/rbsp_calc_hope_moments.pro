@@ -69,10 +69,10 @@ pro rbsp_calc_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
     fac = ['b','w','n']
     rgb = sgcolor(['red','green','blue'])
     species_info = dictionary()
-    species_info['e']  = dictionary('q',-1, 'mass',e_mass, 'energy_range'  ,ele_erng)
-    species_info['p']  = dictionary('q', 1, 'mass',p_mass, 'energy_range'  ,ion_erng)
-    species_info['o']  = dictionary('q', 1, 'mass',p_mass*16,'energy_range',o_erng)
-    species_info['he'] = dictionary('q', 1, 'mass',p_mass*4,'energy_range' ,he_erng)
+    species_info['e']  = dictionary('q',-1, 'mass',e_mass, 'energy_range'  ,electron_energy_range )
+    species_info['p']  = dictionary('q', 1, 'mass',p_mass, 'energy_range'  ,ion_energy_range )
+    species_info['o']  = dictionary('q', 1, 'mass',p_mass*16,'energy_range',oxygen_energy_range )
+    species_info['he'] = dictionary('q', 1, 'mass',p_mass*4,'energy_range' ,helium_energy_range )
     all_species = species_info.keys()
     dt_phase_ratio = 180d/360     ; in terms of 360 deg.
 

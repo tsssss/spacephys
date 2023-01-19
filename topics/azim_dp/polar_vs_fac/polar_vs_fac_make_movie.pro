@@ -250,7 +250,7 @@ foreach time_range, event_list do begin
         glat_bins = (fltarr(nglon_bin)+1) # (get_setting(var, 'glatbins'))
         glon_bins = (get_setting(var, 'glonbins')) # (fltarr(nglat_bin)+1)
         ; Convert to mlon/mlt bins.
-        geotoapex, glat_bins, glon_bins, '', mlat_bins, mlon_bins
+        geo2apex, glat_bins, glon_bins, mlat_bins, mlon_bins
         mlt_bins = mlon2mlt(mlon_bins, time)
         r_bins = (90-mlat_bins)/(90-min_mlat)
         t_bins = (mlt_bins-6)*15*constant('rad')

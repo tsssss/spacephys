@@ -1,7 +1,7 @@
 ;%W% %G%
 ;
 PRO Get_Local_Time, $
-	epoch, geodetic_lat,geodetic_lon,apexfile, $
+	epoch, geodetic_lat,geodetic_lon, $
 	GLT,MLT, lat_mag, lon_mag
 
     ;Calculate local times in geodetic and magnetic coords.
@@ -46,8 +46,8 @@ PRO Get_Local_Time, $
     slon = (12. - UT - (eqtime/15.))*15.
 
     ;convert geodetic data into magnetic data
-    geotoapex,geodetic_lat,geodetic_lon, apexfile,lat_mag,lon_mag
-    geotoapex,dec,slon, apexfile,slat_mag,slon_mag
+    geo2apex,geodetic_lat,geodetic_lon, lat_mag,lon_mag
+    geo2apex,dec,slon, slat_mag,slon_mag
 
     ;calculate magnetic local time
     MLT = (lon_mag - slon_mag)/15. + 12.

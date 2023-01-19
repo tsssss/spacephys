@@ -58,13 +58,13 @@ test = 0
 
 
     zrange = [0,1e4]
-    ztitle = 'Brightness Count (#)'
+    ztitle = 'ASI Count (#)'
 
-    mltimg_var = 'thg_asf_mlt_image_rect'
-    get_data, mltimg_var, times, mltimgs
+    mlt_image_var = 'thg_asf_mlt_image_rect'
+    get_data, mlt_image_var, times, mlt_images
     index = lazy_where(times, '[]', time_range)
     times = times[index]
-    mltimgs = mltimgs[index,*,*]
+    mlt_images = mlt_images[index,*,*]
 
     plot_files = []
     foreach time, times, time_id do begin
@@ -76,22 +76,22 @@ test = 0
         sgopen, plot_file, xsize=4, ysize=2.4, magnify=magn
         tpos = sgcalcpos(1, xchsz=xchsz, ychsz=ychsz, margins=margins)
 
-        mltimg = reform(mltimgs[time_id,*,*])
-        mlt_bins = get_setting(mltimg_var, 'mlt_bins')
+        mlt_image = reform(mlt_images[time_id,*,*])
+        mlt_bins = get_setting(mlt_image_var, 'mlt_bins')
         mlt_index = lazy_where(mlt_bins, '[]', mlt_range)
         mlt_bins = mlt_bins[mlt_index]
-        mltimg = mltimg[mlt_index,*]
-        mlat_bins = get_setting(mltimg_var, 'mlat_bins')
+        mlt_image = mlt_image[mlt_index,*]
+        mlat_bins = get_setting(mlt_image_var, 'mlat_bins')
         mlat_index = lazy_where(mlat_bins, '[]', mlat_range)
         mlat_bins = mlat_bins[mlat_index]
-        mltimg = mltimg[*,mlat_index]
+        mlt_image = mlt_image[*,mlat_index]
 
         tpos[3] = tpos[3]-ychsz*2.5
         cbpos = tpos
         cbpos[1] = tpos[3]+ychsz*0.2
         cbpos[3] = cbpos[1]+ychsz*0.5
 
-        zzs = bytscl(mltimg, min=zrange[0],max=zrange[1], top=top_color)
+        zzs = bytscl(mlt_image, min=zrange[0],max=zrange[1], top=top_color)
         sgtv, zzs, ct=asi_ct, position=tpos, resize=1
         sgcolorbar, findgen(top_color), horizontal=1, ztitle=ztitle, zrange=zrange, ct=asi_ct, position=cbpos
 

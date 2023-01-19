@@ -153,10 +153,10 @@ function read_image_fuv, et0, rec, spin = spinphase, $
     sphere = orbit[2] gt 0
     if n_elements(imgsz) eq 0 then imgsz = 4*(90-minlat) else imgsz -= 1
         
-    ; get mlat/mlon. method 1: geotoapex.
+    ; get mlat/mlon. method 1: geo2apex.
     apexfile = rootdir+'/support/mlatlon.1997a.xdr'
-    geotoapex, glat, glon, apexfile, mlat, mlon
-    get_local_time, et, glat, glon, apexfile, glt, mlt
+    geo2apex, glat, glon, apexfile, mlat, mlon
+    get_local_time, et, glat, glon, glt, mlt
     get_mlt_image, rawimg, mlat, mlt, minlat, sphere, mltimg, ncell = imgsz
     
     return, {rawimg: rawimg, mltimg: mltimg, glat:glat, glon:glon}

@@ -1,4 +1,4 @@
-; (a) image/fuv's geotoapex.
+; (a) image/fuv's geo2apex.
 ; (b) sgeo2mag.
 ; (c) geo_to_mag.
 ; (d) aacgm.
@@ -22,7 +22,7 @@ pro test_geo2mag, et
     ; (2) geotoapex.
     apexfile = file_search( $
         '~/Dropbox/idl/idl82/Default/aurora/image/support/mlatlon.1997a.xdr')
-    geotoapex, slat, slon, apexfile, tmp, mlon
+    geo2apex, slat, slon, tmp, mlon
     print, 'geo2apex: ', slat, slon, mlat, mlon
     
     ; (3) geo_to_mag.

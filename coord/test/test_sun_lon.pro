@@ -31,7 +31,7 @@ pro test_sun_lon, et
     ephem, jd, ut, gha, dec, eqtime
     slon = (12D - ut - eqtime/15D)*15D
     apexfile = file_search('~/Dropbox/idl/idl82/Default/aurora/image/support/mlatlon.1997a.xdr')
-    geotoapex, dec, slon, apexfile, tmp, mlon
+    geo2apex, dec, slon, tmp, mlon
     print, 'fuv glt: ', ut, eqtime, dec, slon, mlon
 
 end

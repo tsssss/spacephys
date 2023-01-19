@@ -130,11 +130,11 @@ image_ptg, $
 
 ;get magnetic latitudes and longitudes
 apexfile = root_dir + "\support\mlatlon.1997a.xdr"
-GeotoApex, geographic_lat, geographic_lon, apexfile, $
+geo2apex, geographic_lat, geographic_lon, apexfile, $
 	magnetic_lat, magnetic_lon
 
 ;get magnetic local time
-Get_Local_Time, epoch, geographic_lat, geographic_lon, apexfile, $
+Get_Local_Time, epoch, geographic_lat, geographic_lon, $
 	GLT, MLT
 
 ;get MLT_image: magnetically mapped image

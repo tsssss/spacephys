@@ -52,7 +52,7 @@
 ;    endfor
 
     apexfile = join_path([homedir(),'Projects','idl','spacephys','aurora','image','support','mlatlon.1997a.xdr'])
-    geotoapex, pixel_glats, pixel_glons, apexfile, pixel_mlats, pixel_mlons
+    geo2apex, pixel_glats, pixel_glons, pixel_mlats, pixel_mlons
 
 
     ; Map to uniform mlon/mlat bins.

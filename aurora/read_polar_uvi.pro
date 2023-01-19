@@ -143,11 +143,11 @@ function read_polar_uvi, et0, l1fn, atfn, orfn, pafn, $
     sphere = orbit[2] gt 0
     if n_elements(imgsz) eq 0 then imgsz = 4*(90-minlat) else imgsz -= 1
         
-    ; get mlat/mlon. method 1: geotoapex.
+    ; get mlat/mlon. method 1: geo2apex.
     rootdir = srootdir()+'/image'
     apexfile = rootdir+'/support/mlatlon.1997a.xdr'
-    geotoapex, glat, glon, apexfile, mlat, mlon
-    get_local_time, fet, glat, glon, apexfile, glt, mlt
+    geo2apex, glat, glon, apexfile, mlat, mlon
+    get_local_time, fet, glat, glon, glt, mlt
     get_mlt_image, img, mlat, mlt, minlat, sphere, mltimg, ncell = imgsz
     
 ;    print, minmax(mltimg)

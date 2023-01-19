@@ -159,7 +159,7 @@ xyouts, tx,ty,normal=1, 'Normalized to 100 km altitude', charsize=0.9
 tpos = poss[*,nvar-1]
 tpos[0] = tpos[2]+xchsz*10
 tpos[2] = 1-xchsz*2.5
-get_data, prefix+'ebratio', ps, ebr
+get_data, ebr_var, ps, ebr
 xrange = [100,1e4]
 xtitle = 'E/B ratio (km/s)'
 plot, ebr, 1d3/ps, $

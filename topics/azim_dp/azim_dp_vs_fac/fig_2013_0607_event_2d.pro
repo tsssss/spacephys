@@ -176,7 +176,7 @@ if keyword_set(test) then plot_file = 0
         glon_bins = (get_setting(var, 'glonbins')) # (fltarr(nglat_bin)+1)
         ; Convert to mlon/mlt bins.
         apexfile = join_path([homedir(),'Projects','idl','spacephys','aurora','image','support','mlatlon.1997a.xdr'])
-        geotoapex, glat_bins, glon_bins, apexfile, mlat_bins, mlon_bins
+        geo2apex, glat_bins, glon_bins, mlat_bins, mlon_bins
         mlt_bins = mlon2mlt(mlon_bins, time)
         r_bins = (90-mlat_bins)/(90-min_mlat)
         t_bins = (mlt_bins-6)*15*constant('rad')

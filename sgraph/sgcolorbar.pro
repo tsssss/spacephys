@@ -6,7 +6,7 @@
 ;-
 pro sgcolorbar, colors, zrange = zr, ztitle = ztitle, position = pos, $
     zcharsize = zcharsize, zticks = zticks, zminor = zminor, ztickv = ztickv, ztickname = ztickn, $
-    horizontal = horizontal, log = log, zticklen=zticklen, ztickformat=ztickformat, $
+    horizontal = horizontal, log=log, zticklen=zticklen, ztickformat=ztickformat, $
     _extra = ex
 
     xr = [0,1]

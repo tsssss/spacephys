@@ -30,6 +30,7 @@ test = 1
     index = where(finite(data))
     data = interpol(data[index], times[index], times)
     store_data, n_var, times, data, limits=lim
+    options, n_var, 'labels', 'Density!C  >200 eV'
     
     var = n_var
     yrange = [0.1,3]
@@ -247,12 +248,16 @@ test = 1
     nplot_var = n_elements(plot_vars)
     nvar = nplot_var
     fig_letters = letters(nvar*2)
-    fig_labels = fig_letters[0:nplot_var-1]+') '+['N','E!D'+fac_labels[1:2],$
+    fig_labels = fig_letters[0:nplot_var-1]+') '+['N!De!N','E!D'+fac_labels[1:2],$
         'dB','SM B','V!D'+fac_labels[1:2]]
         
 
     margins = [10,4,10,1]
     label_size = 0.8
+    symsz = 0.3
+    psym = 1
+    test_o_color = sgcolor('white')
+
 
     tmp = panel_pos(plot_file, pansize=[3,0.75], $
         xpans=[1,1], ypans=1+fltarr(nplot_var), margins=margins, $
@@ -325,6 +330,22 @@ test = 1
         tx = tpos[0]-xchsz*10
         ty = tpos[3]-ychsz*0.8
         xyouts, tx,ty,fig_label, normal=1
+        
+        index = strpos(spec_vars[ii], 'para')
+        if index[0] ne -1 then begin
+            tx = tpos[0]+xchsz*0.5
+            ty = tpos[3]-ychsz*1
+            msg = 'PA [0,45] deg'
+            xyouts, tx,ty,normal=1, msg, charsize=label_size
+        endif
+        
+        index = strpos(spec_vars[ii], 'anti')
+        if index[0] ne -1 then begin
+            tx = tpos[0]+xchsz*0.5
+            ty = tpos[3]-ychsz*1
+            msg = 'PA [135,180] deg'
+            xyouts, tx,ty,normal=1, msg, charsize=label_size
+        endif
     endfor
     timebar, bar_times, linestyle=1, color=sgcolor('black')
     timebar, snapshot_time, color=sgcolor('red')
@@ -333,6 +354,7 @@ test = 1
 ;---Trace O+ data.
     model_time = time_double('2013-05-01/07:38:03')
     beam_dis = 2.1
+    beam_dis = 2.5
     color_beam = sgcolor('deep_pink')
     color_conics = sgcolor(['green','blue'])
     test_pitch_angles = [175d,162]
@@ -344,9 +366,13 @@ test = 1
         'trs', time_double('2013-05-01/'+['07:40:53','07:43:09']), $
         'ens', [6200,1300] )
 ;    test_info_list.add, dictionary($
-;        'species', 'p', $
-;        'trs', time_double('2013-05-01/'+['07:39:22','07:40:53']), $
-;        'ens', [6000,300] )
+;        'species', 'o', $
+;        'trs', time_double('2013-05-01/'+['07:46:00','07:50']), $
+;        'ens', [6200,1300]*2 )
+    test_info_list.add, dictionary($
+        'species', 'p', $
+        'trs', time_double('2013-05-01/'+['07:39:22','07:41:30'])+20, $
+        'ens', [8000,300] )
 
     trace_input_list = list()
     foreach info, test_info_list do begin
@@ -409,7 +435,7 @@ test = 1
 
         times = ((plot_info[species])['times']).toarray()
         energys = ((plot_info[species])['energys']).toarray()
-        plots, times, energys, data=1, psym=1, symsize=0.2, color=sgcolor('black')
+        plots, times, energys, data=1, psym=psym, symsize=symsz, color=test_o_color
     endforeach
 
     
@@ -471,10 +497,10 @@ test = 1
         energys = (the_output['energys']).toarray()
 
         foreach color_conic, color_conics, conic_id do begin        
-            plots, conic_times[*,conic_id], energys, data=1, color=color_conic, psym=1, symsize=0.2
+            plots, conic_times[*,conic_id], energys, data=1, color=color_conic, psym=psym, symsize=symsz
         endforeach
         
-        plots, beam_times, energys, data=1, color=color_beam, psym=1, symsize=0.2
+        plots, beam_times, energys, data=1, color=color_beam, psym=psym, symsize=symsz
     endforeach
     
     
@@ -496,12 +522,12 @@ test = 1
     foreach color_conic, color_conics, conic_id do begin
         ty = tpos[1]+(0.2+conic_id)*ychsz
         the_dis = mean(conic_dis[*,conic_id])
-        msg = 'Conic, PA '+string(test_pitch_angles[conic_id],format='(I0)')+' deg, '+string(the_dis,format='(F3.1)')+' Re'
+        msg = 'Conic, PA '+string(test_pitch_angles[conic_id],format='(I0)')+' deg, '+string(the_dis-1,format='(F3.1)')+' Re'
         xyouts, tx,ty,normal=1, msg, charsize=label_size, color=color_conic
     endforeach
     
     ty = tpos[1]+(0.2+2)*ychsz
-    msg = 'Beam, '+string(beam_dis,format='(F3.1)')+' Re'
+    msg = 'Beam, '+string(beam_dis-1,format='(F3.1)')+' Re'
     xyouts, tx,ty,normal=1, msg, charsize=label_size, color=color_beam
     
     
@@ -518,6 +544,7 @@ test = 1
     if keyword_set(test) then stop
     sgclose
     
+    return, plot_file
     
 
 end

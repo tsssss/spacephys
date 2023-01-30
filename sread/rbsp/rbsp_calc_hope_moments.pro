@@ -13,13 +13,15 @@
 ; release=. By default is 'rel04'.
 ; balance_pixel=. Set to fine tune (balance) the flux in opposite direction.
 ; ncycle=. By default is 1. The # of spin used to calculate moments.
+; vsc_var=. A string storing the SC potential.
 ;-
 pro rbsp_calc_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
     species=input_species, coord=coord, $
     ion_energy_range=ion_energy_range, electron_energy_range=electron_energy_range, $
     oxygen_energy_range=oxygen_energy_range, helium_energy_range=helium_energy_range, $
     release=release, $
-    balance_pixel=balance_pixel, ncycle=ncycle
+    balance_pixel=balance_pixel, ncycle=ncycle, $
+    vsc_var=vsc_var
 
     if n_elements(ion_energy_range) ne 2 then ion_energy_range = [30,1e6]
     if n_elements(electron_energy_range) ne 2 then electron_energy_range = [200,1e6]
@@ -173,7 +175,11 @@ pro rbsp_calc_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
         q0 = species_info[the_species].q
         m0 = species_info[the_species].mass
         m_e = m0/1.6d-19*1d6
-        vsc = 0d
+        if n_elements(vsc_var) eq 0 then begin
+            vscs = fltarr(nrec)+0d
+        endif else begin
+            vscs = get_var_data(vsc_var, at=ut0s+dtimes(dt_phase_ratio))
+        endelse
         for jj=0, nrec-1 do begin
             ; flux, energy and denergy.
             tfdat = reform(fdat[jj,*,*,*])
@@ -223,7 +229,7 @@ pro rbsp_calc_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
             dat0.mass = m_e
             dat0.species = the_species
             dat0.magf = [0d,0,0]
-            dat0.sc_pot = vsc
+            dat0.sc_pot = vscs[jj]
             dat0.units = 'eflux'
             dat0.energy = ten0s
             dat0.denergy = den0s

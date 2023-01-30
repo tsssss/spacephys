@@ -51,7 +51,7 @@ function smom3d, data, vsc=vsc, dmom=dmom, erange=erange
     e1s = e0s+q0*vsc    ; E after sc potential correction.
     weight = 0d> (e0s+q0*vsc)/des+0.5 <1d
 
-    if n_elements(erange) eq 2 then begin   ; energy rrange in eV.
+    if n_elements(erange) eq 2 then begin   ; energy range in eV.
         idx = where(e0s lt erange[0] or e0s gt erange[1], cnt)
         if cnt ne 0 then fdat[idx,*] = 0d
     endif 
@@ -71,7 +71,7 @@ function smom3d, data, vsc=vsc, dmom=dmom, erange=erange
 ;---Calculate the moments.
 
     ; density in 1/cm^3.
-    dens = total(fdat*de_e*weight*e1s^0.5/e0s*do0)*(sqrt(m_e*0.5)*1e-5)
+    dens = total(fdat*de_e*weight*e1s^0.5/e0s*do0,nan=1)*(sqrt(m_e*0.5)*1e-5)
     if dens lt 0 then stop
     if ~finite(dens) then return, mom3d
 

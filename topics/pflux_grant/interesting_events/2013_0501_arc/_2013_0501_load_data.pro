@@ -1055,7 +1055,7 @@ function _2013_0501_load_data_weygand_ut, event_info, time_var=var, get_name=get
     if ~cdf_has_var(var, filename=data_file) then begin
         time_range = event_info['weygand_time_range']
         time_step = event_info['weygand_time_step']
-        times = make_bins(time_range+[0,-1]*time_step, time_step)
+        times = make_bins(time_range, time_step)
         cdf_save_var, var, value=times, filename=data_file
         settings = dictionary($
             'time_step', time_step, $
@@ -1071,10 +1071,28 @@ function _2013_0501_load_data_weygand, event_info, time_var=time_var
 
     data_file = event_info['data_file']
     time_range = event_info['weygand_time_range']
-    j_hor_var = themis_read_weygand_j(time_range, id='j_hor')
-    j_ver_var = themis_read_weygand_j(time_range, id='j_ver')
+    if n_elements(time_var) eq 0 then time_var = _2013_0501_load_data_weygand_ut(get_name=1)
 
-stop
+    types = ['hor','ver']
+    j_vars = 'thg_j_'+types
+    foreach type, types do begin
+        var = 'thg_j_'+type
+        if ~cdf_has_var(var, filename=data_file) then begin
+            var = themis_read_weygand_j(time_range, id='j_'+type)
+
+            data = get_var_data(var, limits=limits)
+            cdf_save_var, var, value=data, filename=data_file
+            settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
+            settings['depend_0'] = time_var
+            settings['var_type'] = 'data'
+            cdf_save_setting, settings, filename=data_file, varname=var
+        endif
+
+        if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
+    endforeach
+
+    return, j_vars
+    
 end
 
 
@@ -1098,6 +1116,7 @@ function _2013_0501_load_data, filename=data_file
     time_range = event_info['time_range']
     probe = event_info['probe']
     prefix = event_info['prefix']
+    event_info['sc_color'] = sgcolor('purple')
     
     snapshot_time = time_double('2013-05-01/07:38:18')
     event_info['snapshot_time'] = snapshot_time
@@ -1110,7 +1129,6 @@ function _2013_0501_load_data, filename=data_file
     event_info['weygand_time_range'] = time_range
     times = _2013_0501_load_data_weygand_ut(event_info, time_var=weygand_time_var)
     j_vars = _2013_0501_load_data_weygand(event_info, time_var=weygand_time_var)
-stop
     
     
 ;---HOPE vars.

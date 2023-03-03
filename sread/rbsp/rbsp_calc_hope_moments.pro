@@ -63,13 +63,14 @@ pro rbsp_calc_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
 
 ;---Constants.
     errmsg = ''
-    re = 6378d & re1 = 1d/re
+    re = constant('re')
+    re1 = 1d/re
     p_mass = 1.67d-27   ; kg.
     e_mass = 0.91d-30   ; kg.
     xyz = ['x','y','z']
     uvw = ['u','v','w']
     fac = ['b','w','n']
-    rgb = sgcolor(['red','green','blue'])
+    rgb = constant('rgb')
     species_info = dictionary()
     species_info['e']  = dictionary('q',-1, 'mass',e_mass, 'energy_range'  ,electron_energy_range )
     species_info['p']  = dictionary('q', 1, 'mass',p_mass, 'energy_range'  ,ion_energy_range )
@@ -149,6 +150,8 @@ pro rbsp_calc_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
         ; Get the start/end times of an integration cycle.
         dt_var = 'Epoch_'+charge_type+'_DELTA'
         dtimes = get_var_data(dt_var)*2d-3
+        ; The start and end of the integration times.
+        ; By default, for 1 spin, the time is the center of the spin, i.e., at phi=180 deg.
         ut0s = times-dtimes*(dt_phase_ratio)
         ut1s = times+dtimes*(1-dt_phase_ratio)
 
@@ -250,8 +253,8 @@ pro rbsp_calc_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
 
         ; Time and Quaternion.
         times = moms.ut
-        get_data, q_var, uts, q_uvw2gse
-        q_uvw2gse = qslerp(q_uvw2gse, uts, times)
+;        get_data, q_var, uts, q_uvw2gse
+;        q_uvw2gse = qslerp(q_uvw2gse, uts, times)
 
         ; Density.
         density_var = prefix+the_species+'_density'

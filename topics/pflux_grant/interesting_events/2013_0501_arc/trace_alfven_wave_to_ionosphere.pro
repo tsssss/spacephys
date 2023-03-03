@@ -20,9 +20,9 @@ function trace_alfven_wave_to_ionosphere, time, model=model, mod_time=model_time
 
     tmp = geopack_resolve_model(model)
     t89 = tmp.t89
-    t95 = tmp.t96
-    t00 = tmp.t01
-    ts03 = tmp.ts04
+    t96 = tmp.t96
+    t01 = tmp.t01
+    ts04 = tmp.ts04
     storm = tmp.storm
     
     if n_elements(model_time) eq -1 then model_time = time

@@ -3,9 +3,9 @@
 ;-
 
 units = ['energy','velocity']
-scales = [0,1]
+scale_methods = ['default']
 test_species = ['p','o','e']
-plot_types = [0,1]
+contour_flags = [0,1]
 
 if n_elements(event_info) eq 0 then event_info = _2013_0501_load_data()
 prefix = event_info['prefix']
@@ -21,14 +21,13 @@ foreach species, test_species do begin
     endcase
 
     foreach unit, units do begin
-        foreach scale, scales do begin
-            scale_str = (scale eq 0)? 'linear': 'log'
-            foreach plot_type, plot_types do begin
-                plot_type_str = (plot_type eq 1)? 'contour': 'polygon'
+        foreach scale_method, scale_methods do begin
+            foreach use_contour, contour_flags do begin
+                plot_type_str = (use_contour eq 1)? 'contour': 'polygon'
                 the_dir = join_path([plot_dir,species])
-                file_suffix = '_'+unit+'_'+scale_str+'_'+plot_type_str
-                var = rbsp_plot_pa_contour2d(time_range, probe=probe, species=species, $
-                    log=scale, unit=unit, zrange=zrange, contour=plot_type, plot_dir=the_dir, file_suffix=file_suffix)
+                file_suffix = '_'+unit+'_'+scale_method+'_'+plot_type_str
+                var = rbsp_plot_pa2d(time_range, probe=probe, species=species, $
+                    scale_method=scale_method, unit=unit, zrange=zrange, contour=use_contour, plot_dir=the_dir, file_suffix=file_suffix)
             endforeach   
         endforeach
     endforeach

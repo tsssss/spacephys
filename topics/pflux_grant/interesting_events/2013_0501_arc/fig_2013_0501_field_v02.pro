@@ -31,6 +31,7 @@ test = 1
     data = interpol(data[index], times[index], times)
     store_data, n_var, times, data, limits=lim
     options, n_var, 'labels', 'Density!C  >200 eV'
+    options, n_var, 'ytitle', '(cm!E-3!N)'
     
     var = n_var
     yrange = [0.1,3]
@@ -163,7 +164,7 @@ test = 1
     log_ytickv = make_bins(log_yrange,1,inner=1)
     ytickv = 10d^log_ytickv
     yticks = n_elements(ytickv)-1
-    ytickn = '10!U'+string(log_ytickv,format='(I0)')
+    ytickn = '10!E'+string(log_ytickv,format='(I0)')
     yminor = 10
     foreach tx, ytickv, ii do begin
         if tx eq 1 then begin
@@ -196,7 +197,7 @@ test = 1
     log_ytickv = make_bins(log_yrange,1,inner=1)
     ytickv = 10d^log_ytickv
     yticks = n_elements(ytickv)-1
-    ytickn = '10!U'+string(log_ytickv,format='(I0)')
+    ytickn = '10!E'+string(log_ytickv,format='(I0)')
     yminor = 10
     foreach tx, ytickv, ii do begin
         if tx eq 1 then begin
@@ -354,7 +355,7 @@ test = 1
 ;---Trace O+ data.
     model_time = time_double('2013-05-01/07:38:03')
     beam_dis = 2.1
-    beam_dis = 2.5
+    beam_dis = 3
     color_beam = sgcolor('deep_pink')
     color_conics = sgcolor(['green','blue'])
     test_pitch_angles = [175d,162]
@@ -363,16 +364,16 @@ test = 1
     test_info_list = list()
     test_info_list.add, dictionary($
         'species', 'o', $
-        'trs', time_double('2013-05-01/'+['07:40:53','07:43:09']), $
-        'ens', [6200,1300] )
-;    test_info_list.add, dictionary($
-;        'species', 'o', $
-;        'trs', time_double('2013-05-01/'+['07:46:00','07:50']), $
-;        'ens', [6200,1300]*2 )
+        'trs', time_double('2013-05-01/'+['07:40:53','07:43:32']), $
+        'ens', [6200,900] )
+;        'trs', time_double('2013-05-01/'+['07:40:53','07:43:09']), $
+;        'ens', [6200,1300] )
     test_info_list.add, dictionary($
         'species', 'p', $
-        'trs', time_double('2013-05-01/'+['07:39:22','07:41:30'])+20, $
-        'ens', [8000,300] )
+        'trs', time_double('2013-05-01/'+['07:40:08','07:42:01']), $
+        'ens', [7000,200] )
+;        'trs', time_double('2013-05-01/'+['07:39:22','07:41:30'])+20, $
+;        'ens', [8000,300] ) 
 
     trace_input_list = list()
     foreach info, test_info_list do begin

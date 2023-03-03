@@ -208,7 +208,7 @@ function _2013_0501_load_data_density, event_info
     add_setting, var, smart=1, dictionary($
         'ylog', 1, $
         'display_type', 'stack', $
-        'unit', 'cm!U-3!N', $
+        'unit', 'cm!E-3!N', $
         'labels', 'N '+labels, $
         'colors', colors )
     return, var
@@ -683,7 +683,7 @@ function _2013_0501_load_data_pflux, event_info, fac_vars
     
     pf_fac_vars = []
     pf_spec_vars = []
-    spec_unit = tex2str('mu')+'W/m!U2!N'
+    spec_unit = tex2str('mu')+'W/m!E2!N'
     spec_ct = 66
     spec_zrange = [-1,1]*50
     spec_zstep = 50
@@ -704,14 +704,14 @@ function _2013_0501_load_data_pflux, event_info, fac_vars
     ndim = 3
     
     foreach type, types do begin
-        b1_fac_var = fac_vars[0]
+        b1_fac_var = prefix+'b1_fac'
         e1_fac_var = prefix+'e'+type+'_fac'
         pf_fac_var = prefix+'pf'+type+'_fac'
         stplot_calc_pflux_mor, e1_fac_var, b1_fac_var, pf_fac_var, scaleinfo=scale_info
         add_setting, pf_fac_var, smart=1, dictionary($
             'display_type', 'vector', $
             'short_name', 'S', $
-            'unit', 'mW/m!U2!N', $
+            'unit', 'mW/m!E2!N', $
             'coord', 'FAC', $
             'coord_labels', event_info['fac_labels'] )
         pf_fac_vars = [pf_fac_vars,pf_fac_var]
@@ -725,7 +725,7 @@ function _2013_0501_load_data_pflux, event_info, fac_vars
         add_setting, pf_fac_map_var, smart=1, dictionary($
             'display_type', 'vector', $
             'short_name', 'S', $
-            'unit', 'mW/m!U2!N', $
+            'unit', 'mW/m!E2!N', $
             'model', model, $
             'internal_model', internal_model, $
             'coord', 'FAC', $
@@ -990,13 +990,14 @@ function _2013_0501_load_data_plasma_param, event_info
     get_data, vf_fac_var, times, v_fac, limits=lim
     ndim = 3
     vf_fac = fltarr(ndim)
-    for ii=0,ndim-1 do vf_fac[ii] = abs(mean(v_fac[*,ii],nan=1))
+;    for ii=0,ndim-1 do vf_fac[ii] = abs(mean(v_fac[*,ii],nan=1))
+    for ii=0,ndim-1 do vf_fac[ii] = mean(abs(v_fac[*,ii]),nan=1)
     plasma_param['vf_fac'] = vf_fac
     plasma_param['vf'] = vf_fac[1]
     
     vf_exb_fac = fltarr(ndim)
     vexb_fac = get_var_data(prefix+'vexbdot0_fac', in=the_time_range)
-    for ii=0,ndim-1 do vf_fac[ii] = abs(mean(vexb_fac[*,ii],nan=1))
+    for ii=0,ndim-1 do vf_fac[ii] = mean(abs(vexb_fac[*,ii]),nan=1)
     plasma_param['vf_exb_fac'] = vf_fac
     plasma_param['vf_exb'] = vf_fac[1]
 
@@ -1116,7 +1117,7 @@ function _2013_0501_load_data, filename=data_file
     time_range = event_info['time_range']
     probe = event_info['probe']
     prefix = event_info['prefix']
-    event_info['sc_color'] = sgcolor('purple')
+    event_info['sc_color'] = sgcolor('dark_violet')
     
     snapshot_time = time_double('2013-05-01/07:38:18')
     event_info['snapshot_time'] = snapshot_time
@@ -1160,6 +1161,7 @@ function _2013_0501_load_data, filename=data_file
 
     ; Seperate B0 and B1.
     event_info['b0_window'] = 20.*60
+    bmod_var = _2013_0501_load_data_bmod_gsm(event_info)
     var = _2013_0501_load_data_b0_gsm(event_info, time_var=field_time_var)
     b1_gsm_var = _2013_0501_load_data_b1_gsm(event_info)
     

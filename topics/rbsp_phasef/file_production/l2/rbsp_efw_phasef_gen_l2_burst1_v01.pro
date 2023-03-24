@@ -225,6 +225,8 @@ root_dir = out_local_root
 
 probes = ['b','a']
 mission_time_range = time_double(['2018-12-30','2020'])
+probes = ['a']
+mission_time_range = time_double(['2015-12-02','2015-12-03'])
 ;mission_time_range = time_double(['2012','2015'])
 ;mission_time_range = time_double(['2012','2012-10-01'])
 time_step = 15d*60

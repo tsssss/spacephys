@@ -3,14 +3,15 @@ function rbsp_themis_injection_identify_rbsp_injection, filename=txt_file
 
     pinfo = rbsp_themis_injection_load_project()
     search_time_range = pinfo['search_time_range']
+    version = pinfo['latest_version']
 
     probes = ['a','b']
-    my_dir = join_path([pinfo['root_dir'],'identify_rbsp_injection_v01'])
+    my_dir = join_path([pinfo['root_dir'],'identify_rbsp_injection_'+version])
     ;my_dir = !null
     secofday = constant('secofday')
     dates = make_bins(search_time_range+[0,-1]*secofday, secofday)
     if n_elements(txt_file) eq 0 then begin
-        txt_file = join_path([my_dir,'identify_rbsp_injection_v01.txt'])
+        txt_file = join_path([my_dir,'identify_rbsp_injection_'+version+'.txt'])
     endif
     if file_test(txt_file) eq 1 then return, txt_file else ftouch, txt_file
 
@@ -38,6 +39,8 @@ function rbsp_themis_injection_identify_rbsp_injection, filename=txt_file
         endforeach
         lprmsg, msg, log_file
     endforeach
+    
+    return, txt_file
 
 end
 

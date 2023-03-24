@@ -6,7 +6,8 @@ function rbsp_themis_injection_read_rbsp_injection, input_time_range, probe=inpu
 
     pinfo = rbsp_themis_injection_load_project()
     data_dir = pinfo['data_dir']
-    injection_file = join_path([data_dir,'rbsp_injection_list_v01.txt'])
+    version = pinfo['latest_version']
+    injection_file = join_path([data_dir,'rbsp_injection_list_'+version+'.txt'])
     if file_test(injection_file) eq 0 then begin
         injection_file = rbsp_themis_injection_gen_rbsp_injection_list(filename=injection_file)
     endif
@@ -108,5 +109,5 @@ function rbsp_themis_injection_read_rbsp_injection, input_time_range, probe=inpu
 end
 
 
-tmp = rbsp_themis_injection_read_rbsp_injection(['2014','2015'])
+tmp = rbsp_themis_injection_read_rbsp_injection(['2013','2018'])
 end

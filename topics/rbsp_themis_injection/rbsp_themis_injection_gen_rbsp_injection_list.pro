@@ -20,9 +20,7 @@ function rbsp_themis_injection_gen_rbsp_injection_list, filename=injection_file
         '-    ----------------------------------    ------------------------------------------    ------------     -------------    ----------------' ]
     ftouch, injection_file
     foreach header, headers do lprmsg, header, injection_file
-    nheader = n_elements(headers)
-    format = 
-    
+    nheader = n_elements(headers)    
 
     foreach line, lines do begin
         infos = strsplit(line,' ', extract=1)

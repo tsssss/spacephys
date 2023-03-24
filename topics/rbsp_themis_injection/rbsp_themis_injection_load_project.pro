@@ -22,6 +22,9 @@ function rbsp_themis_injection_load_project, reset=reset
         project_updated = 1
     endif
 
+    ; 2023-03-07, v02 removes artificial injections for -A, when the wanted energy bins are missing.
+    project['latest_version'] = 'v02'
+
     if project_updated then update_project, project
     return, project
 end

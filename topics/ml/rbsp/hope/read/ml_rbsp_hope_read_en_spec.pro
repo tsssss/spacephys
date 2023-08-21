@@ -65,7 +65,8 @@ function ml_rbsp_hope_read_en_spec, input_time_range, probe=probe, $
         'ylog', 1, $
         'yrange', [4,4e4], $
         'zlog', 1, $
-        'species', species )
+        'species', species, $
+        'requested_time_range', time_range )
     return, en_spec_var
     
 end

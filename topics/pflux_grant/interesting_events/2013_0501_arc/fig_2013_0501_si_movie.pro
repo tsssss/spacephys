@@ -25,7 +25,7 @@ test = 0
     if n_elements(movie_file) eq 0 then begin
         plot_dir = event_info['plot_dir']
         movie_file = join_path([plot_dir,$
-            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD')+'_v02.mp4'])
+            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD')+'_v03.mp4'])
     endif
 
     xticklen_chsz = -0.2
@@ -139,35 +139,35 @@ test = 0
         xyouts, tx,ty,normal=1, msg, color=sgcolor('black')
 
 
-    ;---Add FAC.
-        j_ver = get_var_data('thg_j_ver', at=time, limits=lim)
-        pixel_mlons = lim.mlon_grids
-        pixel_mlats = lim.mlat_grids
-        pixel_mlts = mlon2mlt(pixel_mlons, time)+24
-        index = where(pixel_mlts gt xrange[0] and pixel_mlts lt xrange[1] and $
-            pixel_mlats gt yrange[0] and pixel_mlats lt yrange[1], npixel)
-        xxs = pixel_mlts[index]
-        yys = pixel_mlats[index]
-        zzs = j_ver[index]
-        fac_zrange = [-1,1]*1e5
-        ccs = bytscl(zzs, min=fac_zrange[0], max=fac_zrange[1])
-        dc = 80
-        ccs[where(zzs ge 0)] = 128+dc
-        ccs[where(zzs lt 0)] = 128-dc
-        ct = 70
-        tmp = smkarthm(0,2*!dpi,30,'n')
-        txs = cos(tmp)
-        tys = sin(tmp)
-        usersym, txs, tys
-        
-        symszs = (abs(zzs/fac_zrange[1]))^0.25*0.5
-        for ii=0,npixel-1 do begin
-            cc = sgcolor(ccs[ii], ct=ct)
-            symsz = symszs[ii]
-            ;symsz = 0.5
-            ;cc = (zzs[ii] ge 0)? sgcolor('blue'): sgcolor('red')
-            plots, xxs[ii], yys[ii], color=cc, psym=8, symsize=symsz
-        endfor
+;    ;---Add FAC.
+;        j_ver = get_var_data('thg_j_ver', at=time, limits=lim)
+;        pixel_mlons = lim.mlon_grids
+;        pixel_mlats = lim.mlat_grids
+;        pixel_mlts = mlon2mlt(pixel_mlons, time)+24
+;        index = where(pixel_mlts gt xrange[0] and pixel_mlts lt xrange[1] and $
+;            pixel_mlats gt yrange[0] and pixel_mlats lt yrange[1], npixel)
+;        xxs = pixel_mlts[index]
+;        yys = pixel_mlats[index]
+;        zzs = j_ver[index]
+;        fac_zrange = [-1,1]*1e5
+;        ccs = bytscl(zzs, min=fac_zrange[0], max=fac_zrange[1])
+;        dc = 80
+;        ccs[where(zzs ge 0)] = 128+dc
+;        ccs[where(zzs lt 0)] = 128-dc
+;        ct = 70
+;        tmp = smkarthm(0,2*!dpi,30,'n')
+;        txs = cos(tmp)
+;        tys = sin(tmp)
+;        usersym, txs, tys
+;        
+;        symszs = (abs(zzs/fac_zrange[1]))^0.25*0.5
+;        for ii=0,npixel-1 do begin
+;            cc = sgcolor(ccs[ii], ct=ct)
+;            symsz = symszs[ii]
+;            ;symsz = 0.5
+;            ;cc = (zzs[ii] ge 0)? sgcolor('blue'): sgcolor('red')
+;            plots, xxs[ii], yys[ii], color=cc, psym=8, symsize=symsz
+;        endfor
 
 
         if keyword_set(test) then stop

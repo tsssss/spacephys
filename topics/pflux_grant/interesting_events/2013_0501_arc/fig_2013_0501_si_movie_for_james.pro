@@ -1,21 +1,22 @@
 ;+
 ; Generate the movie for supplemental information.
-;
+; To print the current, glat/glon.
 ; Adopted from fig_si_movie
 ;-
 
-function fig_2013_0501_si_movie_all_models, movie_file, event_info=event_info
+function fig_2013_0501_si_movie_for_james, movie_file, event_info=event_info
 
 
 ;---Load data and settings.
     if n_elements(event_info) eq 0 then event_info = _2013_0501_load_data()
-test = 1
+test = 0
 
     probe = event_info['probe']
     prefix = event_info['prefix']
 
     time_range = event_info['asi_time_range']
     model_setting = event_info['model_setting']
+    external_model = model_setting['external_model']
     internal_model = model_setting['internal_model']
     models = model_setting['models']
     asi_setting = event_info['asi_setting']
@@ -24,7 +25,7 @@ test = 1
     if n_elements(movie_file) eq 0 then begin
         plot_dir = event_info['plot_dir']
         movie_file = join_path([plot_dir,$
-            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD')+'_all_models.mp4'])
+            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD')+'_for_james_v02.mp4'])
     endif
 
     xticklen_chsz = -0.2
@@ -111,64 +112,87 @@ test = 1
             position=tpos, nodata=1, noerase=1, ynozero=1
 
     ;---Add footpoint.
-        fmlts = get_var_data(prefix+'fmlt_'+internal_model, at=time)+24
-        fmlats = get_var_data(prefix+'fmlat_'+internal_model, at=time)
-        model_colors = sgcolor(['red','green','blue','black'])
-        foreach external_model, models, model_index do begin
-            sc_color = event_info['sc_color']
-            model_color = model_colors[model_index]
-            fmlt = fmlts[model_index]
-            fmlat = fmlats[model_index]
+        fmlt = get_var_data(prefix+'fmlt_'+internal_model, at=time)+24
+        fmlat = get_var_data(prefix+'fmlat_'+internal_model, at=time)
+        model_index = where(models eq external_model)
+        sc_color = event_info['sc_color']
+        fmlt = fmlt[model_index]
+        fmlat = fmlat[model_index]
 
-            tmp = convert_coord(fmlt, fmlat, /data, /to_normal)
-            tx = tmp[0]
-            ty = tmp[1]
-            plots, tx,ty,normal=1, psym=6, symsize=0.5, color=model_color
+        tmp = convert_coord(fmlt, fmlat, /data, /to_normal)
+        tx = tmp[0]
+        ty = tmp[1]
+        plots, tx,ty,normal=1, psym=6, symsize=0.5, color=sc_color
+        msg = 'RBSP-B'
+        xyouts, tx,ty+ychsz*0.5,normal=1, msg, color=sc_color, alignment=0.5
 
-            ; Add model name.
-            tx = tpos[0]+xchsz*(1+model_index*5)
-            ty = tpos[3]-ychsz*1.5
-            xyouts, tx,ty,normal=1, strupcase(external_model), color=model_color
-        endforeach
-
+;        ; Add model name.
+;        tx = tpos[0]+xchsz*1
+;        ty = tpos[3]-ychsz*1.5
+;        xyouts, tx,ty,normal=1, strupcase(external_model), color=color
 
 
     ;---Add label.
-        tx = tpos[0]+xchsz*1
-        ty = tpos[1]+ychsz*0.3
+        tx = tpos[0]-xchsz*6
+        ty = tpos[1]-ychsz*3
         msg = strupcase(site)+' '+time_string(time,tformat='YYYY-MM-DD/hh:mm:ss')+' UT'
         xyouts, tx,ty,normal=1, msg, color=sgcolor('black')
 
 
-;    ;---Add FAC.
-;        j_ver = get_var_data('thg_j_ver', at=time, limits=lim)
-;        pixel_mlons = lim.mlon_grids
-;        pixel_mlats = lim.mlat_grids
-;        pixel_mlts = mlon2mlt(pixel_mlons, time)+24
-;        index = where(pixel_mlts gt xrange[0] and pixel_mlts lt xrange[1] and $
-;            pixel_mlats gt yrange[0] and pixel_mlats lt yrange[1], npixel)
-;        xxs = pixel_mlts[index]
-;        yys = pixel_mlats[index]
-;        zzs = j_ver[index]
-;        fac_zrange = [-1,1]*1e5
-;        ccs = bytscl(zzs, min=fac_zrange[0], max=fac_zrange[1])
-;        dc = 80
-;        ccs[where(zzs ge 0)] = 128+dc
-;        ccs[where(zzs lt 0)] = 128-dc
-;        ct = 70
-;        tmp = smkarthm(0,2*!dpi,30,'n')
-;        txs = cos(tmp)
-;        tys = sin(tmp)
-;        usersym, txs, tys
-;        
-;        symszs = (abs(zzs/fac_zrange[1]))^0.25*0.5
-;        for ii=0,npixel-1 do begin
-;            cc = sgcolor(ccs[ii], ct=ct)
-;            symsz = symszs[ii]
-;            ;symsz = 0.5
-;            ;cc = (zzs[ii] ge 0)? sgcolor('blue'): sgcolor('red')
-;            plots, xxs[ii], yys[ii], color=cc, psym=8, symsize=symsz
-;        endfor
+    ;---Add FAC.
+        j_ver = get_var_data('thg_j_ver', at=time, limits=lim)
+        label_size = 0.7
+        pixel_glats = lim.glat_grids
+        pixel_glons = lim.glon_grids
+        pixel_mlons = lim.mlon_grids
+        pixel_mlats = lim.mlat_grids
+        pixel_mlts = mlon2mlt(pixel_mlons, time)+24
+        index = where(pixel_mlts gt xrange[0] and pixel_mlts lt xrange[1] and $
+            pixel_mlats gt yrange[0] and pixel_mlats lt yrange[1], npixel)
+        xxs = pixel_mlts[index]
+        yys = pixel_mlats[index]
+        zzs = j_ver[index]
+        the_glats = pixel_glats[index]
+        the_glons = pixel_glons[index]
+        fac_zrange = [-1,1]*1e5
+        ccs = bytscl(zzs, min=fac_zrange[0], max=fac_zrange[1])
+        dc = 80
+        ccs[where(zzs ge 0)] = 128+dc
+        ccs[where(zzs lt 0)] = 128-dc
+        ct = 70
+        tmp = smkarthm(0,2*!dpi,30,'n')
+        txs = cos(tmp)
+        tys = sin(tmp)
+        usersym, txs, tys
+        
+        symszs = (abs(zzs/fac_zrange[1]))^0.25*0.5
+        glat_list = list()
+        glon_list = list()
+        for ii=0,npixel-1 do begin
+            cc = sgcolor(255-ccs[ii], ct=ct)
+            symsz = symszs[ii]
+            ;symsz = 0.5
+            ;cc = (zzs[ii] ge 0)? sgcolor('blue'): sgcolor('red')
+            plots, xxs[ii], yys[ii], color=cc, psym=8, symsize=symsz
+            tmp = convert_coord(xxs[ii],yys[ii], data=1, to_normal=1)
+            tx = tmp[0]
+            ty = tmp[1]
+            msg = ''
+            if glat_list.where(the_glats[ii]) eq !null then begin
+                msg += strtrim(string(the_glats[ii],format='(F4.1)'),2)+'!C'
+                glat_list.add, the_glats[ii]
+            endif
+            if glon_list.where(the_glons[ii]) eq !null then begin
+                msg += strtrim(string(the_glons[ii],format='(F6.1)'),2)+'!C'
+                glon_list.add, the_glons[ii]
+            endif
+            if msg eq '' then begin
+                msg = strtrim(string(zzs[ii]/1e3,format='(F6.1)'),2)
+                xyouts, tx,ty, msg, normal=1, charsize=label_size, color=cc
+            endif else begin
+                xyouts, tx,ty, msg, normal=1, charsize=label_size
+            endelse
+        endfor
 
 
         if keyword_set(test) then stop
@@ -181,5 +205,5 @@ test = 1
 end
 
 
-print, fig_2013_0501_si_movie_all_models(event_info=event_info)
+print, fig_2013_0501_si_movie_for_james(event_info=event_info)
 end

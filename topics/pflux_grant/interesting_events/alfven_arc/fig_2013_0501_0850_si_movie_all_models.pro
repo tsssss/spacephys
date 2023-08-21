@@ -4,12 +4,12 @@
 ; Adopted from fig_si_movie
 ;-
 
-function fig_2013_0501_si_movie_all_models, movie_file, event_info=event_info
+function fig_2013_0501_0850_si_movie_all_models, movie_file, event_info=event_info
 
 
 ;---Load data and settings.
-    if n_elements(event_info) eq 0 then event_info = _2013_0501_load_data()
-test = 1
+    if n_elements(event_info) eq 0 then event_info = _2013_0501_0850_load_data()
+test = 0
 
     probe = event_info['probe']
     prefix = event_info['prefix']
@@ -24,7 +24,7 @@ test = 1
     if n_elements(movie_file) eq 0 then begin
         plot_dir = event_info['plot_dir']
         movie_file = join_path([plot_dir,$
-            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD')+'_all_models.mp4'])
+            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD_hhmm')+'_all_models.mp4'])
     endif
 
     xticklen_chsz = -0.2
@@ -32,8 +32,8 @@ test = 1
     margins = [7,4,3,1]
 
 ;---ASI.
-    mlt_range = [-2,0.5]
-    mlat_range = [58,68]
+    mlt_range = [-1,2]
+    mlat_range = [55,70]
     asi_ct = 49
     top_color = 254
 
@@ -57,7 +57,7 @@ test = 1
     yminor = 5
 
 
-    zrange = [0,1e4]
+    zrange = [0,5e3]
     ztitle = 'ASI Count (#)'
 
     mlt_image_var = 'thg_asf_mlt_image_rect'
@@ -181,5 +181,5 @@ test = 1
 end
 
 
-print, fig_2013_0501_si_movie_all_models(event_info=event_info)
+print, fig_2013_0501_0850_si_movie_all_models(event_info=event_info)
 end

@@ -18,7 +18,8 @@ function ml_omni_read_ae, input_time_range, get_name=get_name
         return, retval
     endif
     time_range = time_double(input_time_range)
-
+    if not check_if_update(var, time_range) then return, var
+    
     au_var = ml_omni_read_param_var(input_time_range, var='au')
     al_var = ml_omni_read_param_var(input_time_range, var='al')
     get_data, au_var, times, au

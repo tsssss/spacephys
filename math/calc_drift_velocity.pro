@@ -152,6 +152,23 @@ function calc_drift_velocity, rgsm=rgsm0, time=ut0, $
 end
 
 
+energy0 = 200   ; keV
+uts = time_double(['2015-04-15/14:30','2015-04-15/18:00'])
+r_var = rbsp_read_orbit(minmax(uts), probe='a', coord='gsm')
+pitch_angle0 = 75d
+species = 'e
+model = 'igrf'
+foreach ut0, uts do begin
+    rgsm0 = get_var_data(r_var, at=ut0)
+    v_drift = calc_drift_period(rgsm=rgsm0, time=ut0, $
+        energy=energy0, pitch_angle=pitch_angle0, species=species, $
+        model=model, bounce_period=bounce_period)
+    print, energy0, v_drift
+endforeach
+
+stop
+
+
 ut0 = time_double('2014-08-28/10:18')
 rgsm0 = [-1d,6.2,1.2]           ; in Re.
 energys = [40,75,150,275,475]

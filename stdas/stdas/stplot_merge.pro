@@ -57,6 +57,9 @@ function stplot_merge, vars, output=newname, ytitle=ytitle, labels=labels, $
         idx = where(vars eq newname, cnt)       ; ensure newname is different.
         if cnt eq 0 then store_data, vars, /delete
     endif
+    add_setting, newname, smart=1, dictionary($
+        'ynozero', 1, $
+        'labflag', -1 )
     
     return, newname
 end

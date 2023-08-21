@@ -19,7 +19,7 @@ test = 0
     fac_labels = event_info['fac_labels']
     bar_times = make_bins(time_range,600, inner=1)
     
-    bar_thick = (keyword_set(test))? 1: 4
+    bar_thick = (keyword_set(test))? 2: 6
     label_size = 0.8
 
 ;    beam_dis = 2.1
@@ -30,7 +30,8 @@ test = 0
     color_beam = sgcolor('red')
 ;    color_conics = sgcolor(['deep_pink','purple'])
 ;    test_pitch_angles = [162d,144]
-    color_conics = sgcolor(['orange'])
+    color_conics = sgcolor(['purple'])
+    color_conics = sgcolor(['indigo'])
     test_pitch_angles = [162d]
     
     ct_oxygen = 64
@@ -407,15 +408,15 @@ test = 0
     the_info = plot_info[var]
     conic_dis = the_info['conic_dis'].toarray()
     foreach color_conic, color_conics, conic_id do begin
-        ty = tpos[1]+(0.2+conic_id)*ychsz
+        ty = tpos[1]+(0.4+conic_id)*ychsz
         the_dis = mean(conic_dis[*,conic_id])
         msg = 'Conic, PA '+string(test_pitch_angles[conic_id],format='(I0)')+' deg, '+string(the_dis-1,format='(F3.1)')+' Re'
-        xyouts, tx,ty,normal=1, msg, charsize=label_size, color=color_conic
+        xyouts, tx,ty,normal=1, msg, color=color_conic;, charsize=label_size
     endforeach
     
     ty = tpos[1]+(0.2+n_elements(color_conics))*ychsz
     msg = 'Beam, '+string(beam_dis-1,format='(F3.1)')+' Re'
-    xyouts, tx,ty,normal=1, msg, charsize=label_size, color=color_beam
+    xyouts, tx,ty,normal=1, msg, color=color_beam;, charsize=label_size
 
 
 
@@ -474,7 +475,7 @@ test = 0
         foreach time, pa_times, time_id do begin
             tmp = convert_coord(time, yrange[0], data=1, to_normal=1)
             txs = tmp[0]+[0,0]
-            tys = tmp[1]+ychsz*[-0.6,-0.4]
+            tys = tmp[1]+ychsz*[-0.8,-0.4]
             plots, txs, tys, normal=1, thick=bar_thick
         endforeach
     endforeach

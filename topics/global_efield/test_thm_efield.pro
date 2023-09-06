@@ -38,7 +38,7 @@
         dims[0] = ntime
         data = make_array(dims, /float)
         for ii=0, ntime-1 do begin
-            index = lazy_where(uts, '[)', times[ii]+[0,dt], count=count)
+            index = where_pro(uts, '[)', times[ii]+[0,dt], count=count)
             if count eq 0 then continue
             vals = dat[0,*]
             foreach val, vals, ll do vals[ll] = mean(dat[index,ll])

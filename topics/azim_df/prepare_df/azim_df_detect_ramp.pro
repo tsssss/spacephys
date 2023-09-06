@@ -110,11 +110,11 @@ pro azim_df_detect_ramp, project=project, $
             r_sm_var = prefix+'r_sm'
             r_sm = get_var_data(r_sm_var, at=common_times)
             rxy = snorm(r_sm[*,0:1])
-            index = lazy_where(rxy, '][', rxy_range, count=count)
+            index = where_pro(rxy, '][', rxy_range, count=count)
             if count ne 0 then roi_flags[index] = 0
             ; mlt.
             mlt = azim_df_calc_pseudo_mlt(r_sm)
-            index = lazy_where(mlt, '][', mlt_range, count=count)
+            index = where_pro(mlt, '][', mlt_range, count=count)
             if count ne 0 then roi_flags[index] = 0
 
             index = where(roi_flags eq 1, count)
@@ -186,7 +186,7 @@ pro azim_df_detect_ramp, project=project, $
                     if (time_range[1]-the_time_range[1]) le boxcar_window then continue
 
                     ; Find if there is a node.
-                    index = lazy_where(times, '[]', the_time_range, count=npoint)
+                    index = where_pro(times, '[]', the_time_range, count=npoint)
                     min_value_index = index[0]
                     max_value_index = index[npoint-1]
                     min_value = theta_smooth[min_value_index]
@@ -231,7 +231,7 @@ pro azim_df_detect_ramp, project=project, $
                             ystyle=5, $
                             /noerase, /nodata
                         the_time_range = the_ramp.time_range
-                        index = lazy_where(times, '[]', the_time_range)
+                        index = where_pro(times, '[]', the_time_range)
                         xxs = times[index]
                         yys = theta_smooth[index]
                         plots, xxs,yys, color=sgcolor('green'), thick=2

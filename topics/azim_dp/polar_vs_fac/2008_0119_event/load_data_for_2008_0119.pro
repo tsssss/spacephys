@@ -559,19 +559,19 @@ pro load_data_for_2008_0119_lanl, default_settings
             sopa_p6_energy_range = [400,670d]
             sopa_p12_energy_range = [50,113]
             if not is_eflux then begin
-                index = lazy_where(energys, ')(', sopa_p6_energy_range, count=count)
+                index = where_pro(energys, ')(', sopa_p6_energy_range, count=count)
                 if count ne 0 then begin
                     energys = energys[index]
                     fluxes = fluxes[*,index]
                 endif
-                index = lazy_where(energys, ')(', sopa_p12_energy_range, count=count)
+                index = where_pro(energys, ')(', sopa_p12_energy_range, count=count)
                 if count ne 0 then begin
                     energys = energys[index]
                     fluxes = fluxes[*,index]
                 endif
             endif
             
-            index = lazy_where(energys, '[]', energy_range, count=count)
+            index = where_pro(energys, '[]', energy_range, count=count)
             if count eq 0 then message, 'Inconsistency...'
             store_data, flux_var, times, fluxes[*,index], energys[index], limits=lim
             options, flux_var, 'labels', lim.labels[index]
@@ -728,7 +728,7 @@ pro load_data_for_2008_0119_themis_data, default_settings
         flux_vars = prefix+['e','p']+'_flux'
         foreach flux_var, flux_vars do begin
             get_data, flux_var, times, fluxes, energys, limits=lim
-            index = lazy_where(energys, '[]', energy_range, count=count)
+            index = where_pro(energys, '[]', energy_range, count=count)
             if count eq 0 then message, 'Inconsistency...'
             store_data, flux_var, times, fluxes[*,index], energys[index], limits=lim
             options, flux_var, 'labels', lim.labels[index]

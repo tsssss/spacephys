@@ -96,7 +96,7 @@ rbsp_read_orbit, time_range, probe=probe
     e_mgse = cotran(e_uvw, common_times, 'uvw2mgse', probe=probe)
     e_mgse[*,0] = 0
     bad_time = time_double(['2014-06-18/05:00','2014-06-18/09:00'])
-    index = lazy_where(common_times, '[]', bad_time)
+    index = where_pro(mmon_times, '[]', bad_time)
     e_mgse[index,*] = !values.f_nan
     store_data, prefix+'e_mgse', common_times, e_mgse
     add_setting, prefix+'e_mgse', /smart, dictionary($

@@ -49,7 +49,7 @@ pro rbsp_efw_phasef_read_vsvy_gen_file, time, probe=probe, filename=file, versio
     get_data, l1_efw_var, times, vsvy
     foreach mask, mask_list do begin
         if mask.probe ne probe then continue
-        index = lazy_where(times, '[]', mask.time_range, count=count)
+        index = where_pro(times, '[]', mask.time_range, count=count)
         if count ne 0 then times[index] = !values.f_nan
     endforeach
     index = where(finite(times))

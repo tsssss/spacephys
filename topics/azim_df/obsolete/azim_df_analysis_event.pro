@@ -139,9 +139,9 @@ function azim_df_analysis_event, event, project=project, no_load_data=no_load_da
         good_triad_tdiff_range = [70.,1e10]
         foreach key, combo_infos.keys(), ii do begin
             combo_info = combo_infos[key]
-            index = lazy_where(combo_info.angles, '[]', good_triad_angle_range, count=count)
+            index = where_pro(combo_info.angles, '[]', good_triad_angle_range, count=count)
             if count ne nvertex then good_triad_flags[ii] = 0
-            index = lazy_where(combo_info.time_diffs, '[]', good_triad_tdiff_range, count=count)
+            index = where_pro(combo_info.time_diffs, '[]', good_triad_tdiff_range, count=count)
             if count ne nvertex then good_triad_flags[ii] = 0
         endforeach
         tinfo['good_triad_flags'] = good_triad_flags

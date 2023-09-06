@@ -100,7 +100,7 @@
 
 ;---EWOgram.
     mlat_range = [60,70]
-    mlat_index = lazy_where(mlat_bins, '[]', mlat_range)
+    mlat_index = where_pro(mlat_bins, '[]', mlat_range)
     ewo = total(-j_new[*,*,mlat_index], 3)/n_elements(mlat_index)
     ewo = fltarr(ntime,nmlon_bin)
     foreach time, times, ii do begin

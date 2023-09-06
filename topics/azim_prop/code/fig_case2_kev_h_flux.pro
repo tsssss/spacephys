@@ -36,7 +36,7 @@ pro fig_case2_kev_h_flux
 
     foreach probe, plot_info.probes do begin
         get_data, probe+'_kev_h_flux', times, flux, energy_bins
-        index = lazy_where(energy_bins, plot_info.energy_range, count=nenergy_bin)
+        index = where_pro(energy_bins, plot_info.energy_range, count=nenergy_bin)
         flux = flux[*,index]
         energy_bins = energy_bins[index]
 

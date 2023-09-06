@@ -122,7 +122,7 @@ pro rbsp_efw_phasef_read_wobble_free_var_gen_file_v03, time, probe=probe, filena
     b_mgse_bg = fltarr(ncommon_time,ndim)+!values.f_nan
     for time_id=0,ncommon_time-1 do begin
         sec_time = common_times[time_id]+[-1,1]*common_time_step*0.5
-        time_index = lazy_where(times,'[]',sec_time, count=count)
+        time_index = where_pro(times,'[]',sec_time, count=count)
         if count lt min_count then continue
         for dim_id=0,ndim-1 do begin
             dat = b_mgse[time_index,dim_id]
@@ -166,7 +166,7 @@ pro rbsp_efw_phasef_read_wobble_free_var_gen_file_v03, time, probe=probe, filena
     e_mgse_bg = fltarr(ncommon_time,ndim)+!values.f_nan
     for time_id=0,ncommon_time-1 do begin
         sec_time = common_times[time_id]+[-1,1]*common_time_step*0.5
-        time_index = lazy_where(times,'[]',sec_time, count=count)
+        time_index = where_pro(times,'[]',sec_time, count=count)
         if count lt min_count then continue
         for dim_id=0,ndim-1 do begin
             dat = e_mgse[time_index,dim_id]
@@ -266,7 +266,7 @@ if file_test(file) eq 0 then continue
         e_mgse_bg = fltarr(ncommon_time,ndim)+!values.f_nan
         for time_id=0,ncommon_time-1 do begin
             sec_time = common_times[time_id]+[-1,1]*common_time_step*0.5
-            time_index = lazy_where(times,'[]',sec_time, count=count)
+            time_index = where_pro(times,'[]',sec_time, count=count)
             if count lt min_count then continue
             for dim_id=0,ndim-1 do begin
                 dat = e_mgse[time_index,dim_id]

@@ -83,7 +83,7 @@ s1 = 600d
     all_spec_vars = [e_var+suff,b_var+suff]
     foreach tvar, all_spec_vars do begin
         get_data, tvar, uts, dat
-        index = lazy_where(uts, '[]', time_range)
+        index = where_pro(uts, '[]', time_range)
         uts = uts[index]
         dat = dat[index,*]
 ;        dat = snorm(dat)
@@ -122,7 +122,7 @@ s1 = 600d
     cp_nj = atan(imaginary(wxy_nj), real_part(wxy_nj))*deg
     wave_time_range = time_double(['2015-02-18/02:08','2015-02-18/02:11'])
 ;    wave_time_range = time_double(['2015-02-18/02:12','2015-02-18/02:15'])
-    index = lazy_where(times, '[]', wave_time_range, count=count)
+    index = where_pro(times, '[]', wave_time_range, count=count)
     avg_phase = total(cp_nj[index,*],1)/count
 
     fs = 1d/ps

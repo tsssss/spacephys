@@ -50,7 +50,7 @@ pro azim_prop_filter_by_apogee, project
 
 
     ;---Exclude events when probes are around noon.
-        index = lazy_where(apogee_mlt, apogee_filter_setting.mlt_range, count=count)
+        index = where_pro(apogee_mlt, apogee_filter_setting.mlt_range, count=count)
         if count ne nprobe then begin
             lprmsg, 'Only '+sgnum2str(count)+' probes in ['+strjoin(string(apogee_filter_setting.mlt_range,format='(I0)'),',')+'] MLT ...', apogee_filter_setting.log_file
             continue

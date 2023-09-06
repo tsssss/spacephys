@@ -24,7 +24,7 @@ if the_time_range[0] lt time_double('2007-12-12') then continue
         if errmsg ne '' then continue
 
         get_data, fac_var, times, ewo
-        index = lazy_where(times, '[]', the_time_range, count=count)
+        index = where_pro(times, '[]', the_time_range, count=count)
         if count eq 0 then continue
 
         time_range = minmax(times[index])

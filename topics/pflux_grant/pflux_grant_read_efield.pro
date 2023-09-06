@@ -62,7 +62,7 @@ pro pflux_grant_read_efield, time, probe=probe, id=data_type, $
         nnan_time = n_elements(nan_times)*0.5
         get_data, the_var, times, e_mgse
         for ii=0,nnan_time-1 do begin
-            index = lazy_where(times, '[]', nan_times[ii,*], count=count)
+            index = where_pro(times, '[]', nan_times[ii,*], count=count)
             if count eq 0 then continue
             e_mgse[index,*] = fillval
         endfor

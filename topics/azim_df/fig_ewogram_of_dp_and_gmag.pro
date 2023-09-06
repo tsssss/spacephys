@@ -207,14 +207,14 @@ test = 0
         rsm = rsm[index,*]
 
         ; Filter spatially.
-        index = lazy_where(yys, '[]', yrange, count=count)
+        index = where_pro(yys, '[]', yrange, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]
         rxy = rxy[index]
         rsm = rsm[index,*]
 
-        index = lazy_where(rxy, '[]', rxy_range, count=count)
+        index = where_pro(rxy, '[]', rxy_range, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]
@@ -333,7 +333,7 @@ test = 0
     loadct, ct
     
     
-    index = lazy_where(mlats, '[]', mlat_range, count=count)
+    index = where_pro(mlats, '[]', mlat_range, count=count)
     if count eq 0 then message, 'Invalid mlat_range ...'
     gmags = gmags[*,index]
     mlons = mlons[index]
@@ -343,7 +343,7 @@ test = 0
         yys = mlon2mlt(mlons, time)
         zzs = bytscl(gmags[time_id,*], min=zrange[0], max=zrange[1])
 
-        index = lazy_where(yys, '[]', yrange, count=count)
+        index = where_pro(yys, '[]', yrange, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]
@@ -365,7 +365,7 @@ test = 0
 ;    foreach site, sites, site_id do begin
 ;        mlts = mlon2mlt(mlons[site_id], times)
 ;
-;        index = lazy_where(mlts,'[]',yrange, count=nxx)
+;        index = where_pro(mlts,'[]',yrange, count=nxx)
 ;        if nxx eq 0 then continue
 ;        xxs = times[index]
 ;        yys = mlts[index]
@@ -389,7 +389,7 @@ test = 0
 ;        if mlats[site_id] le mlat_range[0] then continue
 ;        mlts = mlon2mlt(mlons[site_id], times)
 ;
-;        index = lazy_where(mlts,'[]',yrange, count=nxx)
+;        index = where_pro(mlts,'[]',yrange, count=nxx)
 ;        if nxx eq 0 then continue
 ;        xxs = times[index]
 ;        yys = mlts[index]

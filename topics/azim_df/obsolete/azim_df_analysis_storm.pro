@@ -116,7 +116,7 @@ test = 0
         foreach mission_probe, mission_probes, jj do begin
             mlt = get_var_data(mission_probe+'_'+key, at=common_times)
             foreach region, regions, kk do begin
-                index = lazy_where(mlt, '[]', region[key], count=count)
+                index = where_pro(mlt, '[]', region[key], count=count)
                 if count ne 0 then data_flags[index,jj,kk] = 1
             endforeach
             rsm = get_var_data(mission_probe+'_r_sm', at=common_times)
@@ -178,7 +178,7 @@ test = 0
                             [xxs[1]-xxs[0],yys[1]-yys[0]], $
                             [xxs[2]-xxs[0],yys[2]-yys[0]], /degree)
                     endfor
-                    index = lazy_where(angles, '[]', angle_range, count=count)
+                    index = where_pro(angles, '[]', angle_range, count=count)
                     if count eq ndim then the_count[ll] = 1 ; A good triad.
                 endforeach
                 num_good_triads[kk] = total(the_count)
@@ -357,13 +357,13 @@ test = 0
             xsm = r_sm[*,0]
             dis = snorm(r_sm)
             ; Exclude data outside the MLT range.
-            index = lazy_where(mlt, '][', mlt_range, count=count)
+            index = where_pro(mlt, '][', mlt_range, count=count)
             if count ne 0 then xxs[index] = !values.f_nan
             ; Exclude data outside the x-range.
-            index = lazy_where(xsm, '][', xsm_range, count=count)
+            index = where_pro(xsm, '][', xsm_range, count=count)
             if count ne 0 then xxs[index] = !values.f_nan
             ; Exclude data ouside the distance range.
-            index = lazy_where(dis, '][', dis_range, count=count)
+            index = where_pro(dis, '][', dis_range, count=count)
             if count ne 0 then xxs[index] = !values.f_nan
             ; Exclude data outside magnetopause.
             magn_flags = check_if_in_magn(cotran(r_sm, times, 'sm2gsm'))
@@ -434,13 +434,13 @@ test = 0
             xsm = r_sm[*,0]
             dis = snorm(r_sm)
             ; Exclude data outside the MLT range.
-            index = lazy_where(mlt, '][', mlt_range, count=count)
+            index = where_pro(mlt, '][', mlt_range, count=count)
             if count ne 0 then xxs[index] = !values.f_nan
             ; Exclude data outside the x-range.
-            index = lazy_where(xsm, '][', xsm_range, count=count)
+            index = where_pro(xsm, '][', xsm_range, count=count)
             if count ne 0 then xxs[index] = !values.f_nan
             ; Exclude data ouside the distance range.
-            index = lazy_where(dis, '][', dis_range, count=count)
+            index = where_pro(dis, '][', dis_range, count=count)
             if count ne 0 then xxs[index] = !values.f_nan
             ; Exclude data outside magnetopause.
             magn_flags = check_if_in_magn(cotran(r_sm, times, 'sm2gsm'))

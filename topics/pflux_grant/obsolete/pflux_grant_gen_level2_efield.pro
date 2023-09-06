@@ -100,13 +100,13 @@ pro pflux_grant_gen_level2_efield, time, probe=probe, $
         bad_time_ranges = time_to_range(uts[index], time_step=time_step)
         nbad_time_range = n_elements(bad_time_ranges)*0.5
         pad_time = 300. ; sec.
-        for ii=0,nbad_time_range-1 do flags[lazy_where(uts,'[]',bad_time_ranges[ii,*]+[-1,1]*pad_time)] = 1
+        for ii=0,nbad_time_range-1 do flags[where_pro(uts,'[]',bad_time_ranges[ii,*]+[-1,1]*pad_time)] = 1
         index = where(flags eq 1)
         bad_time_ranges = time_to_range(uts[index], time_step=time_step)
     endelse
     nbad_time_range = n_elements(bad_time_ranges)*0.5
     get_data, de_var, common_times, de_mgse
-    for ii=0,nbad_time_range-1 do de_mgse[lazy_where(common_times,'[]',bad_time_ranges[ii,*]),*] = !values.f_nan
+    for ii=0,nbad_time_range-1 do de_mgse[where_pro(common_times,'[]',bad_time_ranges[ii,*]),*] = !values.f_nan
     store_data, de_var, common_times, de_mgse
     
 

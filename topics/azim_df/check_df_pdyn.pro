@@ -19,7 +19,7 @@ test = 0
     if check_if_update(p_var, time_range=time_range) then omni_read, time_range, id='pdyn'
     
     pdyns = get_var_data(p_var, at=df_times)
-    index = lazy_where(pdyns, '()', [10,50], count=count)
+    index = where_pro(pdyns, '()', [10,50], count=count)
     the_times = df_times[index]
 
     stop

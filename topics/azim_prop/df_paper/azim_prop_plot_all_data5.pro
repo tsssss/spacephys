@@ -167,7 +167,7 @@ pro azim_prop_plot_all_data5, project
             get_data, probe+'_'+data_type, times, data
 
             ref_time = event[probe].ref_time
-            index = lazy_where(times, ref_time+[-1,1]*1200)
+            index = where_pro(times, ref_time+[-1,1]*1200)
             yrange = minmax(data[index])
             yrange = (yrange[1]+yrange[0])*0.5+[-1,1]*(yrange[1]-yrange[0])*0.75
 

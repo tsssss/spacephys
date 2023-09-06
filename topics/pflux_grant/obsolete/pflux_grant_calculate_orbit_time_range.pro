@@ -33,7 +33,7 @@ function pflux_grant_calculate_orbit_time_range, time_range, probe=probe, use_ap
         apogee_times = [apogee_times[0]-orbit_period, $
             apogee_times, $
             apogee_times[norbit-1]+orbit_period]
-        index = lazy_where(apogee_times, '[]', time_range)
+        index = where_pro(apogee_times, '[]', time_range)
         apogee_times = apogee_times[index]
         norbit = n_elements(apogee_times)-1
         orbit_time_ranges = dblarr(norbit,2)

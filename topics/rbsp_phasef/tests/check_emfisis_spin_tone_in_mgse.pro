@@ -159,7 +159,7 @@
     ; Truncate in time.
     foreach var, prefix+['b0','b1','b','bmod','e0','e1','e','emod']+'_mgse' do begin
         get_data, var, times, b_mgse
-        index = lazy_where(times, '[]', time_range)
+        index = where_pro(times, '[]', time_range)
         store_data, var, times[index], b_mgse[index,*]
     endforeach
 

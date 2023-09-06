@@ -171,7 +171,7 @@ pro azim_prop_calc_time_lag, project
 
             var = probe+'_db_tilt'
             get_data, var, uts, dat, limits=lim
-            index = lazy_where(times, running_time_range+cc_info[probe].time_shift)
+            index = where_pro(times, running_time_range+cc_info[probe].time_shift)
             store_data, var+'_sector', uts[index], dat[index], limits=lim
             cc_info[probe].var = probe+'_db_tilt_sector'
         endforeach

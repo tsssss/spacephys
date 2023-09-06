@@ -103,9 +103,9 @@ test = 1
     dmlt = dmlat/15 ; h.
 
     foreach time, times, time_id do begin
-        mlt_index = lazy_where(mlt_bins, '[]', fmlt[time_id]+[-1,1]*dmlt*0.5, count=count)
+        mlt_index = where_pro(mlt_bins, '[]', fmlt[time_id]+[-1,1]*dmlt*0.5, count=count)
         if count eq 0 then continue
-        mlat_index = lazy_where(mlat_bins, '[]', fmlat[time_id]+[-1,1]*dmlat*0.5, count=count)
+        mlat_index = where_pro(mlat_bins, '[]', fmlat[time_id]+[-1,1]*dmlat*0.5, count=count)
         if count eq 0 then continue
 
         asi_count[time_id] = mean(mlt_images[time_id,mlt_index,mlat_index])

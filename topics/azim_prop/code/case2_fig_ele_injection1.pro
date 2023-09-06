@@ -58,7 +58,7 @@
         energies = energies[index]
         fluxes = fluxes[*,index]
         ; Filter time.
-        index = lazy_where(times, '[]', time_range)
+        index = where_pro(times, '[]', time_range)
         fluxes = fluxes[index,*]
         times = times[index]
 

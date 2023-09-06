@@ -27,7 +27,7 @@ pro polar_vs_fac_read_polar_uvi_time_ranges_gen_file, project_time_range, file=p
             times = ut1s-(rate+4)*9.2
 
             ; No data.
-            index = lazy_where(times, '[]', day_time_range, count=count)
+            index = where_pro(times, '[]', day_time_range, count=count)
             if count eq 0 then continue
             times = times[index]
 

@@ -115,7 +115,7 @@ pro pflux_grant_read_preprocessed_ebfield, time, probe=probe, id=datatype, coord
     if probe eq 'a' then begin
         get_data, e_uv_var, times, e_uv
         foreach bad_date, bad_dates do begin
-            index = lazy_where(times, '[]', bad_date+[0,secofday], count=count)
+            index = where_pro(times, '[]', bad_date+[0,secofday], count=count)
             if count ne 0 then e_uv[index,*] = fillval
         endforeach
     endif

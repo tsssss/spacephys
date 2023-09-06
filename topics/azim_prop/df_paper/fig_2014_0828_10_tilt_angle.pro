@@ -185,7 +185,7 @@ pro fig_2014_0828_10_tilt_angle, sort_by=sort_by, sort=sort
 
     nline = 0
     foreach flag, ['gt','lt'] do begin
-        index = lazy_where(fit_ys, flag, 0, count=count)
+        index = where_pro(fit_ys, flag, 0, count=count)
         if count eq 0 then continue
         nline += 1
 

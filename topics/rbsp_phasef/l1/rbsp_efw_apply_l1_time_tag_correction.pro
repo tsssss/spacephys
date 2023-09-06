@@ -28,7 +28,7 @@ pro rbsp_efw_apply_l1_time_tag_correction, l1_var, probe=probe
     pad_time = 2d
     for section_id=0,nsection-1 do begin
         the_time_range = section_time_ranges[section_id,*]+[-1,1]*pad_time
-        tmp = lazy_where(times, '[]', the_time_range, count=count)
+        tmp = where_pro(times, '[]', the_time_range, count=count)
         if count eq 0 then continue
         var_updated = 1
 
@@ -76,7 +76,7 @@ pro rbsp_efw_apply_l1_time_tag_correction, l1_var, probe=probe
     section_time_ranges[*,1] = isolated_jumps.previous_times
     for section_id=0, nsection-1 do begin
         the_time_range = section_time_ranges[section_id,*]+[-1,1]*pad_time
-        tmp = lazy_where(times, '[]', the_time_range, count=count)
+        tmp = where_pro(times, '[]', the_time_range, count=count)
         if count eq 0 then continue
         var_updated = 1
 

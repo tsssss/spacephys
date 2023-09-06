@@ -236,7 +236,7 @@ pro azim_df_search_candidate_search_apogee_diagnostic_plot, project=project, tim
     xtickformat = '(A1)'
     if check_if_update('dst', time_range) then omni_read_index, time_range
     get_data, 'dst', xxs, yys
-    index = lazy_where(xxs, '[]', xrange)
+    index = where_pro(xxs, '[]', xrange)
     xxs = xxs[index]
     yys = yys[index]
     yticklen = yticklen_chsz*xchsz/(tpos[2]-tpos[0])
@@ -534,7 +534,7 @@ pro azim_df_search_candidate_search_apogee, project=project
     mlt_range = settings.mlt_range<0
     foreach probe, probes do begin
         mlt = get_var_data(probe+'_apogee_mlt')
-        index = lazy_where(mlt, '[]', mlt_range, count=count)
+        index = where_pro(mlt, '[]', mlt_range, count=count)
         if count ne 0 then all_pre_midn_flags[index] += 1
     endforeach
     ; Flags for in post_midnght, 1: in the region.
@@ -542,7 +542,7 @@ pro azim_df_search_candidate_search_apogee, project=project
     mlt_range = settings.mlt_range>0
     foreach probe, probes do begin
         mlt = get_var_data(probe+'_apogee_mlt')
-        index = lazy_where(mlt, '[]', mlt_range, count=count)
+        index = where_pro(mlt, '[]', mlt_range, count=count)
         if count ne 0 then all_post_midn_flags[index] += 1
     endforeach
 
@@ -568,7 +568,7 @@ pro azim_df_search_candidate_search_apogee, project=project
     mlt_range = settings.mlt_range
     for ii=0, nstorm-1 do begin
         time_range = reform(storm_times[ii,*])
-        index = lazy_where(common_times, '[]', time_range, count=ntime)
+        index = where_pro(common_times, '[]', time_range, count=ntime)
         the_flags = all_flags[index]
         index = where(the_flags eq 1, count)
         if count eq 0 then storm_flags[ii] = 0
@@ -799,7 +799,7 @@ pro azim_df_search_candidate_search_triad, project=project
 
     ;test_time = time_double('2013-10-02')
     if n_elements(test_time) ne 0 then begin
-        index = lazy_where(test_time, '[]', time_range, count=count)
+        index = where_pro(test_time, '[]', time_range, count=count)
         if count eq 0 then continue
     endif
 
@@ -858,10 +858,10 @@ pro azim_df_search_candidate_search_triad, project=project
             if count ne 0 then data_flags[index,jj] = 0
             ; In mlt_range.
             mlt_var = prefix+'mlt'
-            index = lazy_where(get_var_data(mlt_var, at=common_times), '][', settings.mlt_range, count=count)
+            index = where_pro(get_var_data(mlt_var, at=common_times), '][', settings.mlt_range, count=count)
             if count ne 0 then data_flags[index,jj] = 0
             ; In dis_range.
-            index = lazy_where(snorm(r_gsm), '][', settings.dis_range, count=count)
+            index = where_pro(snorm(r_gsm), '][', settings.dis_range, count=count)
             if count ne 0 then data_flags[index,jj] = 0
             ; Have bfield.
             b_gsm_var = prefix+'b_gsm'
@@ -890,7 +890,7 @@ pro azim_df_search_candidate_search_triad, project=project
             mlt_range = regions[region].mlt_range
             foreach probe, available_probes, jj do begin
                 prefix = probe_info[probe].prefix
-                index = lazy_where(get_var_data(prefix+'mlt', at=common_times), '][', mlt_range, count=count)
+                index = where_pro(get_var_data(prefix+'mlt', at=common_times), '][', mlt_range, count=count)
                 if count ne 0 then mlt_flags[index,jj] = 0
             endforeach
             region_mlt_flag_var = region+'_mlt_flag'
@@ -920,7 +920,7 @@ pro azim_df_search_candidate_search_triad, project=project
                             [xxs[1]-xxs[0],yys[1]-yys[0]], $
                             [xxs[2]-xxs[0],yys[2]-yys[0]], /degree)
                     endfor
-                    index = lazy_where(angles, '[]', settings.angle_range, count=count)
+                    index = where_pro(angles, '[]', settings.angle_range, count=count)
                     if count eq nvertex then the_count[kk] = 1 ; A good triad.
                 endforeach
                 triad_counts[jj] = total(the_count)

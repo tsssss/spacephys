@@ -106,7 +106,7 @@ function pflux_survey_load_bin_info, bin_info, probe=probe, project=project, $
                 relation = ')['
                 range = range[[1,0]]
             endif
-            index = lazy_where(data, relation, range, count=count)
+            index = where_pro(data, relation, range, count=count)
             if count eq 0 then index = !null
             bins.add, dictionary($
                 'range', range, $

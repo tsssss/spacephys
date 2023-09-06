@@ -167,7 +167,7 @@ pro azim_prop_gen_survey_plot, project, event_list=event_list, save_data=save_da
         tilt_var_labels = strarr(nprobe)
         foreach tvar, panel_vars, ii do begin
             data = get_var_data(tvar)
-            index = lazy_where(data-mean(data), [-1,1]*5*stddev(data))
+            index = where_pro(data-mean(data), [-1,1]*5*stddev(data))
             yrange = minmax(data[index])
             yrange = yrange-(yrange mod yticks)+[0,2]
             options, tvar, 'yrange', yrange

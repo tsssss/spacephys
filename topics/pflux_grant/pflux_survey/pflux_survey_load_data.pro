@@ -175,7 +175,7 @@ pro pflux_survey_load_data, var_type, probe=probe
 ;        the_var = prefix+var_type
 ;        get_data, the_var, times, data
 ;        foreach bad_time_range, bad_time_ranges do begin
-;            index = lazy_where(times, '[]', bad_time_range)
+;            index = where_pro(times, '[]', bad_time_range)
 ;            data[index,*] = fillval
 ;        endforeach
 ;        store_data, the_var, times, data

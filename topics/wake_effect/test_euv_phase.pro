@@ -27,7 +27,7 @@
     
     nspin_time = n_elements(spin_times)
     for ii=0, nspin_time-2 do begin
-        index = lazy_where(times, spin_times[ii:ii+1], count=count)
+        index = where_pro(times, spin_times[ii:ii+1], count=count)
         xx = times[index]
         yy = phase[index]
         for jj=1, count-1 do if yy[jj-1] ge yy[jj] then yy[jj:*] += 2*!dpi

@@ -96,7 +96,7 @@ function azim_df_analyze_subgroup, subgroup, project=project
     geom_triads = dictionary()
     foreach key, triad_infos.keys() do begin
         triad_info = triad_infos[key]
-        index = lazy_where(triad_info.angles, '()', triad_angle_range, count=count)
+        index = where_pro(triad_info.angles, '()', triad_angle_range, count=count)
         if count lt ntriad_vertex then continue
         geom_triads[key] = triad_info
     endforeach

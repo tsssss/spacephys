@@ -256,10 +256,10 @@ pro azim_prop_gen_storm_keo_ewo, time_range, $
         ntime = n_elements(times)
         xxs = times-time_range[0]
         yys = mlt
-        index = lazy_where(yys, '][', yrange, count=count)
+        index = where_pro(yys, '][', yrange, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         get_data, prefix+'dis', time, dis
-        index = lazy_where(dis, '][', dis_range, count=count)
+        index = where_pro(dis, '][', dis_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         index = where(finite(tilt,/nan), count)
         if count ne 0 then xxs[index] = !values.f_nan
@@ -363,10 +363,10 @@ pro azim_prop_gen_storm_keo_ewo, time_range, $
         xyouts, tx-xchsz*2.5, ty, /normal, msg, charsize=label_size, alignment=1
 
 
-        index = lazy_where(yys, '][', yrange, count=count)
+        index = where_pro(yys, '][', yrange, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         get_data, prefix+'mlt', time, mlt
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         index = where(finite(tilt,/nan), count)
         if count ne 0 then xxs[index] = !values.f_nan

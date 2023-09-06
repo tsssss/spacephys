@@ -23,7 +23,7 @@ denergys = energys[1:-1]-energys[0:-2]
 de_e = mean(denergys/((energys[1:-1]+energys[0:-2])*0.5))
 diff_energy_fluxs = fluxs
 foreach energy, energys, energy_id do diff_energy_fluxs[*,energy_id] *= energy
-energy_index = lazy_where(energys, '[]', energy_range, count=nenergy)
+energy_index = where_pro(energys, '[]', energy_range, count=nenergy)
 the_fluxs = total(diff_energy_fluxs[*,energy_index],2)*de_e
 
 

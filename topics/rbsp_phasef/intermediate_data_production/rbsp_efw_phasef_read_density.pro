@@ -92,7 +92,7 @@ pro rbsp_efw_phasef_read_density, time, probe=probe, boom_pairs=boom_pairs, dmin
             endif
         endforeach
 
-        index = lazy_where(density, '][', [dmin,dmax], count=count)
+        index = where_pro(density, '][', [dmin,dmax], count=count)
         if count ne 0 then density[index] = fillval
 
         store_data, var, common_times, density, limits={ylog:1, ytitle:'(cm!U-3!N)', labels:'Density '+boom_pair}

@@ -109,7 +109,7 @@ test = 1
 ;---Adhoc correction.
     smooth_window = 1*60.  ; sec.
     smooth_width = smooth_window/common_time_step
-    index = lazy_where(common_times,'[]', the_time_range)
+    index = where_pro(common_times,'[]', the_time_range)
     section_times = make_bins(time_range, smooth_window)
     nsection = n_elements(section_times)-1
     section_center_times = section_times[0:nsection-1]+smooth_window*0.5
@@ -120,7 +120,7 @@ test = 1
         ; This method has weird coef.
 ;        coef = fltarr(nsection)
 ;        for jj=0,nsection-1 do begin
-;            index = lazy_where(common_times, '[]', section_times[jj:jj+1])
+;            index = where_pro(common_times, '[]', section_times[jj:jj+1])
 ;            fit_res = linfit(e1[index],e0[index])
 ;            coef[jj] = fit_res[1]
 ;        endfor

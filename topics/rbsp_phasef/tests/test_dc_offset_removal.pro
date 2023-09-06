@@ -92,7 +92,7 @@ ndim = 3
         ev_bg = fltarr(ntime)+!values.f_nan
         for time_id=0,ntime-1 do begin
             sec_time = median_times[time_id]+[-1,1]*window*0.5
-            time_index = lazy_where(times, '[]', sec_time, count=count)
+            time_index = where_pro(times, '[]', sec_time, count=count)
             if count lt min_count then continue
             eu_bg[time_id] = median(eu[time_index])
             ev_bg[time_id] = median(ev[time_index])

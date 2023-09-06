@@ -89,7 +89,7 @@ pro rbsp_phasef_fit_per_maneuver, time_range, probe=probe
         get_data, prefix+'fit_data', times, xxs, yys
         time_index = []
         for jj=0,nfit_time_range-1 do begin
-            index = lazy_where(times, '[]', fit_time_ranges[jj,*], count=count)
+            index = where_pro(times, '[]', fit_time_ranges[jj,*], count=count)
             if count eq 0 then continue
             time_index = [time_index,index]
         endfor

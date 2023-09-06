@@ -257,14 +257,14 @@ pro fig_ewogram_of_dp_and_up_down_current, time_range, probes=probes, $
 ;        if time ge mean(time_range) then stop
 
         ; Filter spatially.
-        index = lazy_where(yys, '[]', yrange, count=count)
+        index = where_pro(yys, '[]', yrange, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]
         rxy = rxy[index]
         rsm = rsm[index,*]
 
-        index = lazy_where(rxy, '[]', rxy_range, count=count)
+        index = where_pro(rxy, '[]', rxy_range, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]

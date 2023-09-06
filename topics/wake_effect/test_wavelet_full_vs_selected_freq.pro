@@ -38,7 +38,7 @@
         time_range = time_double(date+'/'+time)+[0,duration]
         if tnames(var) ne '' then begin
             get_data, var, times
-            index = lazy_where(times,time_range, count=count)
+            index = where_pro(times,time_range, count=count)
             if count eq 0 then store_data, var, /delete
         endif
         if tnames(var) eq '' then begin
@@ -54,7 +54,7 @@
             endif
         endif
         get_data, var, times, data, limits=lim
-        index = lazy_where(times, time_range, count=count)
+        index = where_pro(times, time_range, count=count)
         if count eq 0 then message, 'No data in the given time ...'
         data_var = var+'_section'
         stplot_index, var, 0, newname=data_var

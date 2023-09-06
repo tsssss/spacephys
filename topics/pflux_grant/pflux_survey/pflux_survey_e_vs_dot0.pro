@@ -47,7 +47,7 @@ test = 0
             for day_id=0, nday-1 do begin
                 time_range = days[day_id]+[0,secofday]
                 pflux_grant_read_preprocessed_ebfield, time_range, probe=probe
-                index = lazy_where(common_times,'[)', time_range)
+                index = where_pro(common_times,'[)', time_range)
                 de_data[index,*] = (get_var_data(de_var))[0:*:de_step,*]
             endfor
             store_data, de_save_var, common_times, de_data

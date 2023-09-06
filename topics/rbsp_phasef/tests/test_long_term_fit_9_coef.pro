@@ -52,7 +52,7 @@ function rbsp_fit_perigee_9_coef, time_range, probe=probe
         time_ranges = time_to_range(times[index], time_step=the_time_step, pad_time=pad_time)
         ntime_range = n_elements(time_ranges)*0.5
         for ii=0,ntime_range-1 do begin
-            index = lazy_where(common_times,'[]',time_ranges[ii,*], count=count)
+            index = where_pro(common_times,'[]',time_ranges[ii,*], count=count)
             if count eq 0 then continue
             de_mgse[index,*] = fillval
         endfor

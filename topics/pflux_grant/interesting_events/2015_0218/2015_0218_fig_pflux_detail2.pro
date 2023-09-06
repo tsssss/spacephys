@@ -152,7 +152,7 @@ s1 = 600d
     all_spec_vars = [e_var+suff,b_var+suff]
     foreach tvar, all_spec_vars do begin
         get_data, tvar, uts, dat
-        index = lazy_where(uts, '[]', time_range)
+        index = where_pro(uts, '[]', time_range)
         uts = uts[index]
         dat = dat[index,*]
 ;        dat = snorm(dat)

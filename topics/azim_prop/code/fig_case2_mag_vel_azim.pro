@@ -267,7 +267,7 @@ pro fig_case2_mag_vel_azim
             tx = tpos[0]-xchsz*1
             for ii=0, nmag_var-1 do begin
                 ty = mag_data_infos[ii].base_value
-                ty = mean(gmag_data[lazy_where(times, label_time_range),ii])
+                ty = mean(gmag_data[where_pro(times, label_time_range),ii])
                 tmp = convert_coord(xrange[0],ty, /data, /to_normal)
                 ty = tmp[1]-ychsz*half_ychsz
                 xyouts, tx,ty, /normal, alignment=1, mag_data_infos[ii].name, color=tcolors[ii]

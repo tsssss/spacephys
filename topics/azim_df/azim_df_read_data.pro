@@ -359,7 +359,7 @@ pro azim_df_read_data, var, probe=probe, time_range=time_range, project=project
 
     foreach search, search_settings do begin
         search_time_range = search.time_range
-        index = lazy_where(time_range, '[]', search_time_range, count=count)
+        index = where_pro(time_range, '[]', search_time_range, count=count)
         if count eq 0 then continue
         probes = search.probes
         index = where(probes eq probe, count)

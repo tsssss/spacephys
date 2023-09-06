@@ -81,7 +81,7 @@ pro rbsp_efw_phasef_gen_l1_mscb1_split, file, split_cadence=split_cadence, $
 
         ; Read data.
         the_time_range = file_time+[0,split_cadence]
-        time_index = lazy_where(times,'[]', the_time_range, count=count)
+        time_index = where_pro(times,'[]', the_time_range, count=count)
         if count lt 2 then continue
         rec_range = minmax(time_index)
         cdf_id = cdf_open(file)

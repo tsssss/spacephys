@@ -21,7 +21,7 @@ pf_psd_var = prefix+'pf_fac_psd'
 get_data, pf_psd_var, times, pf_psd, freqs
 dst = get_var_data(dst_var, at=times)
 
-index = lazy_where(dst, '[]', quiet_range, count=cnt2)
+index = where_pro(dst, '[]', quiet_range, count=cnt2)
 pf2 = pf_psd[index,*]
 
 sgopen, 0, xsize=5, ysize=5
@@ -35,8 +35,8 @@ bg_color = sgcolor('silver')
 plot, xrange, yrange, position=sgcalcpos(1), /nodata, $
     xlog=1, ylog=1, xtitle='Period (sec)', ytitle='PSD (mW/m!U2!N)/Hz'
 
-index = lazy_where(dst, '[]', dst_range, count=cnt)
-index = lazy_where(dst, '[]', quiet_range, count=cnt)
+index = where_pro(dst, '[]', dst_range, count=cnt)
+index = where_pro(dst, '[]', quiet_range, count=cnt)
 pf = pf_psd[index,*]
 for ii=0,cnt-1 do oplot, txs, pf[ii,*], color=bg_color, psym=1, symsize=0.2
 oplot, txs, total(pf,1)/cnt

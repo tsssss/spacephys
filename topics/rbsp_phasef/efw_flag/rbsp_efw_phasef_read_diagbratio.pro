@@ -12,7 +12,7 @@ pro rbsp_efw_phasef_read_diagbratio, time_range, probe=probe
     rbsp_detrend, b_var, smooth_window
     b_smoothed_var = prefix+'b_mgse_smoothed'
     get_data, b_smoothed_var, times, data
-    index = lazy_where(times, '[]', time_range)
+    index = where_pro(times, '[]', time_range)
     times = times[index]
     data = data[index,*]
     store_data, b_smoothed_var, times, data

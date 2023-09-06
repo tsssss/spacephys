@@ -93,12 +93,12 @@ function azim_df_search_roi, search_setting, project=project, $
                     if probe eq 'thb' or probe eq 'thc' then rxy_range >= 15.
                 endif
                 rxy = snorm(r_sm[*,0:1])
-                index = lazy_where(rxy, '][', rxy_range, count=count)
+                index = where_pro(rxy, '][', rxy_range, count=count)
                 if count ne 0 then roi_flags[index] = 0
 
                 ; "mlt" in SM, but really should be in MAG.
                 mlt = get_var_data(prefix+'pseudo_mlt', at=common_times)
-                index = lazy_where(mlt, '][', mlt_range, count=count)
+                index = where_pro(mlt, '][', mlt_range, count=count)
                 if count ne 0 then roi_flags[index] = 0
 
                 ; Stay in ROI longer than roi_min_duration.
@@ -111,7 +111,7 @@ function azim_df_search_roi, search_setting, project=project, $
                         roi_flags[*] = 0
                         time_ranges = time_ranges[index,*]
                         ntime_range = n_elements(time_ranges)/2
-                        for ii=0, ntime_range-1 do roi_flags[lazy_where(common_times,'[]',reform(time_ranges[ii,*]))] = 1
+                        for ii=0, ntime_range-1 do roi_flags[where_pro(common_times,'[]',reform(time_ranges[ii,*]))] = 1
                     endif
                 endif
 
@@ -187,7 +187,7 @@ function azim_df_search_roi, search_setting, project=project, $
                     'time_range_list', list(), $
                     'probe_list', list())
 
-                index = lazy_where(common_times,'[]',time_range)
+                index = where_pro(common_times,'[]',time_range)
                 the_roi_flags = roi_flags[index,*]
                 the_times = common_times[index]
                 probe_counts = total(the_roi_flags, 1)
@@ -208,7 +208,7 @@ function azim_df_search_roi, search_setting, project=project, $
                 probe_list = list()
                 for jj=0, nsection-1 do begin
                     the_time_range = boundarys[jj:jj+1]
-                    the_roi_flags = roi_flags[lazy_where(common_times,'[)',the_time_range),*]
+                    the_roi_flags = roi_flags[where_pro(common_times,'[)',the_time_range),*]
                     probe_counts = total(the_roi_flags, 1)
                     available_probes = probes[where(total(the_roi_flags,1) ne 0)]
                     time_range_list.add, the_time_range

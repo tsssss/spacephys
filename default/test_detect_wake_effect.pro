@@ -45,7 +45,7 @@ t2s = wavelet_info[7]
 selected_scales = selected_periods*t2s
 if tnames(var) ne '' then begin
     get_data, var, times
-    index = lazy_where(times,full_time_range, count=count)
+    index = where_pro(times,full_time_range, count=count)
     if count le 1 then store_data, var, /delete
 endif
 if tnames(var) eq '' then begin
@@ -62,7 +62,7 @@ u_index = 0
 cwt_var = u_var+'_cwt'
 if tnames(u_var) ne '' then begin
     get_data, u_var, uts
-    index = lazy_where(uts, full_time_range, count=count)
+    index = where_pro(uts, full_time_range, count=count)
     if count lt nsection then store_data, u_var, /delete
 endif
 if tnames(u_var) eq '' then begin
@@ -141,7 +141,7 @@ dt = cwt.dt
 amps = dblarr(nsection,nselected_freq)
 foreach time, sections, ii do begin
     section_time_range = time+[0,duration]
-    index = lazy_where(times, section_time_range, count=N)
+    index = where_pro(times, section_time_range, count=N)
     uts = times[index]
     ees = edata[index]
 

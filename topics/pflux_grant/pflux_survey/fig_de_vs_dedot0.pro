@@ -58,7 +58,7 @@ test = 0
             for day_id=0, nday-1 do begin
                 time_range = days[day_id]+[0,secofday]
                 pflux_grant_read_preprocessed_ebfield, time_range, probe=probe
-                index = lazy_where(common_times,'[)', time_range)
+                index = where_pro(common_times,'[)', time_range)
                 de_data[index,*] = (get_var_data(de_var))[0:*:de_step,*]
             endfor
             store_data, de_save_var, common_times, de_data
@@ -80,7 +80,7 @@ test = 0
             for day_id=0,nday-1 do begin
                 time_range = days[day_id]+[0,secofday]
                 pflux_grant_read_preprocessed_ebfield, time_range, probe=probe, id='bw_ratio'
-                index = lazy_where(common_times,'[)', time_range)
+                index = where_pro(common_times,'[)', time_range)
                 bw_data[index,*] = (get_var_data(bw_var))[0:*:de_step]
             endfor
             file_updated = 1
@@ -266,7 +266,7 @@ test = 0
                 ydata = (get_var_data(prefix+'dedot0_fac'))[*,panel_id]
                 mlts = get_var_data(prefix+'mlt')
 
-                index = lazy_where(mlts,'[)', mlt_vertices[mlt_id,*], count=count)
+                index = where_pro(mlts,'[)', mlt_vertices[mlt_id,*], count=count)
                 if count eq 0 then continue
                 xxs = xdata[index]
                 yys = ydata[index]

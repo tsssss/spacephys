@@ -99,11 +99,11 @@
     
     
         log_ens = alog10(ens)
-        pa_index = lazy_where(pitch_angles, '[]', pitch_angle_range)
+        pa_index = where_pro(pitch_angles, '[]', pitch_angle_range)
         foreach time, test_times, time_id do begin
             the_fluxs = reform(fluxs[time_id,*,*])
             the_energys = energys[time_id,*]
-            index = lazy_where(the_energys, '[]', energy_range)
+            index = where_pro(the_energys, '[]', energy_range)
             the_fluxs = (the_fluxs[index,*])[*,pa_index]
             the_energys = the_energys[index]
             the_pitch_angles = pitch_angles[pa_index]

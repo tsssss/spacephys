@@ -95,7 +95,7 @@ test = 0
             if the_time_range[0] eq time_range[0] then continue
             if the_time_range[1] eq time_range[1] then continue
             ; Find if there is a node.
-            index = lazy_where(times, '[]', the_time_range, count=npoint)
+            index = where_pro(times, '[]', the_time_range, count=npoint)
             min_value_index = index[0]
             max_value_index = index[npoint-1]
             min_value = theta_smooth[min_value_index]
@@ -391,13 +391,13 @@ test = 0
         get_data, prefix+'r_sm', times, r_sm
         rxy = snorm(r_sm[*,0:1])
         ; Exclude data outside the MLT range.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data ouside the distance range.
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data outside time range.
-        index = lazy_where(xxs, '][', short_time_range, count=count)
+        index = where_pro(xxs, '][', short_time_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
 
         index = where(finite(xxs), count)

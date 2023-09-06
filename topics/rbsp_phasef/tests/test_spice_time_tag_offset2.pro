@@ -32,7 +32,7 @@ pro test_spice_time_tag_offset2, time_range, probe=probe, time_tag_offset=time_t
     index = where(dis le perigee_lshell)
     perigee_times = orbit_times[time_to_range(index,time_step=1)]
     the_time_range = reform(perigee_times[1,*])
-    common_times = orbit_times[lazy_where(orbit_times,'[]',the_time_range)]
+    common_times = orbit_times[where_pro(orbit_times,'[]',the_time_range)]
     ncommon_time = n_elements(common_times)
     common_time_step = sdatarate(common_times)
 

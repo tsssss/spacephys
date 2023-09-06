@@ -71,12 +71,12 @@ pro azim_df_search_themis_good_triangle, project=project
 
 ;---Need to be within 7 hr around midnight.
     mlt_range = filter_storm_setting.mlt_range
-    index = lazy_where(thb_mlt, '[]', mlt_range, count=count)
+    index = where_pro(thb_mlt, '[]', mlt_range, count=count)
     if count eq 0 then message, 'No possible time, stop here ...'
     possible_times = possible_times[index]
     thb_mlt = thb_mlt[index]
     thc_mlt = thc_mlt[index]
-    index = lazy_where(thc_mlt, '[]', mlt_range, count=count)
+    index = where_pro(thc_mlt, '[]', mlt_range, count=count)
     if count eq 0 then message, 'No possible time, stop here ...'
     possible_times = possible_times[index]
     thb_mlt = thb_mlt[index]
@@ -129,7 +129,7 @@ pro azim_df_search_themis_good_triangle, project=project
             if ~check_if_in_magn(get_var_data(prefix+'r_gsm', at=the_time)) then continue
             ; Must be in the MLT range.
             the_mlt = get_var_data(prefix+'mlt', at=the_time)
-            index = lazy_where(the_mlt, '[]', mlt_range, count=count)
+            index = where_pro(the_mlt, '[]', mlt_range, count=count)
             if count eq 0 then continue
             ; Must be on the same side of midnight.
             if the_mlt*thb_mlt[ii] lt 0 then continue
@@ -149,7 +149,7 @@ pro azim_df_search_themis_good_triangle, project=project
                     [xxs[1]-xxs[0],yys[1]-yys[0]], $
                     [xxs[2]-xxs[0],yys[2]-yys[0]], /degree)
             endfor
-            index = lazy_where(angles, '[]', angle_range, count=count)
+            index = where_pro(angles, '[]', angle_range, count=count)
             if count eq ndim then begin
                 num_good_triad += 1
                 lprmsg, 'Found a good triangle with TH-'+strupcase(probe)+' ...'

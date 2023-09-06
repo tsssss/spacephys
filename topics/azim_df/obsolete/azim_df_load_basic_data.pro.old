@@ -117,7 +117,7 @@ pro azim_df_load_basic_data, time_range, event_id=event_id, project=project, res
             prefix = mission_probe+'_'
             mlt = get_var_data(prefix+key, at=common_times)
             foreach region, regions, kk do begin
-                index = lazy_where(mlt, '[]', region[key], count=count)
+                index = where_pro(mlt, '[]', region[key], count=count)
                 if count ne 0 then data_flags[index,jj,kk] = 1
             endforeach
             rsm = get_var_data(prefix+'r_sm', at=common_times)
@@ -178,7 +178,7 @@ pro azim_df_load_basic_data, time_range, event_id=event_id, project=project, res
                             [xxs[1]-xxs[0],yys[1]-yys[0]], $
                             [xxs[2]-xxs[0],yys[2]-yys[0]], /degree)
                     endfor
-                    index = lazy_where(angles, '[]', angle_range, count=count)
+                    index = where_pro(angles, '[]', angle_range, count=count)
                     if count eq ndim then the_count[ll] = 1 ; A good triad.
                 endforeach
                 num_good_triads[kk] = total(the_count)

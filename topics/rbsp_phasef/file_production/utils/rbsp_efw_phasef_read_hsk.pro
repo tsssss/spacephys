@@ -173,7 +173,7 @@ pro rbsp_efw_phasef_read_hsk, date0, probe=probe, errmsg=errmsg, $
             vars = prefix+'efw_hsk_beb_analog_IEFI_'+hsk_type+suffix
             
             get_data, vars[0], times
-            index = lazy_where(times, '[]', time_range, count=ntime)
+            index = where_pro(times, '[]', time_range, count=ntime)
             if ntime lt 5 then begin
                 data = fltarr(ncommon_time,ndim)+!values.f_nan
                 times = common_times

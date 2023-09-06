@@ -99,7 +99,7 @@ function rbsp_efw_phasef_read_e_fit_param, probe=probe
         for ii=0,nperigee_time-1 do begin
             the_time_range = reform(perigee_times[ii,*])
             rbsp_efw_phasef_read_e_uvw, the_time_range, probe=probe
-            time_index = lazy_where(common_times,'[]',the_time_range)
+            time_index = where_pro(common_times,'[]',the_time_range)
             the_times = common_times[time_index]
             the_var = prefix+'e_uvw'
             interp_time, the_var, the_times

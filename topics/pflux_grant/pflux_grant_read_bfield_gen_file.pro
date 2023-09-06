@@ -154,7 +154,7 @@ pro pflux_grant_read_bfield_gen_file, time, probe=probe, filename=file, local_ro
 
 
 ;---Trim to day_time_range.
-    index = lazy_where(common_times, '[)', day_time_range)
+    index = where_pro(common_times, '[)', day_time_range)
     times = common_times[index]
     b0_gsm = get_var_data(b0_gsm_var)
     b0_gsm = float(b0_gsm[index,*])

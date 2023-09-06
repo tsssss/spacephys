@@ -35,7 +35,7 @@ pro rbsp_efw_phasef_read_dc_offset, time_range, probe=probe, errmsg=errmsg
     endif
     foreach mask, mask_list do begin
         if mask.probe ne probe then continue
-        index = lazy_where(times, '[]', mask.time_range, count=count)
+        index = where_pro(times, '[]', mask.time_range, count=count)
         if count ne 0 then times[index] = !values.f_nan
     endforeach
     index = where(finite(times))

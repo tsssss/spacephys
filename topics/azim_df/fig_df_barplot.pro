@@ -176,7 +176,7 @@ test = 0
 
             yys = fltarr(nbin)
             for ii=0,nbin-1 do begin
-                index = lazy_where(data, '[)', bins[ii:ii+1], count=count)
+                index = where_pro(data, '[)', bins[ii:ii+1], count=count)
                 yys[ii] = count
             endfor
             yys = yys/total(yys)*100

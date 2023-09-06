@@ -205,14 +205,14 @@ pro azim_dp_read_ramp_gen_file, time, probe=probe, filename=file, test_time=test
 
     ; Rxy.
     rxy = snorm(r_sm[*,0:1])
-    index = lazy_where(rxy, '][', rxy_range, count=count)
+    index = where_pro(rxy, '][', rxy_range, count=count)
     if count ne 0 then roi_flags[index] = 0
 
     ; MLT.
     mlt_var = prefix+'mlt'
     interp_time, mlt_var, common_times
     mlt = get_var_data(mlt_var)
-    index = lazy_where(mlt, '][', mlt_range, count=count)
+    index = where_pro(mlt, '][', mlt_range, count=count)
     if count ne 0 then roi_flags[index] = 0
 
     ; Overall index.
@@ -301,7 +301,7 @@ pro azim_dp_read_ramp_gen_file, time, probe=probe, filename=file, test_time=test
             if (roi_time_range[1]-the_time_range[1]) le boxcar_window then continue
 
             ; Find if there is a node.
-            index = lazy_where(times, '[]', the_time_range, count=npoint)
+            index = where_pro(times, '[]', the_time_range, count=npoint)
             min_value_index = index[0]
             max_value_index = index[npoint-1]
             min_value = theta_smooth[min_value_index]
@@ -360,7 +360,7 @@ pro azim_dp_read_ramp_gen_file, time, probe=probe, filename=file, test_time=test
                     xstyle=5, $
                     ystyle=5, $
                     /noerase, /nodata
-                index = lazy_where(times, '[]', the_time_range)
+                index = where_pro(times, '[]', the_time_range)
                 xxs = times[index]
                 yys = theta_smooth[index]
                 plots, xxs,yys, color=sgcolor('green'), thick=2
@@ -383,7 +383,7 @@ pro azim_dp_read_ramp_gen_file, time, probe=probe, filename=file, test_time=test
             ramp_times[ramp_id] = ramp.ramp_time
             ramp_widths[ramp_id] = ramp.width
         endforeach
-        index = lazy_where(ramp_times, '[)', day_time_range, count=nramp)
+        index = where_pro(ramp_times, '[)', day_time_range, count=nramp)
         if nramp ne 0 then begin
             ramp_times = ramp_times[index]
             ramp_widths = ramp_widths[index]

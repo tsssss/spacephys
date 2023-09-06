@@ -170,7 +170,7 @@ pro rbsp_efw_read_l1_burst_efield, tr, probe=probe, $
             get_data, out_var, times, esvy
             shadow_trs = shadow_trs[index,*]
             for ii=0,ntr-1 do begin
-                index = lazy_where(times, '[]', shadow_trs[ii,0]+[-1,1]*0.3, count=count)
+                index = where_pro(times, '[]', shadow_trs[ii,0]+[-1,1]*0.3, count=count)
                 if count eq 0 then continue
                 esvy[index,0] = !values.f_nan
             endfor

@@ -55,7 +55,7 @@ pro azim_df_study_detect_df2, project=project, probe=probe, time_range=time_rang
     theta_upper = fltarr(nboxcar)+!values.f_nan
     theta_lower = fltarr(nboxcar)+!values.f_nan
     for ii=0, nboxcar-1 do begin
-        index = lazy_where(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+        index = where_pro(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
         if count eq 0 then continue
         the_theta = theta[index]
         index = where(finite(the_theta), count)
@@ -103,7 +103,7 @@ pro azim_df_study_detect_df2, project=project, probe=probe, time_range=time_rang
 ;---Calcualte the local standard deviation of the derivative.
     dtheta_stddev = fltarr(nboxcar)+!values.f_nan
     for ii=0, nboxcar-1 do begin
-        index = lazy_where(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+        index = where_pro(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
         if count eq 0 then continue
         the_dtheta = dtheta[index]
         dtheta_stddev[ii] = stddev(the_dtheta, /nan)
@@ -161,7 +161,7 @@ test = 1
         if the_time_range[0] eq time_range[0] then continue
         if the_time_range[1] eq time_range[1] then continue
 
-        index = lazy_where(times, '[]', the_time_range, count=npoint)
+        index = where_pro(times, '[]', the_time_range, count=npoint)
         ; Find if there is a node.
         min_value_index = index[0]
         max_value_index = index[npoint-1]
@@ -220,7 +220,7 @@ test = 1
     bar_thick = 4
     foreach df_info, df_infos do begin
         the_time_range = df_info.time_range
-        index = lazy_where(xxs, '[]', the_time_range)
+        index = where_pro(xxs, '[]', the_time_range)
         the_xxs = xxs[index]
         the_yys = yys[index]
         plots, the_xxs, the_yys, color=sgcolor('blue'), thick=bar_thick

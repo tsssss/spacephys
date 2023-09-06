@@ -56,7 +56,7 @@ test = 0
         short_name: 'V', $
         coord: 'GSM', $
         coord_labels: xyz }
-    index = lazy_where(orbit_times, '[]', the_time_range)
+    index = where_pro(orbit_times, '[]', the_time_range)
     ds = snorm(vec_cross(r_gsm,v_gsm))
     mean_ds = mean(ds[index])
     mean_ds = mean(ds)

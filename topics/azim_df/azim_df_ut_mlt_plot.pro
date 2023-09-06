@@ -134,11 +134,11 @@ pro azim_df_ut_mlt_plot, df_list, large_df_list, filename=plot_file, project=pro
         zzs = azim_df_normalize_theta(zzs, zrange=theta_range, ct=spec_ct, /reverse_ct)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', yrange, count=count)
+        index = where_pro(mlt, '][', yrange, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=xxs)
         rxy = snorm(rsm[*,0:1])
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(zzs,/nan), count)
         if count ne 0 then yys[index] = !values.f_nan

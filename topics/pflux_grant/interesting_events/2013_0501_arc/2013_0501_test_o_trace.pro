@@ -55,7 +55,7 @@
         
     ;---To get the trace info.
         get_data, prefix+species+'_en_spec', times, data
-        index = lazy_where(times, '[]', trs)
+        index = where_pro(times, '[]', trs)
         test_times = times[index]
         log_ens = alog10(ens)
         foreach time, test_times, time_id do begin

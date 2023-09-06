@@ -104,7 +104,7 @@ pro phasef_gen_l3_e_v03_per_day, date, $
         bad_times = common_times[time_to_range(bad_index,time_step=1)]
         nbad_time = n_elements(bad_times)*0.5
         for ii=0,nbad_time-1 do begin
-            index = lazy_where(common_times, '[]', bad_times[ii,*]+[-1,1]*pad_time, count=count)
+            index = where_pro(common_times, '[]', bad_times[ii,*]+[-1,1]*pad_time, count=count)
             if count eq 0 then continue
             global_flag[index] = 1
         endfor

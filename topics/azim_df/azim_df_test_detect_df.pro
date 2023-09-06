@@ -134,7 +134,7 @@ test = 1
         section_median = fltarr(nsection)
         section_mean = fltarr(nsection)
         for ii=0, nsection-1 do begin
-            the_data = theta_scale[lazy_where(common_times, '[]', section_boundary_times[ii:ii+1])]
+            the_data = theta_scale[where_pro(common_times, '[]', section_boundary_times[ii:ii+1])]
             if n_elements(the_data) eq 1 then begin
                 section_stddev[ii] = the_data
                 section_median[ii] = the_data
@@ -200,7 +200,7 @@ test = 1
         nsigma = 0.5
         for ii=0, nnode-1 do begin
             ; Expect a min-value.
-            index = lazy_where(common_times, '[]', node_boundary_times[ii+0:ii+1], count=count)
+            index = where_pro(common_times, '[]', node_boundary_times[ii+0:ii+1], count=count)
             if count eq 0 then continue
             the_times = common_times[index]
             the_median = theta_median[index]
@@ -213,7 +213,7 @@ test = 1
             ;if min_value gt -mean_stddev then continue
 
             ; Expect a max-value.
-            index = lazy_where(common_times, '[]', node_boundary_times[ii+1:ii+2], count=count)
+            index = where_pro(common_times, '[]', node_boundary_times[ii+1:ii+2], count=count)
             if count eq 0 then continue
             the_times = common_times[index]
             the_median = theta_median[index]
@@ -242,7 +242,7 @@ test = 1
             node_time = node_boundary_times[ii+1]
             node_index = where(common_times eq node_time)
             ; Find max value and its time.
-            index = lazy_where(common_times, '[]', node_boundary_times[ii+1:ii+2], count=count)
+            index = where_pro(common_times, '[]', node_boundary_times[ii+1:ii+2], count=count)
             if count eq 0 then continue
             the_times = common_times[index]
             the_flags = (deriv_prod[index] le 0) and (theta_median[index] ge  theta_stddev[index]*nsigma)
@@ -251,13 +251,13 @@ test = 1
             max_value_index = index[0]
             max_value_time = the_times[max_value_index]
             ; Sometimes the found point is not the minimum.
-            index = lazy_where(common_times, '[]', [node_time,max_value_time], count=count)
+            index = where_pro(common_times, '[]', [node_time,max_value_time], count=count)
             if count eq 0 then message, 'Inconsistency, stop here'
             the_times = common_times[index]
             max_value = max(theta_median[index], max_value_index)
             max_value_time = the_times[max_value_index]
             ; Find min value and its time.
-            index = lazy_where(common_times, '[]', node_boundary_times[ii+0:ii+1], count=count)
+            index = where_pro(common_times, '[]', node_boundary_times[ii+0:ii+1], count=count)
             if count eq 0 then continue
             the_times = common_times[index]
             the_flags = (deriv_prod[index] le 0) and (theta_median[index] le -theta_stddev[index]*nsigma)
@@ -265,7 +265,7 @@ test = 1
             if count eq 0 then continue
             min_value_index = index[count-1]
             min_value_time = the_times[min_value_index]
-            index = lazy_where(common_times, '[]', [min_value_time,node_time], count=count)
+            index = where_pro(common_times, '[]', [min_value_time,node_time], count=count)
             if count eq 0 then message, 'Inconsistency, stop here'
             the_times = common_times[index]
             min_value = min(theta_median[index], min_value_index)
@@ -278,14 +278,14 @@ test = 1
 
 
 ;            ; Find the width and height.
-;            index = lazy_where(common_times, '[]', [min_value_time,node_time])
+;            index = where_pro(common_times, '[]', [min_value_time,node_time])
 ;            the_times = common_times[index]
 ;            the_median = theta_median[index]
 ;            half_min_value = min_value*0.5
 ;            index = where(the_median le half_min_value)
 ;            half_min_value_time = the_times[index[-1]]
 ;
-;            index = lazy_where(common_times, '[]', [node_time,max_value_time])
+;            index = where_pro(common_times, '[]', [node_time,max_value_time])
 ;            the_times = common_times[index]
 ;            the_median = theta_median[index]
 ;            half_max_value = max_value*0.5
@@ -662,11 +662,11 @@ test = 1
         zzs = azim_df_normalize_theta(zzs, mlt, zrange=theta_range, ct=spec_ct, /reverse_ct)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=xxs)
         rxy = snorm(rsm[*,0:1])
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(zzs,/nan), count)
         if count ne 0 then yys[index] = !values.f_nan
@@ -695,11 +695,11 @@ test = 1
         mlt = get_var_data(prefix+'mlt', at=txxs)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=txxs)
         if n_elements(txxs) eq 1 then rxy = snorm(rsm[0:1]) else rxy = snorm(rsm[*,0:1])
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(yys), count)
         if count eq 0 then continue
@@ -756,10 +756,10 @@ test = 1
         zzs = azim_df_normalize_theta(zzs, mlt, zrange=theta_range, ct=spec_ct, /reverse_ct)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=xxs)
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(zzs,/nan), count)
         if count ne 0 then yys[index] = !values.f_nan
@@ -788,11 +788,11 @@ test = 1
         mlt = get_var_data(prefix+'mlt', at=txxs)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=txxs)
         if n_elements(txxs) eq 1 then rxy = snorm(rsm[0:1]) else rxy = snorm(rsm[*,0:1])
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(yys), count)
         if count eq 0 then continue

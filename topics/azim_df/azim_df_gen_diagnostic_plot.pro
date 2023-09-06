@@ -304,11 +304,11 @@ test = 0
         zzs = azim_df_normalize_theta(zzs, zrange=theta_range, ct=spec_ct, /reverse_ct)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=xxs)
         rxy = snorm(rsm[*,0:1])
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(zzs,/nan), count)
         if count ne 0 then yys[index] = !values.f_nan
@@ -376,11 +376,11 @@ test = 0
         zzs = azim_df_normalize_theta(zzs, mlt, zrange=theta_range, ct=spec_ct, /reverse_ct)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=xxs)
         rxy = snorm(rsm[*,0:1])
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(zzs,/nan), count)
         if count ne 0 then yys[index] = !values.f_nan
@@ -505,11 +505,11 @@ pro azim_df_gen_diagnostic_plot_search_event_search_df_group, project=project, $
             ; rxy.
             r_sm = get_var_data(r_sm_var, at=common_times)
             rxy = snorm(r_sm[*,0:1])
-            index = lazy_where(rxy, '][', rxy_range, count=count)
+            index = where_pro(rxy, '][', rxy_range, count=count)
             if count ne 0 then roi_flags[index] = 0
             ; mlt.
             mlt = azim_df_calc_pseudo_mlt(r_sm)
-            index = lazy_where(mlt, '][', mlt_range, count=count)
+            index = where_pro(mlt, '][', mlt_range, count=count)
             if count ne 0 then roi_flags[index] = 0
 
             index = where(roi_flags eq 0, count)
@@ -634,11 +634,11 @@ pro azim_df_gen_diagnostic_plot_search_event_search_large_df, project=project, $
             ; rxy.
             r_sm = get_var_data(r_sm_var, at=common_times)
             rxy = snorm(r_sm[*,0:1])
-            index = lazy_where(rxy, '][', rxy_range, count=count)
+            index = where_pro(rxy, '][', rxy_range, count=count)
             if count ne 0 then roi_flags[index] = 0
             ; mlt.
             mlt = azim_df_calc_pseudo_mlt(r_sm)
-            index = lazy_where(mlt, '][', mlt_range, count=count)
+            index = where_pro(mlt, '][', mlt_range, count=count)
             if count ne 0 then roi_flags[index] = 0
 
             index = where(roi_flags eq 0, count)
@@ -986,11 +986,11 @@ test = 0
         zzs = azim_df_normalize_theta(zzs, mlt, zrange=theta_range, ct=spec_ct, /reverse_ct)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=xxs)
         rxy = snorm(rsm[*,0:1])
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(zzs,/nan), count)
         if count ne 0 then yys[index] = !values.f_nan
@@ -1047,11 +1047,11 @@ test = 0
         zzs = azim_df_normalize_theta(zzs, mlt, zrange=theta_range, ct=spec_ct, /reverse_ct)
 
         ; Remove data outside ROI.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         rsm = get_var_data(prefix+'r_sm', at=xxs)
         rxy = snorm(rsm[*,0:1])
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then yys[index] = !values.f_nan
         index = where(finite(zzs,/nan), count)
         if count ne 0 then yys[index] = !values.f_nan
@@ -1371,7 +1371,7 @@ pro azim_df_gen_diagnostic_plot_search_candidate_search_triad, project=project
                             rsms[*,probe_index[1]]-rsms[*,probe_index[0]], $
                             rsms[*,probe_index[2]]-rsms[*,probe_index[0]], /deg)
                     endforeach
-                    index = lazy_where(triad_angles, '[]', triad_angle_range, count=count)
+                    index = where_pro(triad_angles, '[]', triad_angle_range, count=count)
                     combo_flags[combo_index] = count eq nvertex
                 endforeach
                 index = where(combo_flags eq 1, triad_count)
@@ -1529,7 +1529,7 @@ test = 0
                 region = candidate.region
 
                 if keyword_set(test_time) then begin
-                    index = lazy_where(test_time, '[]', section_time_range, count=count)
+                    index = where_pro(test_time, '[]', section_time_range, count=count)
                     if count ne 0 then stop
                 endif
 

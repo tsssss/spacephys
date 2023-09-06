@@ -69,7 +69,7 @@ pro pflux_grant_preprocess_efield_per_orbit, orbit_time_range, probe=probe, proj
     for ii=0, nbad_time_range-1 do begin
         current_time_range = reform(bad_time_ranges[ii,*])+[-1,1]*pad_time
         lprmsg, time_string(current_time_range)
-        index = lazy_where(efield_times, '[]', current_time_range, count=count)
+        index = where_pro(efield_times, '[]', current_time_range, count=count)
         if count eq 0 then continue
         e_uv[index,*] = fillval
     endfor
@@ -150,7 +150,7 @@ pro pflux_grant_preprocess_efield_save_data, date, probe=probe, project=project
 
     e_uv_var = prefix+'e_uv'
     e_uv = get_var_data(e_uv_var, times=efield_times)
-    index = lazy_where(efield_times, '[)', time_range)
+    index = where_pro(efield_times, '[)', time_range)
     e_uv = float(e_uv[index,*])
     settings = dictionary($
         'depend_0', time_var, $
@@ -246,7 +246,7 @@ pro pflux_grant_preprocess_efield_load_data, date, probe=probe, project=project
     if ntime ne ntime0 then begin
         new_times = make_bins(date_time_range, efield_time_step)
         new_vsvy = fltarr(ntime0,nboom)+!values.f_nan
-        index = lazy_where(new_times, '[]', minmax(times), count=count)
+        index = where_pro(new_times, '[]', minmax(times), count=count)
         if count ne 0 then new_vsvy[index,*] = sinterpol(vsvy, times, new_times[index], /nan)
         times = new_times
         vsvy = new_vsvy

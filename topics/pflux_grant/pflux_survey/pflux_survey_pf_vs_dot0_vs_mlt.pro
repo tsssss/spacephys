@@ -52,7 +52,7 @@ test = 4
 ;        dedot0 = dedot0[0:*:step,*]
 
         mlt = azim_df_calc_pseudo_mlt(get_var_data(prefix+'r_gsm', at=times))
-        index = lazy_where(mlt, ')[', [-9,9])
+        index = where_pro(mlt, ')[', [-9,9])
         mlt = mlt[index]
         times = times[index]
         de = de[index,*]
@@ -71,7 +71,7 @@ test = 4
         mlt_bins = smkarthm(mlt_min+dmlt*0.5, mlt_max-dmlt*0.5, dmlt, 'dx')
         mlt_colors = fltarr(ntime)+colors[0]
         for ii=0, n_elements(mlt_bins)-2 do begin
-            index = lazy_where(mlt, '[)', mlt_bins[ii:ii+1], count=count)
+            index = where_pro(mlt, '[)', mlt_bins[ii:ii+1], count=count)
             if count eq 0 then continue
             mlt_colors[index] = colors[ii+1]
         endfor

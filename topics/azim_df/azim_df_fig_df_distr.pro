@@ -141,7 +141,7 @@ test = 0
     height_mlt_means = fltarr(nmlt_bin)
     height_mlt_stddevs = fltarr(nmlt_bin)
     for ii=0, nmlt_bin-1 do begin
-        index = lazy_where(df_mlts, '[]', mlt_bin_boundarys[ii:ii+1], count=count)
+        index = where_pro(df_mlts, '[]', mlt_bin_boundarys[ii:ii+1], count=count)
         if count le 10 then continue
         the_heights = df_heights[index]
         the_heights = the_heights[sort(the_heights)]
@@ -212,7 +212,7 @@ test = 0
     ; Bin data.
     width_mlt_stddevs = fltarr(nmlt_bin)
     for ii=0, nmlt_bin-1 do begin
-        index = lazy_where(df_mlts, '[]', mlt_bin_boundarys[ii:ii+1], count=count)
+        index = where_pro(df_mlts, '[]', mlt_bin_boundarys[ii:ii+1], count=count)
         if count le 10 then continue
         the_widths = df_widths[index]
         the_widths = the_widths[sort(the_widths)]
@@ -276,7 +276,7 @@ test = 0
     ; Bin data.
     height_rxy_stddevs = fltarr(nrxy_bin)
     for ii=0, nrxy_bin-1 do begin
-        index = lazy_where(df_rxys, '[]', rxy_bin_boundarys[ii:ii+1], count=count)
+        index = where_pro(df_rxys, '[]', rxy_bin_boundarys[ii:ii+1], count=count)
         if count le 10 then continue
         the_heights = df_heights[index]
         the_heights = the_heights[sort(the_heights)]
@@ -339,7 +339,7 @@ test = 0
     ; Bin data.
     width_rxy_stddevs = fltarr(nrxy_bin)
     for ii=0, nrxy_bin-1 do begin
-        index = lazy_where(df_rxys, '[]', rxy_bin_boundarys[ii:ii+1], count=count)
+        index = where_pro(df_rxys, '[]', rxy_bin_boundarys[ii:ii+1], count=count)
         if count le 10 then continue
         the_widths = df_widths[index]
         the_widths = the_widths[sort(the_widths)]

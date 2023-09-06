@@ -81,7 +81,7 @@ test = 1
     ytickv = 10d^log_ytickv
     yticks = n_elements(ytickv)-1
     ytickn = '10!U'+string(log_ytickv,format='(I0)')
-    index = lazy_where(ytickv, '()', yrange)
+    index = where_pro(ytickv, '()', yrange)
     constant = ytickv[index]
     foreach tx, ytickv, ii do begin
         if tx eq 1 then begin
@@ -136,9 +136,9 @@ test = 1
     dmlt = dmlat/15 ; h.
 
     foreach time, times, time_id do begin
-        mlt_index = lazy_where(mlt_bins, '[]', fmlt[time_id]+[-1,1]*dmlt*0.5, count=count)
+        mlt_index = where_pro(mlt_bins, '[]', fmlt[time_id]+[-1,1]*dmlt*0.5, count=count)
         if count eq 0 then continue
-        mlat_index = lazy_where(mlat_bins, '[]', fmlat[time_id]+[-1,1]*dmlat*0.5, count=count)
+        mlat_index = where_pro(mlat_bins, '[]', fmlat[time_id]+[-1,1]*dmlat*0.5, count=count)
         if count eq 0 then continue
 
         asi_count[time_id] = mean(mlt_images[time_id,mlt_index,mlat_index])
@@ -283,11 +283,11 @@ test = 1
     mlt_image = reform(mlt_images[index,*,*])
     
     mlt_bins = get_setting(mlt_image_var, 'mlt_bins')
-    mlt_index = lazy_where(mlt_bins, '[]', mlt_range)
+    mlt_index = where_pro(mlt_bins, '[]', mlt_range)
     mlt_bins = mlt_bins[mlt_index]
     mlt_image = mlt_image[mlt_index,*]
     mlat_bins = get_setting(mlt_image_var, 'mlat_bins')
-    mlat_index = lazy_where(mlat_bins, '[]', mlat_range)
+    mlat_index = where_pro(mlat_bins, '[]', mlat_range)
     mlat_bins = mlat_bins[mlat_index]
     mlt_image = mlt_image[*,mlat_index]
     

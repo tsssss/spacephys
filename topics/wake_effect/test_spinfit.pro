@@ -41,7 +41,7 @@ pro test_spinfit, date, probe=mission_probe
     data_var = pre0+'e_uv'
     if tnames(data_var) ne '' then begin
         get_data, data_var, times
-        index = lazy_where(times,full_time_range, count=count)
+        index = where_pro(times,full_time_range, count=count)
         if count le 1 then store_data, data_var, /delete
     endif
     if tnames(data_var) eq '' then load_var = 1 else load_var = 0
@@ -115,7 +115,7 @@ pro test_spinfit, date, probe=mission_probe
 
             foreach time, section_times, ii do begin
                 section_time_range = time+[-0.5,0.5]*duration
-                index = lazy_where(times, section_time_range, count=N)
+                index = where_pro(times, section_time_range, count=N)
                 wps = abs(ww[index,*])^2
                 gws = total(wps,1)/N
                 psd = gws*2*s2t*dt/cdelta
@@ -166,7 +166,7 @@ pro test_spinfit, date, probe=mission_probe
 
             foreach time, section_times, ii do begin
                 section_time_range = time+[-0.5,0.5]*duration
-                index = lazy_where(times, section_time_range, count=N)
+                index = where_pro(times, section_time_range, count=N)
                 wps = abs(ww[index,*])^2
                 gws = total(wps,1)/N
                 psd = gws*2*s2t*dt/cdelta

@@ -72,7 +72,7 @@ pro pflux_grant_preprocess_bfield, time_range, probe=probe
         if ndata lt bfield_min_nrec then continue
 
         ; Get dB = B_meas - B_model.
-        time_index = lazy_where(common_times, '[]', orbit_time_range)
+        time_index = where_pro(common_times, '[]', orbit_time_range)
         times = common_times[time_index]
         b_gsm = get_var_data(b_var, at=times)
         bmod_gsm = get_var_data(bmod_gsm_var, at=times)

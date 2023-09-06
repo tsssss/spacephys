@@ -242,7 +242,7 @@ function azim_df_filter_edge, candidate, project=project, $
 
         angles = triad_info.angles
         lprmsg, tab+tab+'angles (deg): '+strjoin(string(angles,format='(F5.1)'),','), log_file
-        index = lazy_where(angles, '()', triad_angle_range, count=count)
+        index = where_pro(angles, '()', triad_angle_range, count=count)
         if count lt ntriad_vertex then begin
             lprmsg, tab+'Not all angles in range, skip ...', log_file
             triad_dict.remove, key

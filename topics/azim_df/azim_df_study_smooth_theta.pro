@@ -87,7 +87,7 @@ test = 0
                 boxcar_center_times = boxcar_boundary_times[0:nboxcar-1]+boxcar_window*0.5
                 theta_median = fltarr(nboxcar)+!values.f_nan
                 for ii=0, nboxcar-1 do begin
-                    index = lazy_where(common_times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+                    index = where_pro(common_times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
                     if count eq 0 then continue
                     the_theta = theta[index]
                     index = where(finite(the_theta),count)
@@ -111,7 +111,7 @@ test = 0
                 boxcar_center_times = boxcar_boundary_times[0:nboxcar-1]+boxcar_window*0.5
                 theta_mean = fltarr(nboxcar)+!values.f_nan
                 for ii=0, nboxcar-1 do begin
-                    index = lazy_where(common_times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+                    index = where_pro(common_times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
                     if count eq 0 then continue
                     the_theta = theta[index]
                     index = where(finite(the_theta),count)
@@ -135,7 +135,7 @@ test = 0
                 boxcar_center_times = boxcar_boundary_times[0:nboxcar-1]+boxcar_window*0.5
                 theta_mean_ratio = fltarr(nboxcar)+!values.f_nan
                 for ii=0, nboxcar-1 do begin
-                    index = lazy_where(common_times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+                    index = where_pro(common_times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
                     if count eq 0 then continue
                     the_theta = theta[index]
                     index = where(finite(the_theta),count)
@@ -161,7 +161,7 @@ test = 0
                 theta = get_var_data(prefix+'theta', in=slide_time_range, times=times)
                 boxcar_width = boxcar_window/time_step
                 theta_slide = sliding_boxcar(theta, boxcar_width, type='mean')
-                index = lazy_where(times, '[]', time_range)
+                index = where_pro(times, '[]', time_range)
                 theta_slide = theta_slide[index]
                 times = times[index]
                 store_data, theta_mean_slide_var, times, theta_slide
@@ -180,7 +180,7 @@ test = 0
                 theta = get_var_data(prefix+'theta', in=slide_time_range, times=times)
                 boxcar_width = boxcar_window/time_step
                 theta_mean_ratio_slide = sliding_boxcar(theta, boxcar_width, type='mean', ratio=boxcar_ratio)
-                index = lazy_where(times, '[]', time_range)
+                index = where_pro(times, '[]', time_range)
                 theta_mean_ratio_slide = theta_mean_ratio_slide[index]
                 times = times[index]
                 store_data, theta_mean_ratio_slide_var, times, theta_mean_ratio_slide

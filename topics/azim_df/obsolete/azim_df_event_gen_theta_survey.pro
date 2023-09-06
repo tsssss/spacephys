@@ -54,17 +54,17 @@ test = 0
         xsm = r_sm[*,0]
         dis = snorm(r_sm)
         ; Exclude data outside the MLT range.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data ouside the distance range.
-        index = lazy_where(dis, '][', dis_range, count=count)
+        index = where_pro(dis, '][', dis_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data outside magnetopause.
         magn_flags = check_if_in_magn(cotran(r_sm, times, 'sm2gsm'))
         index = where(magn_flags eq 0, count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data outside time range.
-        index = lazy_where(xxs, '][', event_time_range, count=count)
+        index = where_pro(xxs, '][', event_time_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
 
         index = where(finite(xxs), count)

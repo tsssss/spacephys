@@ -139,7 +139,7 @@
     b_theta = asin(b_uvw[*,2]/snorm(b_uvw))*constant('deg')
     
     energy_range = [1e3,1e5]
-    energy_index = lazy_where(en_bins,'[]',energy_range,count=nenergy_index)
+    energy_index = where_pro(en_bins,'[]',energy_range,count=nenergy_index)
     tpos = sgcalcpos(1, margins=[10,4,2,2])
     the_fluxs = total(reform(fpdu[time_id,energy_index,*,*]),1)/nenergy_index
     zrange = minmax(the_fluxs)
@@ -186,7 +186,7 @@
         max_angles = fltarr(nut)
         max_times = dblarr(nut)
         foreach time, uts, time_id do begin
-            time_index = lazy_where(times,'[]',time+[0,2]*5.5)
+            time_index = where_pro(times,'[]',time+[0,2]*5.5)
             max_fluxs[time_id] = max(flux[time_index],index)
             max_times[time_id] = (times[time_index])[index]
             max_angles[time_id] = (angle[time_index])[index]

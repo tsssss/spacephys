@@ -73,7 +73,7 @@ pro rbsp_efw_phasef_read_e_fit_gen_file, time, probe=probe, filename=file
         fit_coef[*,1] = fit_info.y
         fit_coef[*,2] = fit_info.z
         section_time_range = fit_info.time_range
-        time_index = lazy_where(common_times,'[]',section_time_range)
+        time_index = where_pro(common_times,'[]',section_time_range)
         foreach jj, fit_index do begin
             res = fit_coef[0:2,jj]
             efit_mgse[time_index,jj] = reform(xxs[*,time_index,jj] ## res)

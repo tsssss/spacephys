@@ -67,7 +67,7 @@ pro pflux_grant_preprocess_efield_per_orbit, orbit_time_range, probe=probe, proj
     for ii=0, nbad_time_range-1 do begin
         current_time_range = reform(bad_time_ranges[ii,*])+[-1,1]*pad_time
         lprmsg, time_string(current_time_range)
-        index = lazy_where(efield_times, '[]', current_time_range, count=count)
+        index = where_pro(efield_times, '[]', current_time_range, count=count)
         if count eq 0 then continue
         e_uv[index,*] = fillval
     endfor
@@ -75,7 +75,7 @@ pro pflux_grant_preprocess_efield_per_orbit, orbit_time_range, probe=probe, proj
 
 
 ;---The times within the orbit.
-    time_index = lazy_where(efield_times, '[]', orbit_time_range, count=ntime)
+    time_index = where_pro(efield_times, '[]', orbit_time_range, count=ntime)
     times = efield_times[time_index]
 
 
@@ -265,7 +265,7 @@ pro pflux_grant_preprocess_efield_save_data, date, probe=probe, project=project
     ; Remove spikes within perigee shell.
     e_uv_var = prefix+'e_uv'
     e_uv = get_var_data(e_uv_var, times=efield_times)
-    time_index = lazy_where(efield_times, '[]', time_range)
+    time_index = where_pro(efield_times, '[]', time_range)
     the_e_uv = e_uv[time_index,*]
     times = efield_times[time_index]
     emag = snorm(the_e_uv)

@@ -56,14 +56,14 @@
         vars = pre0+['db','e']
         foreach var, vars do begin
             get_data, var+'_gsm', times, data
-            index = lazy_where(times, time_range)
+            index = where_pro(times, time_range)
             store_data, var+'_mag', times[index], snorm(data[index,*])
             calc_psd, var+'_mag', scales=scales
         endforeach
 
         tvar = pre0+'pf_fac_mor_spec_1'
         get_data, tvar, uts, dat
-        index = lazy_where(uts, time_range, count=nrec)
+        index = where_pro(uts, time_range, count=nrec)
         spsd = total(dat[index,*], 1)/nrec
 
 

@@ -141,7 +141,7 @@ pro azim_df_search_candidate_search_roi, project=project
                 if probe eq 'thb' or probe eq 'thc' then rxy_range >= 15.
             endif
             rxy = snorm(r_sm[*,0:1])
-            index = lazy_where(rxy, '][', rxy_range, count=count)
+            index = where_pro(rxy, '][', rxy_range, count=count)
             if count ne 0 then roi_flags[index] = 0
 
             ; "mlt" in SM, but really should be in MAG.
@@ -161,7 +161,7 @@ pro azim_df_search_candidate_search_roi, project=project
                 yrange: mlt_range, $
                 short_name: 'MLT!USM', $
                 unit: 'hr'}
-            index = lazy_where(mlt, '][', mlt_range, count=count)
+            index = where_pro(mlt, '][', mlt_range, count=count)
             if count ne 0 then roi_flags[index] = 0
 
             the_var = prefix+'roi_flag'
@@ -186,7 +186,7 @@ pro azim_df_search_candidate_search_roi, project=project
             foreach probe, probes, ii do begin
                 prefix = probe_infos[probe].prefix
                 roi_flags[*,ii] = get_var_data(prefix+'roi_flag')
-                index = lazy_where(get_var_data(prefix+'mlt'), '][', mlt_range, count=count)
+                index = where_pro(get_var_data(prefix+'mlt'), '][', mlt_range, count=count)
                 if count ne 0 then roi_flags[index,ii] = 0
             endforeach
             store_data, the_var, common_times, roi_flags, limits={$
@@ -209,10 +209,10 @@ pro azim_df_search_candidate_search_roi, project=project
             for ii=0, ntime_range-1 do begin
                 time_range = reform(time_ranges[ii,*])
                 if keyword_set(test_time) then begin
-                    index = lazy_where(test_time, '[]', time_range, count=count)
+                    index = where_pro(test_time, '[]', time_range, count=count)
                     if count ne 0 then stop
                 endif
-                probe_durations = reform(total(roi_flags[lazy_where(common_times,'[]',time_range),*],1))*time_step
+                probe_durations = reform(total(roi_flags[where_pro(common_times,'[]',time_range),*],1))*time_step
                 index = where(probe_durations ge roi_min_duration*roi_probe_ratio, count)
                 if count lt roi_min_count then begin
                     message, 'Not enough probes in ROI, skip ...', /continue
@@ -339,7 +339,7 @@ pro azim_df_search_candidate_search_triad, project=project
 
 ;    test_time = time_double('2014-08-28/10:00')
 ;;    test_time = time_double('2016-10-13/10:00')
-;    index = lazy_where(test_time, '[]', time_range, count=count)
+;    index = where_pro(test_time, '[]', time_range, count=count)
 ;    if count eq 0 then continue else stop
 
 
@@ -407,7 +407,7 @@ pro azim_df_search_candidate_search_triad, project=project
                 angles = sang($
                     r_sm[*,*,combo_index[1]]-r_sm[*,*,combo_index[0]], $
                     r_sm[*,*,combo_index[2]]-r_sm[*,*,combo_index[0]], /deg)
-                index = lazy_where(angles, '][', triad_angle_range, count=count)
+                index = where_pro(angles, '][', triad_angle_range, count=count)
                 if count ne 0 then triad_flags[index,jj] = 0
             endfor
         endforeach
@@ -509,7 +509,7 @@ pro azim_df_search_candidate_search_omni, project=project
     ncommon_time = n_elements(common_times)
     omni_flags = bytarr(ncommon_time)
     ntime_range = n_elements(time_ranges)/2
-    for ii=0, ntime_range-1 do omni_flags[lazy_where(common_times,'[]',reform(time_ranges[ii,*]))] = 1
+    for ii=0, ntime_range-1 do omni_flags[where_pro(common_times,'[]',reform(time_ranges[ii,*]))] = 1
     omni_flag_var = 'omni_'+omni_type+'_flag'
     store_data, omni_flag_var, common_times, omni_flags
     add_setting, omni_flag_var, /smart, {$
@@ -523,7 +523,7 @@ pro azim_df_search_candidate_search_omni, project=project
     candidates = search_candidate.search_triad.candidates
     foreach candidate, candidates do begin
         time_range = candidate.time_range
-        the_flags = omni_flags[lazy_where(common_times,'[]',time_range)]
+        the_flags = omni_flags[where_pro(common_times,'[]',time_range)]
         index = where(the_flags eq 1, count)
         overlap = count*time_step
         if overlap lt omni_min_overlap then continue

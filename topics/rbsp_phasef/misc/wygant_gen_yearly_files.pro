@@ -35,7 +35,7 @@
             neclipse = n_elements(eclipse_time_ranges)*0.5
             flags = intarr(nflag_time)
             for ii=0,neclipse-1 do begin    ; eclipse time tend to be off?
-                index = lazy_where(flag_times, '[]', eclipse_time_ranges[ii,*]+[-10,5]*flag_time_step, count=count)
+                index = where_pro(flag_times, '[]', eclipse_time_ranges[ii,*]+[-10,5]*flag_time_step, count=count)
                 if count eq 0 then continue
                 flags[index] = 1
             endfor
@@ -46,7 +46,7 @@
             nmaneuver = n_elements(maneuver_time_ranges)*0.5
             flags = intarr(nflag_time)
             for ii=0,nmaneuver-1 do begin   ; pad a little to ensure exclusion.
-                index = lazy_where(flag_times, '[]', maneuver_time_ranges[ii,*]+[-2,2]*flag_time_step, count=count)
+                index = where_pro(flag_times, '[]', maneuver_time_ranges[ii,*]+[-2,2]*flag_time_step, count=count)
                 if count eq 0 then continue
                 flags[index] = 1
             endfor
@@ -73,7 +73,7 @@
                 endif else flag_times = !null
                 nflag_time = n_elements(flag_times)*0.5
                 for flag_id=0,nflag_time-1 do begin
-                    index = lazy_where(times, '[]', flag_times[flag_id,*], count=count)
+                    index = where_pro(times, '[]', flag_times[flag_id,*], count=count)
                     if count eq 0 then continue
                     times[index] = !values.d_nan
                 endfor

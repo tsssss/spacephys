@@ -44,7 +44,7 @@ function azim_df_read_df, time_range, probe=probe, project=project, $
         the_range = minmax(mlt_range)
         the_var = prefix+'obs_mlt'
         data = get_var_data(the_var)
-        index = lazy_where(data, '()', the_range, count=count)
+        index = where_pro(data, '()', the_range, count=count)
         if count eq 0 then return, retval
         foreach var, out_vars do begin
             get_data, var, time, data
@@ -56,7 +56,7 @@ function azim_df_read_df, time_range, probe=probe, project=project, $
         the_range = minmax(rxy_range)
         the_var = prefix+'obs_rxy'
         data = get_var_data(the_var)
-        index = lazy_where(data, '()', the_range, count=count)
+        index = where_pro(data, '()', the_range, count=count)
         if count eq 0 then return, retval
         foreach var, out_vars do begin
             get_data, var, time, data

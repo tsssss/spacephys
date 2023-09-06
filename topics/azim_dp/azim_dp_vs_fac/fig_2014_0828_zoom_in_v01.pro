@@ -482,7 +482,7 @@
         prefix = probe+'_'
         var = prefix+'kev_e_flux'
         get_data, var, times, fluxes, ebins, limits=lim
-        index = lazy_where(ebins, '[]', injection_energy_range, count=nebin)
+        index = where_pro(ebins, '[]', injection_energy_range, count=nebin)
         fluxes = fluxes[*,index]
         ebins = ebins[index]
         if nebin gt max_nebin then begin
@@ -491,7 +491,7 @@
             ;fluxes = fluxes[*,0:*:2]
             ;ebins = ebins[0:*:2]
         endif
-        index = lazy_where(times, '[]', mid_time_range)
+        index = where_pro(times, '[]', mid_time_range)
         times = times[index]
         fluxes = fluxes[index,*]
         store_data, var+'_plot', times, fluxes, ebins
@@ -684,8 +684,8 @@
     get_data, mltimg_var, times, mltimg
     mlt_bins = get_setting(mltimg_var, 'mlt_bins')
     mlat_bins = get_setting(mltimg_var, 'mlat_bins')
-    mlt_index = lazy_where(mlt_bins, '[]', mlt_range)
-    mlat_index = lazy_where(mlat_bins, '[]', mlat_range)
+    mlt_index = where_pro(mlt_bins, '[]', mlt_range)
+    mlat_index = where_pro(mlat_bins, '[]', mlat_range)
 
 
     foreach panel_id, [0,1,2] do begin
@@ -726,9 +726,9 @@
     if check_if_update(ewo_var, ewo_time_range) then $
         themis_read_mltimg_ewo, ewo_time_range, mlat_range=mlat_range
     get_data, ewo_var, times, ewo, mlt_bins
-    index = lazy_where(mlt_bins, '[]', mlt_range)
+    index = where_pro(mlt_bins, '[]', mlt_range)
     ewo = ewo[*,index]
-    index = lazy_where(times, '[]', ewo_time_range)
+    index = where_pro(times, '[]', ewo_time_range)
     ewo = ewo[index,*]
 
     zzs = bytscl(transpose(ewo), min=ewo_zrange[0], max=ewo_zrange[1], top=254)

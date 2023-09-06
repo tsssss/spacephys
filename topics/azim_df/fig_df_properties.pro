@@ -164,7 +164,7 @@ test = 1
     test_ratio = 0.7
     min_count = 10
     for ii=0, nbin-1 do begin
-        index = lazy_where(xxs, '[]', bins[ii:ii+1], count=count)
+        index = where_pro(xxs, '[]', bins[ii:ii+1], count=count)
         if count le min_count then continue
         the_data = yys[index]
         bin_yys[ii] = median(the_data)
@@ -232,7 +232,7 @@ test = 1
     bin_yys = fltarr(nbin)+!values.f_nan
     min_count = 10
     for ii=0, nbin-1 do begin
-        index = lazy_where(xxs, '[]', bins[ii:ii+1], count=count)
+        index = where_pro(xxs, '[]', bins[ii:ii+1], count=count)
         if count le min_count then continue
         the_data = yys[index]
         bin_yys[ii] = median(the_data)
@@ -281,7 +281,7 @@ test = 1
     bin_yys = fltarr(nbin)+!values.f_nan
     min_count = 10
     for ii=0, nbin-1 do begin
-        index = lazy_where(xxs, '[]', bins[ii:ii+1], count=count)
+        index = where_pro(xxs, '[]', bins[ii:ii+1], count=count)
         if count le min_count then continue
         the_data = yys[index]
         bin_yys[ii] = median(the_data)
@@ -336,7 +336,7 @@ test = 1
     bin_yys = fltarr(nbin)+!values.f_nan
     min_count = 10
     for ii=0, nbin-1 do begin
-        index = lazy_where(xxs, '[]', bins[ii:ii+1], count=count)
+        index = where_pro(xxs, '[]', bins[ii:ii+1], count=count)
         if count le min_count then continue
         the_data = yys[index]
         bin_yys[ii] = median(the_data)

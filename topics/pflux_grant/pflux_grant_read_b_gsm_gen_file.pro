@@ -78,7 +78,7 @@ pro pflux_grant_read_b_gsm_gen_file, time, probe=probe, filename=file;, pad_time
 
 
 ;---Save data to file.
-    index = lazy_where(common_times, '[)', day_time_range)
+    index = where_pro(common_times, '[)', day_time_range)
     times = common_times[index]
     b_gsm = get_var_data(b_gsm_var)
     b_gsm = float(b_gsm[index,*])

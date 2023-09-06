@@ -51,7 +51,7 @@ pro rbsp_efw_phasef_read_b_mgse_gen_file, time, probe=probe, filename=file
     get_data, b_uvw_var, times
     
 ;---Remove invalid data and convert b_uvw to b_mgse.
-    index = lazy_where(times, '[]', time_range, count=count)
+    index = where_pro(times, '[]', time_range, count=count)
     if count ge 10 then begin
         ; Mask invalid data with NaN.
         cal_state = get_var_data(prefix+'cal_state', times=uts)
@@ -64,7 +64,7 @@ pro rbsp_efw_phasef_read_b_mgse_gen_file, time, probe=probe, filename=file
             ntime_range = n_elements(time_ranges)*0.5
             b_uvw = get_var_data(b_uvw_var, times=uts)
             for ii=0,ntime_range-1 do begin
-                index = lazy_where(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+                index = where_pro(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
                 if count eq 0 then continue
                 b_uvw[index,*] = fillval
             endfor
@@ -79,7 +79,7 @@ pro rbsp_efw_phasef_read_b_mgse_gen_file, time, probe=probe, filename=file
             time_ranges = uts[time_to_range(bad_index,time_step=1)]
             ntime_range = n_elements(time_ranges)*0.5
             for ii=0,ntime_range-1 do begin
-                index = lazy_where(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+                index = where_pro(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
                 if count eq 0 then continue
                 b_uvw[index,*] = fillval
             endfor
@@ -96,7 +96,7 @@ pro rbsp_efw_phasef_read_b_mgse_gen_file, time, probe=probe, filename=file
     if probe eq 'b' then begin
         bad_time_range = time_double(['2018-09-27/04:00','2018-09-27/14:00'])
         get_data, b_mgse_var, times, b_mgse
-        index = lazy_where(times, '[]', bad_time_range, count=count)
+        index = where_pro(times, '[]', bad_time_range, count=count)
         if count ne 0 then begin
             b_mgse[index,*] = !values.f_nan
             store_data, b_mgse_var, times, b_mgse

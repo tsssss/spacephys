@@ -34,7 +34,7 @@
     themis_read_mltimg, time_range, sites=sites
     mltimg_var = 'thg_mltimg'
     get_data, mltimg_var, times, mltimgs
-    index = lazy_where(times, '[]', time_range)
+    index = where_pro(times, '[]', time_range)
     times = times[index]
     mltimgs = mltimgs[index,*,*]
 
@@ -48,11 +48,11 @@
 
         mltimg = reform(mltimgs[time_id,*,*])
         mlt_bins = get_setting(mltimg_var, 'mlt_bins')
-        mlt_index = lazy_where(mlt_bins, '[]', mlt_range)
+        mlt_index = where_pro(mlt_bins, '[]', mlt_range)
         mlt_bins = mlt_bins[mlt_index]
         mltimg = mltimg[mlt_index,*]
         mlat_bins = get_setting(mltimg_var, 'mlat_bins')
-        mlat_index = lazy_where(mlat_bins, '[]', mlat_range)
+        mlat_index = where_pro(mlat_bins, '[]', mlat_range)
         mlat_bins = mlat_bins[mlat_index]
         mltimg = mltimg[*,mlat_index]
 

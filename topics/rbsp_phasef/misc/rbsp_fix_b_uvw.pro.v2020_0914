@@ -93,7 +93,7 @@ pro rbsp_fix_b_uvw, time_range, probe=probe, test=test, common_time_step=common_
 ;        nan_time_ranges = time_to_range(times, time_step=common_time_step, pad_time=1)
 ;        nnan_time_range = n_elements(nan_time_ranges)*0.5
 ;        for ii=0,nnan_time_range-1 do begin
-;            index = lazy_where(common_times, '[]', nan_time_ranges[ii,*], count=count)
+;            index = where_pro(common_times, '[]', nan_time_ranges[ii,*], count=count)
 ;            if count eq 0 then continue
 ;            b_dsc[index,*] = fillval
 ;        endfor

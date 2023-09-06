@@ -26,7 +26,7 @@ function sg_autolim, x0, ntick = ntick, maxntick = maxntick
     ; check spikes.
     mean_val = mean(x0,/nan)
     stddev_val = stddev(x0,/nan)
-    index = lazy_where(x0, mean_val+[-1,1]*stddev_val*3)
+    index = where_pro(x0, mean_val+[-1,1]*stddev_val*3)
     xmax0 = max(x0[index], min=xmin0, /nan)
     
     ; calc range.

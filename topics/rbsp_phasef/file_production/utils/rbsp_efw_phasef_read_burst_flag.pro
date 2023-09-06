@@ -21,7 +21,7 @@ pro rbsp_efw_phasef_read_burst1_flag, time_range, probe=probe
     if nsection ne 0 then begin
         time_ranges = time_ranges[index,*]
         for ii=0,nsection-1 do begin
-            index = lazy_where(common_times, '[]', time_ranges[ii,*], count=count)
+            index = where_pro(common_times, '[]', time_ranges[ii,*], count=count)
             if count eq 0 then continue
             flags[index] = 1
         endfor
@@ -51,7 +51,7 @@ pro rbsp_efw_phasef_read_burst2_flag, time_range, probe=probe
         pad_time = 6.
         time_ranges = time_ranges[index,*]
         for ii=0,nsection-1 do begin
-            index = lazy_where(common_times, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+            index = where_pro(common_times, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
             if count eq 0 then continue
             flags[index] = 1
         endfor

@@ -817,11 +817,11 @@ function _2013_0501_load_data_asi, event_info, filename=data_file, time_var=time
     time_range = event_info['asi_time_range']
     if n_elements(time_var) eq 0 then time_var = _2013_0501_load_data_asi_ut(event_info, get_name=1)
 
-    mlt_image_var = themis_read_asf_mlt_image(time_range, get_name=1)
+    mlt_image_var = themis_asf_read_mlt_image(time_range, get_name=1)
     if ~cdf_has_var(mlt_image_var, filename=data_file) then begin
         sites = asi_setting['sites']
         min_elev = asi_setting['min_elev']
-        mlt_image_var = themis_read_asf_mlt_image(time_range, sites=sites, min_elev=min_elev)
+        mlt_image_var = themis_asf_read_mlt_image(time_range, sites=sites, min_elev=min_elev)
         data = get_var_data(mlt_image_var, limits=limits)
         cdf_save_var, mlt_image_var, value=data, filename=data_file
 
@@ -834,13 +834,13 @@ function _2013_0501_load_data_asi, event_info, filename=data_file, time_var=time
         cdf_load_var, mlt_image_var, filename=data_file
     endif
 
-    mlt_image_rect_var = themis_read_asf_mlt_image_rect(time_range, get_name=1)
+    mlt_image_rect_var = themis_asf_read_mlt_image_rect(time_range, get_name=1)
     if ~cdf_has_var(mlt_image_rect_var, filename=data_file) then begin
         sites = asi_setting['sites']
         min_elev = asi_setting['min_elev']
         mlt_range = asi_setting['mlt_range']
         mlat_range = asi_setting['mlat_range']
-        mlt_image_rect_var = themis_read_asf_mlt_image_rect(time_range, sites=sites, min_elev=min_elev, mlt_range=mlt_range, mlat_range=mlat_range)
+        mlt_image_rect_var = themis_asf_read_mlt_image_rect(time_range, sites=sites, min_elev=min_elev, mlt_range=mlt_range, mlat_range=mlat_range)
         data = get_var_data(mlt_image_rect_var, limits=limits)
         cdf_save_var, mlt_image_rect_var, value=data, filename=data_file
 

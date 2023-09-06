@@ -144,7 +144,7 @@ function search_dmsp_rbsp_conjunction_times, input_time_range, $
         if errmsg ne '' then continue
         dmsp_mlat_var = dmsp_mlat_vars[0]
         mlats = get_var_data(dmsp_mlat_var, times=times)
-        index = lazy_where(abs(mlats), '[]', abs_mlat_range, count=count)
+        index = where_pro(abs(mlats), '[]', abs_mlat_range, count=count)
         if count eq 0 then continue
         dmsp_time_ranges = times[time_to_range(index,time_step=1)]
         ndmsp_time_range = n_elements(dmsp_time_ranges[*,0])
@@ -267,7 +267,7 @@ end
         
         ; MLT range.
         rbsp_mlt = mean(info.rbsp.mlt_range)
-        index = lazy_where(rbsp_mlt, '[]', mlt_range, count=count)
+        index = where_pro(rbsp_mlt, '[]', mlt_range, count=count)
         if count eq 0 then begin
             mlt_flags[ii] = 1
             continue

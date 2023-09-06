@@ -80,7 +80,7 @@ pro plot_themis_flow_along_orbit, time_range, probes=probes
             
             vec_avg = fltarr(ntime,ndim)
             foreach time, common_times, time_id do begin
-                time_index = lazy_where(times, '[]', time+[0,time_step])
+                time_index = where_pro(times, '[]', time+[0,time_step])
                 for dim_id=0,ndim-1 do vec_avg[time_id,dim_id] = mean(vec[time_index,dim_id],/nan)
             endforeach
             store_data, out_var, common_times, vec_avg

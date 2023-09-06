@@ -52,9 +52,9 @@ pro cusp_ml_test_sph, filename=filename
 ;    get_data, 'density', tmp, dens
 ;    get_data, 'lat', tmp, lat
 ;    dens[*] = 1e-2
-;    index = lazy_where(lat, '[]', [50,60])
+;    index = where_pro(lat, '[]', [50,60])
 ;    dens[index] = 1e2
-;    index = lazy_where(lat, '[]', [-70,-60])
+;    index = where_pro(lat, '[]', [-70,-60])
 ;    dens[index] = 1e1
 ;    store_data, 'density', tmp, dens
 

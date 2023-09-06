@@ -33,9 +33,9 @@ pro fig_case2_mag, add_themis=add_themis
     endforeach
 
     used_sites = gmag_sites
-    index = lazy_where(mlons, mlon_range)
+    index = where_pro(mlons, mlon_range)
     used_sites = used_sites[index]
-    index = lazy_where(mlats, mlat_range)
+    index = where_pro(mlats, mlat_range)
     used_sites = used_sites[index]
 
     index = []

@@ -108,7 +108,7 @@ foreach probe, probes do begin
             vars = prefix+'_v'+boom_str+['','_shift']
             foreach var, vars do begin
                 get_data, var, times, data
-                index = lazy_where(times, '[]', plot_tr)
+                index = where_pro(times, '[]', plot_tr)
                 foreach val, data[0,*], val_id do data[*,val_id] -= mean(data[index,val_id],/nan)
                 store_data, var, times, data
             endforeach

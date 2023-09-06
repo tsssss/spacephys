@@ -21,11 +21,11 @@ function azim_dp_is_good_ramp, ramp
 
 ;---Filter.
     ; width.
-    index = lazy_where(ramp.width, '()', width_range, count=count)
+    index = where_pro(ramp.width, '()', width_range, count=count)
     if count eq 0 then return, retval
 
     ; height.
-    index = lazy_where(ramp.height, '()', height_range, count=count)
+    index = where_pro(ramp.height, '()', height_range, count=count)
     if count eq 0 then return, retval
 
     ; scaled_height.

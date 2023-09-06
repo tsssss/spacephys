@@ -55,7 +55,7 @@ pro azim_df_study_detect_df, project=project, probe=probe, time_range=time_range
     theta_upper = fltarr(nboxcar)+!values.f_nan
     theta_lower = fltarr(nboxcar)+!values.f_nan
     for ii=0, nboxcar-1 do begin
-        index = lazy_where(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+        index = where_pro(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
         if count eq 0 then continue
         the_theta = theta[index]
         index = where(finite(the_theta), count)
@@ -101,7 +101,7 @@ pro azim_df_study_detect_df, project=project, probe=probe, time_range=time_range
 ;---Calcualte the local standard deviation of the derivative.
     dtheta_stddev = fltarr(nboxcar)+!values.f_nan
     for ii=0, nboxcar-1 do begin
-        index = lazy_where(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+        index = where_pro(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
         if count eq 0 then continue
         the_dtheta = dtheta[index]
         dtheta_stddev[ii] = stddev(the_dtheta, /nan)
@@ -137,7 +137,7 @@ test = 0
         for ii=0, ntime_range-1 do begin
             ; Exclude the time ranges that are too short.
             the_time_range = reform(time_ranges[ii,*])
-            index = lazy_where(times, '[]', the_time_range, count=count)
+            index = where_pro(times, '[]', the_time_range, count=count)
             the_index = where(dtheta[index] ge dtheta_stddev[index]*nsigma, count)
             if count le gauss_nterm then continue
 
@@ -203,7 +203,7 @@ test = 0
     bar_thick = 4
     foreach df_info, df_infos do begin
         the_time_range = df_info.time_range
-        index = lazy_where(xxs, '[]', the_time_range)
+        index = where_pro(xxs, '[]', the_time_range)
         the_xxs = xxs[index]
         the_yys = yys[index]
         plots, the_xxs, the_yys, color=sgcolor('blue'), thick=bar_thick

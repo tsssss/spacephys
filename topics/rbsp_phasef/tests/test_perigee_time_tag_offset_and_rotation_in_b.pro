@@ -16,7 +16,7 @@ pro rbsp_efw_phasef_read_b_uvw, time_range, probe=probe
     get_data, b_uvw_var, times
 
 ;---Remove invalid data and convert b_uvw to b_mgse.
-    index = lazy_where(times, '[]', time_range, count=count)
+    index = where_pro(times, '[]', time_range, count=count)
     if count ge 10 then begin
         ; Mask invalid data with NaN.
         cal_state = get_var_data(prefix+'cal_state', times=uts)
@@ -29,7 +29,7 @@ pro rbsp_efw_phasef_read_b_uvw, time_range, probe=probe
             ntime_range = n_elements(time_ranges)*0.5
             b_uvw = get_var_data(b_uvw_var, times=uts)
             for ii=0,ntime_range-1 do begin
-                index = lazy_where(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+                index = where_pro(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
                 if count eq 0 then continue
                 b_uvw[index,*] = fillval
             endfor
@@ -44,7 +44,7 @@ pro rbsp_efw_phasef_read_b_uvw, time_range, probe=probe
             time_ranges = uts[time_to_range(bad_index,time_step=1)]
             ntime_range = n_elements(time_ranges)*0.5
             for ii=0,ntime_range-1 do begin
-                index = lazy_where(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+                index = where_pro(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
                 if count eq 0 then continue
                 b_uvw[index,*] = fillval
             endfor
@@ -95,7 +95,7 @@ pro test_perigee_time_tag_offset_and_rotation_in_b, time_range, probe=probe, b_o
     perigee_times = orbit_times[time_to_range(index,time_step=1)]
     the_time_range = reform(perigee_times[1,*])
     timespan, the_time_range[0], total(the_time_range*[-1,1]), /second
-    common_times = orbit_times[lazy_where(orbit_times,'[]',the_time_range)]
+    common_times = orbit_times[where_pro(orbit_times,'[]',the_time_range)]
     ncommon_time = n_elements(common_times)
     common_time_step = sdatarate(common_times)
 

@@ -43,7 +43,7 @@ pro pflux_grant_fix_b_uvw, time_range, probe=probe, test=test, pad_suffix=pad_su
         ntime_range = n_elements(time_ranges)*0.5
         b_uvw = get_var_data(b_uvw_var, times=uts)
         for ii=0,ntime_range-1 do begin
-            index = lazy_where(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+            index = where_pro(uts, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
             if count eq 0 then continue
             b_uvw[index,*] = fillval
         endfor
@@ -100,7 +100,7 @@ pro pflux_grant_fix_b_uvw, time_range, probe=probe, test=test, pad_suffix=pad_su
     b_dsc_bg = fltarr(nsection_time, ndim)
     b_dsc = get_var_data(b_dsc_var)
     for ii=0,nsection_time-1 do begin
-        index = lazy_where(common_times, '[]', section_times[ii:ii+1])
+        index = where_pro(common_times, '[]', section_times[ii:ii+1])
         for jj=0,ndim-1 do b_dsc_bg[ii,jj] = median(b_dsc[index,jj])
     endfor
     center_times = section_times[0:nsection_time-1]+section_window*0.5
@@ -126,7 +126,7 @@ pro pflux_grant_fix_b_uvw, time_range, probe=probe, test=test, pad_suffix=pad_su
         time_ranges = uts[time_to_range(range_index,time_step=1)]
         ntime_range = n_elements(time_ranges)*0.5
         for ii=0,ntime_range-1 do begin
-            index = lazy_where(common_times, '[]', time_ranges[ii,*], count=count)
+            index = where_pro(common_times, '[]', time_ranges[ii,*], count=count)
             if count eq 0 then continue
             dbmag[index] *= 0.25
         endfor
@@ -138,7 +138,7 @@ pro pflux_grant_fix_b_uvw, time_range, probe=probe, test=test, pad_suffix=pad_su
         time_ranges = common_times[time_to_range(index,time_step=1)]
         ntime_range = n_elements(time_ranges)*0.5
         for ii=0,ntime_range-1 do begin
-            index = lazy_where(common_times, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+            index = where_pro(common_times, '[]', time_ranges[ii,*]+[-1,1]*pad_time, count=count)
             if count eq 0 then continue
             dbmag[index] = fillval
         endfor
@@ -153,7 +153,7 @@ pro pflux_grant_fix_b_uvw, time_range, probe=probe, test=test, pad_suffix=pad_su
         time_ranges = common_times[time_to_range(index,time_step=1)]
         ntime_range = n_elements(time_ranges)*0.5
         for ii=0,ntime_range-1 do begin
-            index = lazy_where(common_times, '[]', time_ranges[ii,*]+[-1,1]*300, count=count)
+            index = where_pro(common_times, '[]', time_ranges[ii,*]+[-1,1]*300, count=count)
             if count eq 0 then continue
             dbmag[index] = fillval
         endfor

@@ -159,10 +159,10 @@ pro azim_df_plot_timing_result, event_time_range, event_id=event_id, project=pro
         xsm = r_sm[*,0]
         dis = snorm(r_sm)
         ; Exclude data outside the MLT range.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data ouside the distance range.
-        index = lazy_where(dis, '][', dis_range, count=count)
+        index = where_pro(dis, '][', dis_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data outside magnetopause.
         magn_flags = check_if_in_magn(r_sm)

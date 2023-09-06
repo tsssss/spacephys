@@ -65,14 +65,14 @@ foreach probe, probes do begin
             continue
         endif
         
-        index = lazy_where(spinphase, ')(', spinphase_range, count=count)
+        index = where_pro(spinphase, ')(', spinphase_range, count=count)
         if count ne 0 then begin
             msg = msg+' # of spin phase out of range is '+string(count,format='(I0)')
             lprmsg, msg, log_file
             continue
         endif
         
-        index = lazy_where(spinperiod, ')(', spinperiod_range, count=count)
+        index = where_pro(spinperiod, ')(', spinperiod_range, count=count)
         if count ne 0 then begin
             msg = msg+' # of spin period out of range is '+string(count,format='(I0)')
             lprmsg, msg, log_file

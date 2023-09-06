@@ -103,11 +103,11 @@ reset = 0
             if count ne 0 then flags[index] = 0
 
             ; Within MLT range.
-            index = lazy_where(get_var_data(prefix+'mlt'),'][', mlt_range, count=count)
+            index = where_pro(get_var_data(prefix+'mlt'),'][', mlt_range, count=count)
             if count ne 0 then flags[index] = 0
 
             ; Within dis range.
-            index = lazy_where(snorm(rsm), ']', min(dis_range), count=count)
+            index = where_pro(snorm(rsm), ']', min(dis_range), count=count)
             if count ne 0 then flags[index] = 0
 
             ; Apply to data.

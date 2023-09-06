@@ -98,7 +98,7 @@ pro _2014_0828_10_load_weygand, the_info, reload=reload, event_info=event_info
             mlat_range = [60,70]
 	    stop
 	    ; Need to change to the packaged routine.
-            mlat_index = lazy_where(mlat_bins, '[]', mlat_range)
+            mlat_index = where_pro(mlat_bins, '[]', mlat_range)
             ewo = total(-j_new[*,*,mlat_index], 3)/n_elements(mlat_index)
             ewo = fltarr(ntime,nmlon_bin)
             foreach time, times, ii do begin
@@ -238,14 +238,14 @@ pro _2014_0828_10_calc_pflux, the_info, reload=reload, event_info=event_info
                 vars = prefix+['db','e']
                 foreach var, vars do begin
                     get_data, var+'_gsm', times, data
-                    index = lazy_where(times, time_range)
+                    index = where_pro(times, time_range)
                     store_data, var+'_mag', times[index], snorm(data[index,*])
                     calc_psd, var+'_mag', scales=scales
                 endforeach
 
                 tvar = prefix+'pf_fac_mor_spec_1'
                 get_data, tvar, uts, dat
-                index = lazy_where(uts, time_range, count=nrec)
+                index = where_pro(uts, time_range, count=nrec)
                 spsd = total(dat[index,*], 1)/nrec
 
                 get_data, prefix+'db_mag_psd_cwt', freqs, bpsd
@@ -320,7 +320,7 @@ pro _2014_0828_10_calc_drift_period, drift_period_info, reload=reload_drift_peri
 ;if tnames(drift_period_var) ne '' then continue
                     get_data, flux_vars[probe_id], times, fluxes, energies
                     ; Filter energy.
-                    index = lazy_where(energies,'[]', energy_range)
+                    index = where_pro(energies,'[]', energy_range)
                     energies = energies[index]
                     ; Select times to calc drift period.
                     times = test_times
@@ -416,13 +416,13 @@ pro _2014_0828_10_calc_gmag_info, gmag_info, event_info=event_info
         end_time = uts[index]
         (gmag_info[site])['end_time'] = end_time[0]
         ; Find the time when FAC arrives.
-        index = lazy_where(times, [start_time,end_time])
+        index = where_pro(times, [start_time,end_time])
         f1 = f0[index]
         t1 = times[index]
         value_threshold = (gmag_info['fac_method'] eq 'absolute')? f1[0]-gmag_info['fac_threshold']: f1[0]+(f1_min-f1[0])*gmag_info['fac_threshold']
-        index = lazy_where(f1, 'le', value_threshold, count=count)
+        index = where_pro(f1, 'le', value_threshold, count=count)
         fac_time1 = t1[index[0]]   ; should always find a result.
-        index = lazy_where(f1, 'ge', value_threshold, count=count)
+        index = where_pro(f1, 'ge', value_threshold, count=count)
         fac_time2 = t1[index[count-1]]   ; should always find a result.
         fac_time = (abs(f1[0]-f1_min) le gmag_info['fac_db_threshold'])? fac_time1: fac_time2
         (gmag_info[site])['fac_time'] = fac_time[0]
@@ -814,7 +814,7 @@ pro _2014_0828_10_load_ephemeris, ephemeris, reload=reload_ephemeris, event_info
                         var = probe+'_r_gsm'
                         fix_lanl_orbit, var, bad_time=bad_time, to=var
                         get_data, var, times, rgsm
-                        index = lazy_where(times, time_range)
+                        index = where_pro(times, time_range)
                         store_data, var, times[index], rgsm[index,*]
                     endif
 

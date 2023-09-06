@@ -42,7 +42,7 @@ pro rbsp_efw_phasef_read_sunpulse_time_gen_file, time, probe=probe, filename=fil
     get_data, tphase, phase_times, phase_data
     get_data, tper, phase_times, period_data
     period_range = [0d,15]   ; to work with commisional phase.
-    index = lazy_where(period_data, ')(', period_range, count=count)
+    index = where_pro(period_data, ')(', period_range, count=count)
     fillval = !values.f_nan
     if count ne 0 then begin
         phase_data[index] = fillval
@@ -56,7 +56,7 @@ pro rbsp_efw_phasef_read_sunpulse_time_gen_file, time, probe=probe, filename=fil
 
     sunpulse_times = []
     for section_id=0,ngood_section-1 do begin
-        index = lazy_where(phase_times, '[]', good_sections[section_id,*], count=count)
+        index = where_pro(phase_times, '[]', good_sections[section_id,*], count=count)
         if count eq 0 then continue
         times = phase_times[index]
         phase = phase_data[index]

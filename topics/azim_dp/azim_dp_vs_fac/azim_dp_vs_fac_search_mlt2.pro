@@ -117,7 +117,7 @@ function azim_dp_vs_fac_search_mlt2, roi_list, $
 
             for ii=0,count-1 do begin
                 the_time_range = reform(time_ranges[ii,*])
-                index = lazy_where(times, '[]', the_time_range)
+                index = where_pro(times, '[]', the_time_range)
                 the_mlt_range = minmax(mlt_ranges[index,*])
                 candidate = dictionary($
                     'time_range', the_time_range, $

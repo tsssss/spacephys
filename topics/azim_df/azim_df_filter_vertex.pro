@@ -55,7 +55,7 @@ function azim_df_filter_vertex, df, project=project, settings=settings, $
 ;---Check width.
     msg = tab+'width (sec): '+string(df.width,format='(I0)')
     lprmsg, msg, log_file
-    index = lazy_where(df.width, '][', width_range, count=count)
+    index = where_pro(df.width, '][', width_range, count=count)
     if count ne 0 then begin
         msg = 'DF out of width range, skip ...'
         lprmsg, msg, log_file
@@ -65,7 +65,7 @@ function azim_df_filter_vertex, df, project=project, settings=settings, $
 ;---Check height.
     msg = tab+'height (deg): '+string(df.height,format='(F5.1)')
     lprmsg, msg, log_file
-    index = lazy_where(df.height, '][', height_range, count=count)
+    index = where_pro(df.height, '][', height_range, count=count)
     if count ne 0 then begin
         msg = 'DF out of height range, skip ...'
         lprmsg, msg, log_file

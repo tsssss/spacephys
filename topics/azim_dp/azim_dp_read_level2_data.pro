@@ -119,7 +119,7 @@ pro azim_dp_read_level2_data, time, probe=probe, datatype=datatype, $
                 xxs = [xxs, txx]
                 yys = [yys, tyy]
             endforeach
-            index = lazy_where(xxs, '[]', time, count=count)
+            index = where_pro(xxs, '[]', time, count=count)
             if count eq 0 then begin
                 del_data, in_var
                 errmsg = 'No data in given time ...'

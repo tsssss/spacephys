@@ -97,10 +97,10 @@
         ystyle=5, yrange=yrange, $
         /nodata, /noerase, position=tpos
     get_data, keo_infos[0].var_name, times, timg, mlat_bins
-    index = lazy_where(mlat_bins, minmax(yrange))
+    index = where_pro(mlat_bins, minmax(yrange))
     timg = timg[*,index]
     mlat_bins = mlat_bins[index]
-    index = lazy_where(times, time_range_plot)
+    index = where_pro(times, time_range_plot)
     timg = timg[index,*]
     timg = bytscl(timg, min=zrange[0], max=zrange[1], top=color_end)
     if yrange[1] lt yrange[0] then timg = reverse(timg,2)
@@ -119,7 +119,7 @@
     slope_brightness = 120
     slope_separator = 64.5
     earth_rotation = 0
-    slope_index = lazy_where(times, time_range_slope, count=npoint)
+    slope_index = where_pro(times, time_range_slope, count=npoint)
     for ii=0, 1 do begin
         txs = times[slope_index]
         tzs = timg[slope_index,*]

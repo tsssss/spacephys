@@ -165,7 +165,7 @@ function azim_df_search_subgroup, search_setting, project=project, $
                     triad_angles = triangle_angles(reform(transpose(vertex_r_sms), [1,ntriad_vertex,ndim]))
                     triad_angles = reform(triad_angles)
                     lprmsg, tab+'triad '+key+' angles (deg): '+strjoin(string(triad_angles,format='(I0)'),','), log_file
-                    index = lazy_where(triad_angles, '()', triad_angle_range, count=count)
+                    index = where_pro(triad_angles, '()', triad_angle_range, count=count)
                     if count ne ntriad_vertex then begin
                         lprmsg, 'Not all angles in range, skip ...', log_file
                         continue

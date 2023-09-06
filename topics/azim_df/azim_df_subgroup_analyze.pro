@@ -87,7 +87,7 @@ endif
     msg = tab+'obs_time diff (sec): '
     foreach tmp, dtimes do msg += string(tmp,format='(I0)')+' '
     lprmsg, msg, log_file
-    index = lazy_where(dtimes, ')(', obs_time_diff_range, count=count)
+    index = where_pro(dtimes, ')(', obs_time_diff_range, count=count)
     if count ne 0 then begin
         lprmsg, tab+'obs_time diff too large or too small, skip ...', log_file
         return, retval
@@ -244,7 +244,7 @@ endif
 ;---Filter by geometry.
     foreach key, triad_list.keys() do begin
         triad_info = triad_list[key]
-        index = lazy_where(triad_info.angles, '()', triad_angle_range, count=count)
+        index = where_pro(triad_info.angles, '()', triad_angle_range, count=count)
         if count eq ntriad_vertex then continue
         triad_list.remove, key
     endforeach

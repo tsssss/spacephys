@@ -44,7 +44,7 @@ foreach probe, probes do begin
     pad_time = 5*60d
     fillval = !values.f_nan
     for bad_id=0,nbad_time-1 do begin
-        index = lazy_where(common_times, '[]', bad_times[bad_id,*]+[-1,1]*pad_time, count=count)
+        index = where_pro(common_times, '[]', bad_times[bad_id,*]+[-1,1]*pad_time, count=count)
         if count eq 0 then continue
         edata[index,*] = fillval
     endfor

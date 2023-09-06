@@ -102,7 +102,7 @@ function rbsp_efw_phasef_read_e_fit_param_per_maneuver, probe=probe
             if the_time_range[0] lt fit_time_range[0] then continue
             if the_time_range[1] gt fit_time_range[1] then continue
             rbsp_efw_phasef_read_e_uvw, the_time_range, probe=probe
-            time_index = lazy_where(common_times,'[]',the_time_range)
+            time_index = where_pro(common_times,'[]',the_time_range)
             the_times = common_times[time_index]
             the_var = prefix+'e_uvw'
             interp_time, the_var, the_times
@@ -123,7 +123,7 @@ function rbsp_efw_phasef_read_e_fit_param_per_maneuver, probe=probe
 
     ;---Do fit.
         get_data, prefix+'fit_data', times, xxs, yys
-        time_index = lazy_where(times, '[]', fit_time_range, count=count)
+        time_index = where_pro(times, '[]', fit_time_range, count=count)
         if count eq 0 then message, 'Inconsistency ...'
         xxs = xxs[*,time_index,*]
         yys = yys[time_index,*]

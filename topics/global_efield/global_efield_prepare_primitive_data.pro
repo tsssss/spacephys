@@ -78,7 +78,7 @@ pro global_efield_prepare_primitive_data_internal, $
                 data_dims[0] = n_elements(date_time)
                 date_data = make_array(dimension=data_dims, /float, value=!values.f_nan)
                 for kk=0, ndate_time-1 do begin
-                    index = lazy_where(uts, date_time[kk]+[0,time_step], count=count)
+                    index = where_pro(uts, date_time[kk]+[0,time_step], count=count)
                     if count eq 0 then continue
                     tdata = dat[index,*]
                     index = where(finite(snorm(tdata)), count)  ; snorm is used to eliminate all dimension if one dimension is nan.
@@ -181,7 +181,7 @@ pro global_efield_prepare_primitive_data_internal, $
         data_dims[0] = ncommon_time
         common_data = make_array(dimension=data_dims, value=!values.f_nan)
         common_time_range = common_times[[0,ncommon_time-1]]
-        index = lazy_where(time, '[]', common_time_range, count=count)
+        index = where_pro(time, '[]', common_time_range, count=count)
         time = time[index]
         data = data[index,*,*,*,*,*,*,*]
         time_index = round((time-common_time_range[0])/time_step)

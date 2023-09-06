@@ -42,7 +42,7 @@ pro plot_wavelet_and_morlet_zoomin, zoomin_times, probe=mission_probe
     comp_var = pre0+'e_'+comp_string
     if tnames(data_var) ne '' then begin
         get_data, data_var, times
-        index = lazy_where(times,full_time_range, count=count)
+        index = where_pro(times,full_time_range, count=count)
         if count le 1 then store_data, data_var, /delete
     endif
     if tnames(data_var) eq '' then load_var = 1 else load_var = 0
@@ -134,7 +134,7 @@ pro plot_wavelet_and_morlet_zoomin, zoomin_times, probe=mission_probe
 
         foreach time, section_times, ii do begin
             section_time_range = time+[-0.5,0.5]*duration
-            index = lazy_where(times, section_time_range, count=N)
+            index = where_pro(times, section_time_range, count=N)
             uts = times[index]
             ees = edata[index]
             wps = abs(ww[index,*])^2
@@ -169,7 +169,7 @@ pro plot_wavelet_and_morlet_zoomin, zoomin_times, probe=mission_probe
 
     ;---Calculate the full psd.
         get_data, comp_var, times, edata
-        index = lazy_where(times, time_range)
+        index = where_pro(times, time_range)
         tmp_var = comp_var+'_tmp'
         store_data, tmp_var, times[index], edata[index]
         yrange = sg_autolim(edata[index])

@@ -246,7 +246,7 @@ pro pflux_grant_survey_on_efield, project=project, probe=probe, time_range=time_
             bad_times = uts[time_to_range(index,time_step=1)]
             nbad_time = n_elements(bad_times)*0.5
             for section_id=0,nbad_time-1 do begin
-                index = lazy_where(xxs, '[]', bad_times[section_id,*]+[-1,1]*pad_window, count=count)
+                index = where_pro(xxs, '[]', bad_times[section_id,*]+[-1,1]*pad_window, count=count)
                 if count eq 0 then continue
                 yys[index,*] = !values.f_nan
             endfor

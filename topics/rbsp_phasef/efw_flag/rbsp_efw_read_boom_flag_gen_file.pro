@@ -48,7 +48,7 @@ pro rbsp_efw_read_boom_flag_gen_file, date, probe=probe, filename=data_file, $
         nan_times = highres_times[time_to_range(index,time_step=1)]
         nnan_time = n_elements(nan_times)*0.5
         for section_id=0,nnan_time-1 do begin
-            index = lazy_where(highres_times, '[]', nan_times[section_id,*]+[-1,1]*pad_time, count=count)
+            index = where_pro(highres_times, '[]', nan_times[section_id,*]+[-1,1]*pad_time, count=count)
             if count eq 0 then continue
             vsvy[index,*] = fillval
         endfor
@@ -132,7 +132,7 @@ pro rbsp_efw_read_boom_flag_gen_file, date, probe=probe, filename=data_file, $
 
     ;---Mask times when other flags are 1.
         for jj=0, nflag_time_range-1 do begin
-            index = lazy_where(lowres_times, '[]', flag_time_ranges[jj,*]+[-1,1]*pad_time, count=count)
+            index = where_pro(lowres_times, '[]', flag_time_ranges[jj,*]+[-1,1]*pad_time, count=count)
             if count eq 0 then continue
             probe_flags[index,*] = 0
         endfor
@@ -167,7 +167,7 @@ pro rbsp_efw_read_boom_flag_gen_file, date, probe=probe, filename=data_file, $
 ;                abs(nan_times[*,0]-test_time) le max_dt, nsection)
 ;            if nsection eq 0 then continue
 ;            for ii=0,nsection-1 do begin
-;                index = lazy_where(lowres_times, '[]', nan_times[section_index[ii],*], count)
+;                index = where_pro(lowres_times, '[]', nan_times[section_index[ii],*], count)
 ;                if count eq 0 then continue
 ;            endfor
 ;            stop
@@ -177,7 +177,7 @@ pro rbsp_efw_read_boom_flag_gen_file, date, probe=probe, filename=data_file, $
 
 
 ;---Uniform time.
-    time_index = lazy_where(lowres_times, '[]', date_time_range)
+    time_index = where_pro(lowres_times, '[]', date_time_range)
     common_times = lowres_times[time_index]
     ncommon_time = n_elements(common_times)
 

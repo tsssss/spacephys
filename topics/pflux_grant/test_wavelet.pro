@@ -92,7 +92,7 @@ end
     foreach component, xyz, ii do begin
         comp_var = prefix+'b'+xyz[ii]+'_gse'
         foreach pad_time, pad_times do begin
-            index = lazy_where(common_times, '[]', day_time_range+[-1,1]*pad_time)
+            index = where_pro(common_times, '[]', day_time_range+[-1,1]*pad_time)
             store_data, comp_var, common_times[index], b_gse[index,ii]
 
         ;---Calculate cwt.
@@ -114,7 +114,7 @@ end
 
         vars = comp_var+'_'+string(pad_times,format='(I0)')+'_sec'
         the_time_range = day_time_range+[1,-1]*spin_period*2*3
-        times = common_times[lazy_where(common_times, '[]', the_time_range)]
+        times = common_times[where_pro(common_times, '[]', the_time_range)]
         data0 = get_var_data(vars[0], at=times)
         for jj=1,n_elements(vars)-1 do begin
             ddata = get_var_data(vars[jj], at=times)-data0

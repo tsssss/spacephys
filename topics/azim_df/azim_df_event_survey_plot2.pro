@@ -231,10 +231,10 @@ test = 1
         r_sm = get_var_data(prefix+'r_sm', at=xxs)
         rxy = snorm(r_sm[*,0:1])
         ; Exclude data outside the MLT range.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data ouside the distance range.
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data outside magnetopause.
         magn_flags = check_if_in_magn(r_sm)
@@ -347,10 +347,10 @@ test = 1
         r_sm = get_var_data(prefix+'r_sm', at=xxs)
         rxy = snorm(r_sm[*,0:1])
         ; Exclude data outside the MLT range.
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data ouside the distance range.
-        index = lazy_where(rxy, '][', rxy_range, count=count)
+        index = where_pro(rxy, '][', rxy_range, count=count)
         if count ne 0 then xxs[index] = !values.f_nan
         ; Exclude data outside magnetopause.
         magn_flags = check_if_in_magn(r_sm)
@@ -418,7 +418,7 @@ test = 1
         get_data, prefix+data_var_suffix, xxs, yys
         xxs -= time_lag
 
-        index = lazy_where(xxs, '[]', short_time_range)
+        index = where_pro(xxs, '[]', short_time_range)
         yrange = minmax(yys[index])
         yrange = (yrange[1]+yrange[0])*0.5+[-1,1]*(yrange[1]-yrange[0])*0.75
 

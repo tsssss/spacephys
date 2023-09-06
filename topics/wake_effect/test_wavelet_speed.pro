@@ -37,7 +37,7 @@
     selected_scales = selected_periods*t2s
     if tnames(var) ne '' then begin
         get_data, var, times
-        index = lazy_where(times,time_range, count=count)
+        index = where_pro(times,time_range, count=count)
         if count eq 0 then store_data, var, /delete
     endif
     if tnames(var) eq '' then begin
@@ -129,7 +129,7 @@
     time = test_times[0]
     time_range = time+[0,duration]
     get_data, var, times, data, limits=lim
-    index = lazy_where(times, time_range, count=count)
+    index = where_pro(times, time_range, count=count)
     if count eq 0 then message, 'No data in the given time ...'
     stplot_index, var, 0, newname=data_var
     times = times[index]

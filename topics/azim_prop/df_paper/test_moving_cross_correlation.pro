@@ -73,7 +73,7 @@ pro test_moving_cross_correlation, project, event_id=event_id, time_range=time_r
         endelse
         var = probe+'_db_tilt'
         get_data, var, uts, dat, limits=lim
-        index = lazy_where(times, time_range)
+        index = where_pro(times, time_range)
         store_data, var+'_sector', uts[index], dat[index], limits=lim
         cc_info[probe].var = probe+'_db_tilt_sector'
     endforeach

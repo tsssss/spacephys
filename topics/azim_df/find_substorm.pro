@@ -68,7 +68,7 @@ function find_substorm, time_range, pad_time=pad_time, $
         flags = bytarr(ntime_range)
         for ii=0, ntime_range-1 do begin
             the_time_range = reform(time_ranges[ii,*])
-            tdata = the_data[lazy_where(common_times, '[]', the_time_range)]
+            tdata = the_data[where_pro(common_times, '[]', the_time_range)]
             index = where(tdata ge max_value, count)
             flags[ii] = count ne 0
         endfor

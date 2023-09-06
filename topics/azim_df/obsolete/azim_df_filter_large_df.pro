@@ -73,7 +73,7 @@ function azim_df_filter_large_df, df_list, project=project, $
         ;---Check width.
             msg = tab+'width (sec): '+string(df.width,format='(I0)')
             lprmsg, msg, log_file
-            index = lazy_where(df.width, '][', width_range, count=count)
+            index = where_pro(df.width, '][', width_range, count=count)
             if count ne 0 then begin
                 flags[df_id] = 0
                 msg = tab+'DF out of width range, skip ...'
@@ -84,7 +84,7 @@ function azim_df_filter_large_df, df_list, project=project, $
         ;---Check height.
             msg = tab+'height (deg): '+string(df.height,format='(F5.1)')
             lprmsg, msg, log_file
-            index = lazy_where(df.height, '][', height_range, count=count)
+            index = where_pro(df.height, '][', height_range, count=count)
             if count ne 0 then begin
                 flags[df_id] = 0
                 msg = tab+'DF out of height range, skip ...'
@@ -400,11 +400,11 @@ end
             zzs = azim_df_normalize_theta(zzs, zrange=theta_range, ct=spec_ct, /reverse_ct)
 
             ; Remove data outside ROI.
-            index = lazy_where(mlt, '][', mlt_range, count=count)
+            index = where_pro(mlt, '][', mlt_range, count=count)
             if count ne 0 then yys[index] = !values.f_nan
             rsm = get_var_data(prefix+'r_sm', at=xxs)
             rxy = snorm(rsm[*,0:1])
-            index = lazy_where(rxy, '][', rxy_range, count=count)
+            index = where_pro(rxy, '][', rxy_range, count=count)
             if count ne 0 then yys[index] = !values.f_nan
             index = where(finite(zzs,/nan), count)
             if count ne 0 then yys[index] = !values.f_nan

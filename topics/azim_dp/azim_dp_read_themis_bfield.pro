@@ -40,7 +40,7 @@ pro azim_dp_read_themis_bfield, time_range, probe=probe, errmsg=errmsg
         bad_times[*,0] -= pad_time
         bad_times[*,1] += pad_time
         nbad_time = n_elements(bad_times)/2
-        for ii=0, nbad_time-1 do b_gsm[lazy_where(times,'[]',reform(bad_times[ii,*])),*] = !values.f_nan
+        for ii=0, nbad_time-1 do b_gsm[where_pro(times,'[]',reform(bad_times[ii,*])),*] = !values.f_nan
 
         ; Check out L1 data with eclipse correction.
         thm_load_fgm, probe=probe, level=1, type='calibrated', use_eclipse_corrections=1, trange=time_range
@@ -54,12 +54,12 @@ pro azim_dp_read_themis_bfield, time_range, probe=probe, errmsg=errmsg
         get_data, prefix+'l1_b_gse', l1_times, b_gse
         l1_b_gsm = cotran(b_gse, l1_times, 'gse2gsm')
         for ii=0, nbad_time-1 do begin
-            index = lazy_where(l1_times, '[]', bad_times[ii,*], count=count)
+            index = where_pro(l1_times, '[]', bad_times[ii,*], count=count)
             if count eq 0 then continue
             the_times = l1_times[index]
             the_b_gsm = l1_b_gsm[index,*]
             b1_time_range = the_times[[0,count-1]]
-            index = lazy_where(times, '[]', b1_time_range, count=count)
+            index = where_pro(times, '[]', b1_time_range, count=count)
             if count eq 0 then continue
             b_gsm[index,*] = sinterpol(the_b_gsm, the_times, times[index])
         endfor

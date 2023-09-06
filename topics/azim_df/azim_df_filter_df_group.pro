@@ -159,7 +159,7 @@ function azim_df_filter_df_group, candidate, project=project, $
 
         angles = triad_info.angles
         lprmsg, tab+tab+'angles (deg): '+strjoin(string(angles,format='(F5.1)'),','), log_file
-        index = lazy_where(angles, '()', triad_angle_range, count=count)
+        index = where_pro(angles, '()', triad_angle_range, count=count)
         if count lt ntriad_vertex then begin
             lprmsg, tab+'Not all angles in range, skip ...', log_file
             triad_list.remove, key
@@ -169,7 +169,7 @@ function azim_df_filter_df_group, candidate, project=project, $
         dtimes = triad_info.times
         dtimes = abs(dtimes-shift(dtimes,1))
         lprmsg, tab+tab+'dtimes (sec): '+strjoin(string(dtimes,format='(I0)'),','), log_file
-        index = lazy_where(dtimes, '[]', triad_dtime_range, count=count)
+        index = where_pro(dtimes, '[]', triad_dtime_range, count=count)
         if count lt ntriad_vertex then begin
             lprmsg, tab+'Not all dtimes in range, skip ...', log_file
             triad_list.remove, key

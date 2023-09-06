@@ -21,7 +21,7 @@ test = 0
         old_var = prefix+'kev_e_flux'
         new_var = prefix+'kev_e_flux_plot'
         get_data, old_var, times, eflux, ebins
-        index = lazy_where(ebins, energy_range)
+        index = where_pro(ebins, energy_range)
         eflux = eflux[*,index]
         ebins = ebins[index]
         nebin = n_elements(ebins)

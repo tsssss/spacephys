@@ -78,7 +78,7 @@ function azim_dp_vs_fac_search_roi, time_range, probes=probes, $
             lprmsg, tab+'Processing '+time_string(day,tformat='YYYY-MM-DD')+' ...', log_file
 
             day_time_range = day+[0,secofday]
-            time_index = lazy_where(common_times, '[]', day_time_range, count=count)
+            time_index = where_pro(common_times, '[]', day_time_range, count=count)
             if count le roi_min_count then continue
 
             azim_dp_read_mlt, day_time_range, probe=probe, errmsg=errmsg
@@ -100,7 +100,7 @@ function azim_dp_vs_fac_search_roi, time_range, probes=probes, $
         mlt_var = prefix+'mlt'
         mlts = get_var_data(mlt_var)
         if n_elements(mlts) ne ntime then continue
-        index = lazy_where(mlts, '[]', mlt_range, count=count)
+        index = where_pro(mlts, '[]', mlt_range, count=count)
         if count eq 0 then continue
         mlt_counts[index] += 1
     endforeach

@@ -99,7 +99,7 @@ pro azim_df_plot_time_lag, event_time_range, event_id=event_id, project=project
     probe_yranges = list()
     foreach probe, sorted_probes, ii do begin
         get_data, probe+var_suffix, times, dbtilt
-        index = lazy_where(times, event_time_range)
+        index = where_pro(times, event_time_range)
         times = times[index]
         dbtilt = dbtilt[index]
 
@@ -209,7 +209,7 @@ pro azim_df_plot_time_lag, event_time_range, event_id=event_id, project=project
         time_lag = event_info[probe].time_lag
         max_corr = cc_info[probe].max_corr
         times = times-time_lag
-        index = lazy_where(times, event_time_range)
+        index = where_pro(times, event_time_range)
         times = times[index]
         dbtilt = dbtilt[index]
         oplot, times, dbtilt, color=sgcolor('gray')

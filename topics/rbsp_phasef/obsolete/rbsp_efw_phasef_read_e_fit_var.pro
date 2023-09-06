@@ -73,9 +73,9 @@ pro rbsp_efw_phasef_read_e_fit_var, time, probe=probe, version=version, $
     valid_tr = rbsp_efw_phasef_get_valid_range('e_spinfit', probe=probe)
     vars = prefix+[['b','e','v','r','omega','ex_dotb']+'_mgse','flag_25']
     get_data, vars[0], times
-    index = lazy_where(times, ')(', valid_tr, count=count)
+    index = where_pro(times, ')(', valid_tr, count=count)
     if count ne 0 then begin
-        index = lazy_where(times, '[]', valid_tr)
+        index = where_pro(times, '[]', valid_tr)
         foreach var, vars do begin
             get_data, var, times, data
             store_data, var, times[index], data[index,*]

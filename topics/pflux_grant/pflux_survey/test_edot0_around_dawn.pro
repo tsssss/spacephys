@@ -32,7 +32,7 @@
     
     test_mlt_range = [5,6]
     apogee_mlt = get_var_data(apogee_mlt_var, times=apogee_times)
-    index = lazy_where(apogee_mlt, '[]', test_mlt_range)
+    index = where_pro(apogee_mlt, '[]', test_mlt_range)
     test_time_ranges = apogee_times[time_to_range(index,time_step=1)]
     ntest_section = n_elements(test_time_ranges)*0.5
     for section_id=0,ntest_section-1 do begin

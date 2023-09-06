@@ -51,7 +51,7 @@ pro rbsp_efw_phasef_read_orbit_num_gen_file, time, probe=probe, filename=file, $
     nperigee = n_elements(perigee_time_ranges)*0.5
     perigee_times = dblarr(nperigee)
     for perigee_id=0, nperigee-1 do begin
-        index = lazy_where(times, '[]', perigee_time_ranges[perigee_id,*])
+        index = where_pro(times, '[]', perigee_time_ranges[perigee_id,*])
         min_dis = min(dis[index], min_index)
         perigee_times[perigee_id] = (times[index])[min_index]
     endfor

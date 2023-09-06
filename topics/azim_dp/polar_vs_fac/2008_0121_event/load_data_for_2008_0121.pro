@@ -172,7 +172,7 @@ pro load_data_for_2008_0121_themis_data, default_settings
         flux_vars = prefix+['e','p']+'_flux'
         foreach flux_var, flux_vars do begin
             get_data, flux_var, times, fluxes, energys, limits=lim
-            index = lazy_where(energys, '[]', energy_range, count=count)
+            index = where_pro(energys, '[]', energy_range, count=count)
             if count eq 0 then message, 'Inconsistency...'
             store_data, flux_var, times, fluxes[*,index], energys[index], limits=lim
             options, flux_var, 'labels', lim.labels[index]
@@ -207,7 +207,7 @@ pro load_data_for_2008_0121_thg_mlt_image, default_settings
 ;---Load data.
     data_file = default_settings.data_file
     if ~cdf_has_var(var, filename=data_file) then begin
-        themis_read_asf_mlt_image, time_range, sites=sites, merge_method=merge_method, min_elev=min_elev
+        themis_asf_read_mlt_image, time_range, sites=sites, merge_method=merge_method, min_elev=min_elev
         var = 'thg_asf_mlt_image'
         get_data, var, times, mlt_images, limits=lim
         settings = dictionary(lim)

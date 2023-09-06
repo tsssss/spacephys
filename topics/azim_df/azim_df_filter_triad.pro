@@ -98,7 +98,7 @@ function azim_df_filter_triad, candidate, project=project, $
         ; Angles.
         triad_angles = triangle_angles(reform(transpose(obs_r_sms), [1,ntriad_vertex,ndim]))
         triad_angles = reform(triad_angles)
-        index = lazy_where(triad_angles, '()', triad_angle_range, count=count)
+        index = where_pro(triad_angles, '()', triad_angle_range, count=count)
         lprmsg, tab+'angles (deg): '+strjoin(string(triad_angles,format='(I0)'),' '), log_file
         if count ne ndim then begin
             lprmsg, 'bad geometry, skip ...', log_file

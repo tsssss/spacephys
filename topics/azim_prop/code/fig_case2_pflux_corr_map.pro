@@ -123,7 +123,7 @@ pro fig_case2_pflux_corr_map, models=models, mlon_range=mlon_range, mlat_range=m
     get_data, mlonimg_var, times, mlonimgs
 
     ; Apply the time lag to aurora data, then crop in time.
-    index = lazy_where(times, time_range_plot+alfven_travel_time[0])
+    index = where_pro(times, time_range_plot+alfven_travel_time[0])
     mlonimgs = mlonimgs[index,*,*]
     times = times[index]
 
@@ -132,13 +132,13 @@ pro fig_case2_pflux_corr_map, models=models, mlon_range=mlon_range, mlat_range=m
 
     ; Apply MLon/MLat range.
     mlon_bins = get_setting(mlonimg_var, 'mlon_bins')
-    index = lazy_where(mlon_bins, mlon_range, count=nmlon_bin)
+    index = where_pro(mlon_bins, mlon_range, count=nmlon_bin)
     if nmlon_bin eq 0 then stop
     mlonimgs = mlonimgs[*,index,*]
     mlon_bins = mlon_bins[index]
 
     mlat_bins = get_setting(mlonimg_var, 'mlat_bins')
-    index = lazy_where(mlat_bins, mlat_range, count=nmlat_bin)
+    index = where_pro(mlat_bins, mlat_range, count=nmlat_bin)
     if nmlat_bin eq 0 then stop
     mlonimgs = mlonimgs[*,*,index]
     mlat_bins = mlat_bins[index]

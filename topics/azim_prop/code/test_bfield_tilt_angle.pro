@@ -145,7 +145,7 @@ pro test_bfield_tilt_angle, probes=probes, time_range=time_range, plot_bmag=plot
     tilt_var_labels = strarr(nprobe)
     foreach tvar, panel_vars, ii do begin
         data = get_var_data(tvar)
-        index = lazy_where(data-mean(data), [-1,1]*5*stddev(data))
+        index = where_pro(data-mean(data), [-1,1]*5*stddev(data))
         yrange = minmax(data[index])
         yrange = yrange-(yrange mod yticks)+[0,2]
         options, tvar, 'yrange', yrange

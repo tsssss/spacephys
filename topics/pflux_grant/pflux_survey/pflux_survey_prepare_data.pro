@@ -111,7 +111,7 @@ pro pflux_survey_prepare_data_b_gsm, cdf_file, probe=probe, time_var=time_var, t
         foreach day, days do begin
             day_time_range = day+[0,secofday]
             pflux_grant_read_bfield, day_time_range, probe=probe, id=data_type
-            time_index = lazy_where(common_times, '[]', day_time_range)
+            time_index = where_pro(common_times, '[]', day_time_range)
             times = common_times[time_index]
             interp_time, the_var, times
             b_gsm[time_index,*] = get_var_data(the_var)
@@ -172,7 +172,7 @@ pro pflux_survey_prepare_ion_t, cdf_file, probe=probe, time_var=time_var, time_r
     ;get_data, ion_t_var, the_times
     ;data_time_range = minmax(the_times)
     ;data_time_range = data_time_range-(data_time_range mod common_time_step)+[common_time_step,0]
-    ;index = lazy_where(common_times, '][', data_time_range, count=count)
+    ;index = where_pro(common_times, '][', data_time_range, count=count)
     ;if count ne 0 then ion_t[index] = !values.f_nan
     ;index = where(ion_t lt 0, count)
     ;if count ne 0 then ion_t[index] = !values.f_nan
@@ -264,7 +264,7 @@ pro pflux_survey_prepare_data, cdf_file, probe=probe
 ;
         ;for ii=0, ntime_range-1 do begin
             ;current_time_range = time_ranges[ii:ii+1]
-            ;time_index = lazy_where(common_times, '[)', current_time_range, count=ntime)
+            ;time_index = where_pro(common_times, '[)', current_time_range, count=ntime)
             ;if ntime eq 0 then continue
 ;
             ;pflux_grant_read_preprocessed_pflux, current_time_range, probe=probe
@@ -277,7 +277,7 @@ pro pflux_survey_prepare_data, cdf_file, probe=probe
                 ;get_data, the_var, full_times, data
                 ;times = common_times[time_index]
                 ;for jj=0, ntime-1 do begin
-                    ;index = lazy_where(full_times, '[)', times[jj]+[0,common_time_step], count=count)
+                    ;index = where_pro(full_times, '[)', times[jj]+[0,common_time_step], count=count)
                     ;the_data[jj,*] = total(data[index,*],1, /nan)/count
                 ;endfor
 ;
@@ -321,7 +321,7 @@ pro pflux_survey_prepare_data, cdf_file, probe=probe
 ;
         ;for ii=0, ntime_range-1 do begin
             ;current_time_range = time_ranges[ii:ii+1]
-            ;time_index = lazy_where(common_times, '[)', current_time_range, count=ntime)
+            ;time_index = where_pro(common_times, '[)', current_time_range, count=ntime)
             ;if ntime eq 0 then continue
 ;
             ;pflux_grant_read_preprocessed_ebfield, current_time_range, probe=probe, id='bw_ratio'
@@ -354,7 +354,7 @@ pro pflux_survey_prepare_data, cdf_file, probe=probe
 ;
         ;for ii=0, ntime_range-1 do begin
             ;current_time_range = time_ranges[ii:ii+1]
-            ;time_index = lazy_where(common_times, '[)', current_time_range, count=ntime)
+            ;time_index = where_pro(common_times, '[)', current_time_range, count=ntime)
             ;if ntime eq 0 then continue
 ;
             ;pflux_grant_read_preprocessed_ebfield, current_time_range, probe=probe, coord='gsm'
@@ -365,7 +365,7 @@ pro pflux_survey_prepare_data, cdf_file, probe=probe
                 ;get_data, the_var, full_times, data
                 ;times = common_times[time_index]
                 ;for jj=0, ntime-1 do begin
-                    ;index = lazy_where(full_times, '[)', times[jj]+[0,common_time_step], count=count)
+                    ;index = where_pro(full_times, '[)', times[jj]+[0,common_time_step], count=count)
                     ;the_data[jj,*] = total(data[index,*],1, /nan)/count
                 ;endfor
 ;

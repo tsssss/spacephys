@@ -77,7 +77,7 @@ pro rbsp_efw_phasef_read_ect_orbit_num_gen_file, time, probe=probe, filename=fil
         nperigee = n_elements(perigee_time_ranges)*0.5
         perigee_uts = dblarr(nperigee)
         for perigee_id=0, nperigee-1 do begin
-            index = lazy_where(uts, '[]', perigee_time_ranges[perigee_id,*])
+            index = where_pro(uts, '[]', perigee_time_ranges[perigee_id,*])
             min_dis = min(dis[index], min_index)
             perigee_uts[perigee_id] = (uts[index])[min_index]
         endfor
@@ -92,7 +92,7 @@ pro rbsp_efw_phasef_read_ect_orbit_num_gen_file, time, probe=probe, filename=fil
         data = fltarr(ncommon_time)
         nperigee_ut = n_elements(perigee_uts)-1
         for ii=0, nperigee_ut-1 do begin
-            index = lazy_where(common_times, '[)', perigee_uts[ii:ii+1], count=count)
+            index = where_pro(common_times, '[)', perigee_uts[ii:ii+1], count=count)
             if count eq 0 then continue
             data[index] = orbit_num0
             orbit_num0 += 1

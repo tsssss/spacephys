@@ -42,7 +42,7 @@ foreach probe, probes do begin
 
     data = fltarr(norbit)
     for ii=0,norbit-1 do begin
-        index = lazy_where(times, '[)', orbit_time_ranges[ii,*], count=count)
+        index = where_pro(times, '[)', orbit_time_ranges[ii,*], count=count)
         duration = total(orbit_time_ranges[ii,*]*[-1,1])
         if count eq 0 then begin
             data[ii] = !values.f_nan
@@ -68,7 +68,7 @@ common_times = make_bins(time_range, time_step)
 apogee_mlt = (get_var_data('rbspa_apogee_mlt', at=common_times)+$
     get_var_data('rbspb_apogee_mlt', at=common_times))*0.5
 mlt_range = [-1,1]*7.5
-index = lazy_where(apogee_mlt, '[]', mlt_range)
+index = where_pro(apogee_mlt, '[]', mlt_range)
 mlt_time_ranges = time_to_range(common_times[index], time_step=time_step)
 durations = (mlt_time_ranges[*,1]-mlt_time_ranges[*,0])
 index = where(durations ge 4*30*time_step)

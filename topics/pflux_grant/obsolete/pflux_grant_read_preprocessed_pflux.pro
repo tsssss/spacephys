@@ -61,7 +61,7 @@ pro pflux_grant_read_preprocessed_pflux, time, probe=probe, filename=data_file, 
         pfdot0_var = prefix+'pfdot0_fac_norm'
         get_data, pfdot0_var, times, pfdot0
         for ii=0, ntime_range-1 do begin
-            index = lazy_where(times, '[]', time_ranges[ii,*], count=count)
+            index = where_pro(times, '[]', time_ranges[ii,*], count=count)
             if count eq 0 then continue
             pfdot0[index,*] = fillval
         endfor

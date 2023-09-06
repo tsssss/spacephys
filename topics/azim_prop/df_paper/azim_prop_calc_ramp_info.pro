@@ -91,7 +91,7 @@ pro azim_prop_calc_ramp_info, project
         foreach probe, sorted_probes, ii do begin
             ref_time = event[probe].ref_time
             search_time_range = ref_time_range+ref_time
-            index = lazy_where(common_times, search_time_range)
+            index = where_pro(common_times, search_time_range)
             times = common_times[index]
             data = get_var_data(probe+'_db_tilt', at=times)
             sdespike, times, data, width=n_elements(times)/10
@@ -185,9 +185,9 @@ pro azim_prop_calc_ramp_info, project
         foreach probe, sorted_probes do begin
             var = probe+'_'+data_type
             get_data, probe+'_'+data_type, times, data
-            index = lazy_where(times, event_time_range)
+            index = where_pro(times, event_time_range)
             data = data[index]
-            offset = mean(data[lazy_where(times, event_time_range[0]+[10,40]*60)])
+            offset = mean(data[where_pro(times, event_time_range[0]+[10,40]*60)])
             data = data-offset
             offsets = [offsets,offset]
             yrange = [yrange, minmax(data)]

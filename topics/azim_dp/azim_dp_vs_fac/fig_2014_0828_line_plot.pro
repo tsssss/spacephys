@@ -119,7 +119,7 @@
     foreach probe, sorted_probes, probe_id do begin
         prefix = probe+'_'
         theta = get_var_data(prefix+'theta', times=times)
-        index = lazy_where(times, '[]', short_time_range)
+        index = where_pro(times, '[]', short_time_range)
         yrange = minmax(theta[index])
         yrange = [-1,1]*max(abs(make_bins(yrange,2)))
         yticks = 2
@@ -141,7 +141,7 @@
         ytitle = ' '
         the_time_range = short_time_range+time_lags[probe_id]
 
-        index = lazy_where(times, '[]', the_time_range)
+        index = where_pro(times, '[]', the_time_range)
         xxs = times[index]
         xxs -= time_lags[probe_id]
         yys = theta[index]

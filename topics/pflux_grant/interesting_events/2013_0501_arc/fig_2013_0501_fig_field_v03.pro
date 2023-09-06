@@ -137,7 +137,7 @@ test = 0
     yminor = 5
     ytickv = make_bins(yrange, ystep, inner=1)
     yticks = n_elements(ytickv)-1
-    constant = ytickv[lazy_where(ytickv,'()', yrange)]
+    constant = ytickv[where_pro(ytickv,'()', yrange)]
     var = b_var
     options, var, 'yrange', yrange
     options, var, 'ytickv', ytickv

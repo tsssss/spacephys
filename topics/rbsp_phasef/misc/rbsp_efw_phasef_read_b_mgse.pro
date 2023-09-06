@@ -35,7 +35,7 @@ pro rbsp_efw_phasef_read_b_mgse, time_range, probe=probe
         
     if probe eq 'b' then begin
         bad_time_range = time_double(['2018-09-27/04:00','2018-09-27/14:00'])
-        index = lazy_where(times, '[]', bad_time_range, count=count)
+        index = where_pro(times, '[]', bad_time_range, count=count)
         if count ne 0 then begin
             b_mgse[index,*] = !values.f_nan
             store_data, b_mgse_var, times, b_mgse

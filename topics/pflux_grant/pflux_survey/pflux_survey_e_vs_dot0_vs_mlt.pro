@@ -62,7 +62,7 @@ test = 0
         mlt_bins = smkarthm(mlt_min+dmlt*0.5, mlt_max-dmlt*0.5, dmlt, 'dx')
         mlt_colors = fltarr(ntime)+colors[0]
         for ii=0, n_elements(mlt_bins)-2 do begin
-            index = lazy_where(mlt, '[)', mlt_bins[ii:ii+1], count=count)
+            index = where_pro(mlt, '[)', mlt_bins[ii:ii+1], count=count)
             if count eq 0 then continue
             mlt_colors[index] = colors[ii+1]
         endfor

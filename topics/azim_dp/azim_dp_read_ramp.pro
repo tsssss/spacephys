@@ -100,7 +100,7 @@ function azim_dp_read_ramp, time, probe=probe, mlt_range=mlt_range, errmsg=errms
     ; Filter time.
     times = dblarr(nramp)
     foreach ramp, ramp_list, ramp_id do times[ramp_id] = ramp.time
-    index = lazy_where(times, '[]', time, count=nramp)
+    index = where_pro(times, '[]', time, count=nramp)
     if nramp eq 0 then return, list()
     ramp_list = ramp_list[index]
     
@@ -110,7 +110,7 @@ function azim_dp_read_ramp, time, probe=probe, mlt_range=mlt_range, errmsg=errms
         foreach ramp, ramp_list, ramp_id do begin
             mlts[ramp_id] = ramp.mlt
         endforeach
-        index = lazy_where(mlts, '[]', mlt_range, count=nramp)
+        index = where_pro(mlts, '[]', mlt_range, count=nramp)
         if nramp eq 0 then return, retval
         ramp_list = ramp_list[index]
     endif

@@ -125,7 +125,7 @@
 
 ;---Plot keogram and the associated mag data.
     ; Filter out the wanted mag sites.
-    index = lazy_where(site_infos.mlon, 'in', mag_keo_range, count=nkeo_site)
+    index = where_pro(site_infos.mlon, 'in', mag_keo_range, count=nkeo_site)
     keo_infos = site_infos[index]
     keo_mag_data = mag_data[*,index]
 

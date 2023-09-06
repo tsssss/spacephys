@@ -76,7 +76,7 @@ pro rbsp_efw_phasef_save_bias_current_to_file, date, probe=probe, filename=file,
         tplot_var = tplot_vars[var_id]
         new_var = new_vars[var_id]
         get_data, tplot_var, times, data
-        index = lazy_where(times, '[]', time_range, count=ntime)
+        index = where_pro(times, '[]', time_range, count=ntime)
         if ntime eq 0 then message, 'No bias current in current time range ...'
         times = times[index]
         data = data[index,*]

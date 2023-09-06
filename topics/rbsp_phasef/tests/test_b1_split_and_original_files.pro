@@ -44,11 +44,11 @@ foreach probe, probes do begin
         the_time_range = time_range+[1,-1]*pad_time
         
         ; Get the wanted data.
-        index = lazy_where(times, '[]', time_range, count=ntime)
+        index = where_pro(times, '[]', time_range, count=ntime)
         times = times[index]
         data_orig = cdf_read_var(type, filename=test_file, range=[0,ntime-1])
         
-        index = lazy_where(times, '[]', the_time_range)
+        index = where_pro(times, '[]', the_time_range)
         data_orig = data_orig[index,*]
         times = times[index]
         index = uniq(times, sort(times))
@@ -59,7 +59,7 @@ foreach probe, probes do begin
         rbsp_efw_phasef_read_b1_split, time_range, probe=probe, id=type
         data_split = get_var_data(prefix+'vb1', times=split_times)
         
-        index = lazy_where(split_times, '[]', the_time_range)
+        index = where_pro(split_times, '[]', the_time_range)
         data_split = data_split[index,*]
         split_times = split_times[index]
         index = uniq(split_times, sort(split_times))

@@ -62,7 +62,7 @@ test = 1
 
     mlt_image_var = 'thg_asf_mlt_image_rect'
     get_data, mlt_image_var, times, mlt_images
-    index = lazy_where(times, '[]', time_range)
+    index = where_pro(times, '[]', time_range)
     times = times[index]
     mlt_images = mlt_images[index,*,*]
 
@@ -78,11 +78,11 @@ test = 1
 
         mlt_image = reform(mlt_images[time_id,*,*])
         mlt_bins = get_setting(mlt_image_var, 'mlt_bins')
-        mlt_index = lazy_where(mlt_bins, '[]', mlt_range)
+        mlt_index = where_pro(mlt_bins, '[]', mlt_range)
         mlt_bins = mlt_bins[mlt_index]
         mlt_image = mlt_image[mlt_index,*]
         mlat_bins = get_setting(mlt_image_var, 'mlat_bins')
-        mlat_index = lazy_where(mlat_bins, '[]', mlat_range)
+        mlat_index = where_pro(mlat_bins, '[]', mlat_range)
         mlat_bins = mlat_bins[mlat_index]
         mlt_image = mlt_image[*,mlat_index]
 

@@ -101,7 +101,7 @@ pro rbsp_efw_phasef_gen_b1_split_v03, old_file, new_file
     new_time = []
     new_data = []
     for ii=0,ntr-1 do begin
-        index = lazy_where(b1_time,'[]',the_trs[ii,*], count=count)
+        index = where_pro(b1_time,'[]',the_trs[ii,*], count=count)
         if count eq 0 then continue
         ; Adjust the time tag to the actual measured time.
         new_time = [new_time,b1_time[index]-the_dts[ii]]

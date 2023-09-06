@@ -95,7 +95,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
     neclipse = n_elements(eclipse_time_ranges)*0.5
     flags = intarr(nflag_time)
     for ii=0,neclipse-1 do begin
-        index = lazy_where(flag_times, '[]', eclipse_time_ranges[ii,*], count=count)
+        index = where_pro(flag_times, '[]', eclipse_time_ranges[ii,*], count=count)
         if count eq 0 then continue
         flags[index] = 1
     endfor
@@ -105,7 +105,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
     nmaneuver = n_elements(maneuver_time_ranges)*0.5
     flags = intarr(nflag_time)
     for ii=0,nmaneuver-1 do begin
-        index = lazy_where(flag_times, '[]', maneuver_time_ranges[ii,*], count=count)
+        index = where_pro(flag_times, '[]', maneuver_time_ranges[ii,*], count=count)
         if count eq 0 then continue
         flags[index] = 1
     endfor
@@ -118,7 +118,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
     attitude_time_ranges = (count eq 0)? !null: time_to_range(flag_times[index], time_step=flag_time_step, pad_time=2*flag_time_step)
     nattitude_time_range = n_elements(attitude_time_ranges)*0.5
     flags = intarr(ntime)
-    for ii=0,nattitude_time_range-1 do flags[lazy_where(times,'[]',attitude_time_ranges[ii,*])] = 1
+    for ii=0,nattitude_time_range-1 do flags[where_pro(times,'[]',attitude_time_ranges[ii,*])] = 1
     attitude_index = where(flags eq 1, attitude_count)
 
 

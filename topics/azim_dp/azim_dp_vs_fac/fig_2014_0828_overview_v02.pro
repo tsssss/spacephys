@@ -80,7 +80,7 @@ test = 0
 
         vec_avg = fltarr(ntime,ndim)
         foreach time, common_times, time_id do begin
-            time_index = lazy_where(times, '[]', time+[0,time_step])
+            time_index = where_pro(times, '[]', time+[0,time_step])
             for dim_id=0,ndim-1 do vec_avg[time_id,dim_id] = mean(vec[time_index,dim_id],/nan)
             ;for dim_id=0,ndim-1 do vec_avg[time_id,dim_id] = median(vec[time_index,dim_id])
         endforeach
@@ -315,14 +315,14 @@ test = 0
         rsm = rsm[index,*]
 
         ; Filter spatially.
-        index = lazy_where(yys, '[]', yrange, count=count)
+        index = where_pro(yys, '[]', yrange, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]
         rxy = rxy[index]
         rsm = rsm[index,*]
 
-        index = lazy_where(rxy, '[]', rxy_range, count=count)
+        index = where_pro(rxy, '[]', rxy_range, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]
@@ -774,7 +774,7 @@ test = 0
     foreach probe, sorted_probes, probe_id do begin
         prefix = probe+'_'
         theta = get_var_data(prefix+'theta', times=times)
-        index = lazy_where(times, '[]', short_time_range)
+        index = where_pro(times, '[]', short_time_range)
         yrange = minmax(theta[index])
         yrange = [-1,1]*max(abs(make_bins(yrange,2)))
         yticks = 2
@@ -795,7 +795,7 @@ test = 0
         ytitle = '(deg)'
         the_time_range = short_time_range
 
-        index = lazy_where(times, '[]', the_time_range)
+        index = where_pro(times, '[]', the_time_range)
         xxs = times[index]
         yys = theta[index]
 

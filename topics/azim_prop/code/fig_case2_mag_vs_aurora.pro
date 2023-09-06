@@ -151,9 +151,9 @@
     ;---Draw the auroral snapshot.
         timg = get_var_data(mlonimg_var, at=fac_time)
         timg = bytscl(timg, min=count_range[0], max=count_range[1], top=top_color)
-        index = lazy_where(mlon_bins, mlon_range)
+        index = where_pro(mlon_bins, mlon_range)
         timg = timg[index,*]
-        index = lazy_where(mlat_bins, mlat_range)
+        index = where_pro(mlat_bins, mlat_range)
         timg = timg[*,index]
 
         figure_pos = poss[*,0,jj]

@@ -136,7 +136,7 @@ test = 1
     yminor = 5
     ytickv = make_bins(yrange, ystep, inner=1)
     yticks = n_elements(ytickv)-1
-    constant = ytickv[lazy_where(ytickv,'()', yrange)]
+    constant = ytickv[where_pro(ytickv,'()', yrange)]
     var = b_var
     options, var, 'yrange', yrange
     options, var, 'ytickv', ytickv
@@ -385,7 +385,7 @@ test = 1
         
     ;---To get the trace info.
         get_data, prefix+species+'_en_spec', times, data
-        index = lazy_where(times, '[]', trs)
+        index = where_pro(times, '[]', trs)
         test_times = times[index]
         log_ens = alog10(ens)
         foreach time, test_times, time_id do begin

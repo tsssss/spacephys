@@ -21,11 +21,11 @@ foreach species, ['e'] do begin
         the_var = prefix+'kev_'+species+'_flux'
         get_data, the_var, times, fluxes, energies
         ; Filter energy.
-        index = lazy_where(energies,'[]', energy_range)
+        index = where_pro(energies,'[]', energy_range)
         energies = energies[index]
         fluxes = fluxes[*,index]
         ; Filter time.
-        index = lazy_where(times, '[]', time_range)
+        index = where_pro(times, '[]', time_range)
         fluxes = fluxes[index,*]
         times = times[index]
         ; Select times to calc drift period.
@@ -91,11 +91,11 @@ foreach species, ['e'] do begin
             the_var = prefix+'kev_'+species+'_flux'
             get_data, the_var, times, fluxes, energies, limits=lim
             ; Filter energy.
-            index = lazy_where(energies,'[]', energy_range)
+            index = where_pro(energies,'[]', energy_range)
             energies = energies[index]
             fluxes = fluxes[*,index]
             ; Filter time.
-            index = lazy_where(times, '[]', time_range)
+            index = where_pro(times, '[]', time_range)
             fluxes = fluxes[index,*]
             times = times[index]
             
@@ -140,11 +140,11 @@ foreach species, ['e'] do begin
         the_var = prefix+'kev_'+species+'_flux'
         get_data, the_var, times, fluxes, energies, limits=lim
         ; Filter energy.
-        index = lazy_where(energies,'[]', energy_range)
+        index = where_pro(energies,'[]', energy_range)
         energies = energies[index]
         fluxes = fluxes[*,index]
         ; Filter time.
-        index = lazy_where(times, '[]', time_range)
+        index = where_pro(times, '[]', time_range)
         fluxes = fluxes[index,*]
         times = times[index]
 

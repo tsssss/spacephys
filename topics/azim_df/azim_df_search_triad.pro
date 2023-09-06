@@ -115,7 +115,7 @@ function azim_df_search_triad, search_setting, project=project, $
             for section_id=0, candidate.nsection-1 do begin
                 section_time_range = candidate.time_range_list[section_id]
                 section_probes = candidate.probe_list[section_id]
-                index = lazy_where(common_times,'[]', section_time_range, count=count)
+                index = where_pro(common_times,'[]', section_time_range, count=count)
                 if count eq 0 then message, 'Inconsistency, stop here ...'
                 roi_flags[index] = 1
                 foreach probe, section_probes do probe_flags[index,(where(all_probes eq probe))[0]] = 1
@@ -145,7 +145,7 @@ function azim_df_search_triad, search_setting, project=project, $
             for section_id=0, candidate.nsection-1 do begin
                 section_time_range = candidate.time_range_list[section_id]
                 section_probes = candidate.probe_list[section_id]
-                time_index = lazy_where(roi_times,'[]', section_time_range, count=ntime)
+                time_index = where_pro(roi_times,'[]', section_time_range, count=ntime)
                 if ntime eq 0 then message, 'Inconsistency, stop here ...'
                 the_combos = (search_name eq 'beyond_15Re')? roi_combos: choose_from(section_probes, nvertex)
                 foreach combo, the_combos do begin
@@ -155,7 +155,7 @@ function azim_df_search_triad, search_setting, project=project, $
                     triad_angles = triangle_angles(roi_rsms[time_index,*,probe_index])
                     triad_flags = intarr(ntime)+1
                     for ii=0, nvertex-1 do begin
-                        index = lazy_where(triad_angles[*,ii], '][', triad_angle_range, count=count)
+                        index = where_pro(triad_angles[*,ii], '][', triad_angle_range, count=count)
                         if count ne 0 then triad_flags[index] = 0
                     endfor
                     roi_triad_flags[time_index,combo_index] = triad_flags
@@ -203,7 +203,7 @@ function azim_df_search_triad, search_setting, project=project, $
                 'time_range_list', list(), $
                 'probe_list', list())
 
-            index = lazy_where(roi_times,'[]',time_range)
+            index = where_pro(roi_times,'[]',time_range)
             the_triad_flags = roi_triad_flags[index,*]
             the_times = roi_times[index]
             combo_counts = total(the_triad_flags, 1)
@@ -222,7 +222,7 @@ function azim_df_search_triad, search_setting, project=project, $
             nsection = n_elements(boundarys)-1
             for jj=0, nsection-1 do begin
                 the_time_range = boundarys[jj:jj+1]
-                the_flags = the_triad_flags[lazy_where(the_times,'[)',the_time_range),*]
+                the_flags = the_triad_flags[where_pro(the_times,'[)',the_time_range),*]
                 available_combos = the_combos[where(total(the_flags,1) ne 0)]
                 available_probes = list()
                 foreach combo, available_combos do available_probes.add, combo, /extract

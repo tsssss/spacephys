@@ -68,7 +68,7 @@ function azim_df_preprocess_df_subgroup, project=project, reset=reset
     ;---Check in ROI.
         rxys = fltarr(df_list.length)
         foreach df, df_list, ii do rxys[ii] = snorm(df.arrival_r_sm[0:1])
-        index = lazy_where(rxys, '[]', rxy_range, count=count)
+        index = where_pro(rxys, '[]', rxy_range, count=count)
         if count lt min_probe_count then begin
             lprmsg, tab+tab+'Not enough probes in ROI (Rxy), skip ...'
             continue
@@ -80,7 +80,7 @@ function azim_df_preprocess_df_subgroup, project=project, reset=reset
         foreach df, df_list, ii do mlts[ii] = azim_df_calc_pseudo_mlt(df.arrival_r_sm)
         region_name = df_group.region
         mlt_range = regions[region_name].mlt_range
-        index = lazy_where(mlts, '[]', mlt_range, count=count)
+        index = where_pro(mlts, '[]', mlt_range, count=count)
         if count lt min_probe_count then begin
             lprmsg, tab+tab+'No enough probes in ROI (MLT), skip ...'
             continue
@@ -117,7 +117,7 @@ function azim_df_preprocess_df_subgroup, project=project, reset=reset
             the_r_sms[2,*] = 0
             the_r_sms = reform(the_r_sms, [1,3,3])
             triad_angles = triangle_angles(the_r_sms)
-            index = lazy_where(triad_angles, '[]', triad_angle_range, count=count)
+            index = where_pro(triad_angles, '[]', triad_angle_range, count=count)
             if count ne nvertex then triad_flags[jj] = 0
             
             

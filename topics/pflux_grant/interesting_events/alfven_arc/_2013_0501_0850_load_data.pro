@@ -1004,10 +1004,10 @@ function _2013_0501_0850_load_data_asi, event_info, filename=data_file, time_var
     merge_method = 'merge_elev'
     calibration_method = 'simple'
 
-    mlt_image_var = themis_read_asf_mlt_image(time_range, get_name=1)
+    mlt_image_var = themis_asf_read_mlt_image(time_range, get_name=1)
     if ~cdf_has_var(mlt_image_var, filename=data_file) then begin
         sites = asi_setting['sites']
-        mlt_image_var = themis_read_asf_mlt_image(time_range, sites=sites, min_elev=min_elev, merge_method=merge_method, calibration_method=calibration_method)
+        mlt_image_var = themis_asf_read_mlt_image(time_range, sites=sites, min_elev=min_elev, merge_method=merge_method, calibration_method=calibration_method)
         data = get_var_data(mlt_image_var, limits=limits)
         cdf_save_var, mlt_image_var, value=data, filename=data_file
 
@@ -1020,12 +1020,12 @@ function _2013_0501_0850_load_data_asi, event_info, filename=data_file, time_var
         cdf_load_var, mlt_image_var, filename=data_file
     endif
 
-    mlt_image_rect_var = themis_read_asf_mlt_image_rect(time_range, get_name=1)
+    mlt_image_rect_var = themis_asf_read_mlt_image_rect(time_range, get_name=1)
     if ~cdf_has_var(mlt_image_rect_var, filename=data_file) then begin
         sites = asi_setting['sites']
         mlt_range = asi_setting['mlt_range']
         mlat_range = asi_setting['mlat_range']
-        mlt_image_rect_var = themis_read_asf_mlt_image_rect(time_range, sites=sites, $
+        mlt_image_rect_var = themis_asf_read_mlt_image_rect(time_range, sites=sites, $
             min_elev=min_elev, merge_method=merge_method, calibration_method=calibration_method, $
             mlt_range=mlt_range, mlat_range=mlat_range)
         data = get_var_data(mlt_image_rect_var, limits=limits)

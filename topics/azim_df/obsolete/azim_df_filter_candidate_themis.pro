@@ -30,8 +30,8 @@ pro azim_df_filter_candidate_themis, project=project
     events = list()
     foreach the_time_range, candidates do begin
         the_flag = 0
-;        index = lazy_where(common_times, '[]', the_time_range+[-1,1]*min_ae_duration, count=count)
-        index = lazy_where(common_times, '[]', the_time_range, count=count)
+;        index = where_pro(common_times, '[]', the_time_range+[-1,1]*min_ae_duration, count=count)
+        index = where_pro(common_times, '[]', the_time_range, count=count)
         if count eq 0 then begin
             ae_flags.add, the_flag
             continue

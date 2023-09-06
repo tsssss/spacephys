@@ -103,7 +103,7 @@ root_dir = join_path([homedir(),'test_fit_e_mgse'])
             ez_old[dis_index] = fillval
             for ii=0,nsection-1 do begin
                 section_time_range = reform(section_times[ii,*])
-                index = lazy_where(times, '[]', section_time_range)
+                index = where_pro(times, '[]', section_time_range)
                 ey_fit[index] = xxs[*,index,1] ## reform(y_coef[ii,0:2])+y_coef[ii,3]
                 ez_fit[index] = xxs[*,index,2] ## reform(z_coef[ii,0:2])+z_coef[ii,3]
 

@@ -86,7 +86,7 @@ stop
     dmag_stddev = fltarr(ntime, nsite)
     get_data, dmag_var, uts, dmagh
     for ii=0, ntime-1 do begin
-        index = lazy_where(uts, 'in', times[ii]+[0,data_rate_asi], count=count)
+        index = where_pro(uts, 'in', times[ii]+[0,data_rate_asi], count=count)
         if count eq 0 then continue
         for jj=0, nsite-1 do dmag_stddev[ii,jj] = stddev(dmagh[index,jj])
     endfor

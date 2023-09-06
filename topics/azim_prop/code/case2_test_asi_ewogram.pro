@@ -14,7 +14,7 @@
     mlat_bins = lim.mlat_bins
     mlon_bins = lim.mlon_bins
 
-    mlat_index = lazy_where(mlat_bins, '[]', mlat_range, count=nmlat_bin)
+    mlat_index = where_pro(mlat_bins, '[]', mlat_range, count=nmlat_bin)
     ntime = n_elements(times)
     nmlon_bin = n_elements(mlon_bins)
     ewo = fltarr(ntime,nmlon_bin)

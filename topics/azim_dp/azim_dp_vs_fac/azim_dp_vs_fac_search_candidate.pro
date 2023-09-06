@@ -25,7 +25,7 @@
     pad_time = 3600.    ; sec.
     for substorm_id=0,nsubstorm-1 do begin
         the_time_range = reform(substorm_times[substorm_id,*])+[-1,1]*pad_time
-        index = lazy_where(times, '[]', the_time_range, count=count)
+        index = where_pro(times, '[]', the_time_range, count=count)
         if count eq 0 then continue
         flags[index] = 1
     endfor

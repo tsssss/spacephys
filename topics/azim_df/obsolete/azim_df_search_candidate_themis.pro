@@ -87,7 +87,7 @@ pro azim_df_search_candidate_themis, project=project
         the_var = prefix+'mlt'
         mlt = get_var_data(the_var, at=common_times)
         mlt_flags *= mlt
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then common_flags[index] = 0
     endforeach
 
@@ -123,7 +123,7 @@ pro azim_df_search_candidate_themis, project=project
         the_var = prefix+'mlt'
         mlt = get_var_data(the_var, at=possible_times)
         mlt_flags *= mlt
-        index = lazy_where(mlt, '][', mlt_range, count=count)
+        index = where_pro(mlt, '][', mlt_range, count=count)
         if count ne 0 then data_flags[index,ii] = 0
     endforeach
 
@@ -171,7 +171,7 @@ pro azim_df_search_candidate_themis, project=project
                     [xxs[1]-xxs[0],yys[1]-yys[0]], $
                     [xxs[2]-xxs[0],yys[2]-yys[0]], /degree)
             endfor
-            index = lazy_where(angles, '[]', triad_angle_range, count=count)
+            index = where_pro(angles, '[]', triad_angle_range, count=count)
             if count eq ndim then begin
                 num_good_triad += 1
             endif
@@ -237,8 +237,8 @@ pro azim_df_search_candidate_themis, project=project
     events = list()
     foreach the_time_range, candidates do begin
         the_flag = 0
-;        index = lazy_where(common_times, '[]', the_time_range+[-1,1]*min_ae_duration, count=count)
-        index = lazy_where(common_times, '[]', the_time_range, count=count)
+;        index = where_pro(common_times, '[]', the_time_range+[-1,1]*min_ae_duration, count=count)
+        index = where_pro(common_times, '[]', the_time_range, count=count)
         if count eq 0 then begin
             ae_flags.add, the_flag
             continue

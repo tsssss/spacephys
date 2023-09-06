@@ -83,7 +83,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
     neclipse = n_elements(eclipse_time_ranges)*0.5
     flags = intarr(nflag_time)
     for ii=0,neclipse-1 do begin    ; eclipse time tend to be off?
-        index = lazy_where(flag_times, '[]', eclipse_time_ranges[ii,*]+[-10,5]*flag_time_step, count=count)
+        index = where_pro(flag_times, '[]', eclipse_time_ranges[ii,*]+[-10,5]*flag_time_step, count=count)
         if count eq 0 then continue
         flags[index] = 1
     endfor
@@ -94,7 +94,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
     nmaneuver = n_elements(maneuver_time_ranges)*0.5
     flags = intarr(nflag_time)
     for ii=0,nmaneuver-1 do begin   ; pad a little to ensure exclusion.
-        index = lazy_where(flag_times, '[]', maneuver_time_ranges[ii,*]+[-2,2]*flag_time_step, count=count)
+        index = where_pro(flag_times, '[]', maneuver_time_ranges[ii,*]+[-2,2]*flag_time_step, count=count)
         if count eq 0 then continue
         flags[index] = 1
     endfor
@@ -106,7 +106,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
     attitude_time_ranges = (count eq 0)? !null: time_to_range(flag_times[index], time_step=flag_time_step);, pad_time=2*flag_time_step)
     nattitude_time_range = n_elements(attitude_time_ranges)*0.5
     flags = intarr(ncommon_time)
-    for ii=0,nattitude_time_range-1 do flags[lazy_where(common_times,'[]',attitude_time_ranges[ii,*])] = 1
+    for ii=0,nattitude_time_range-1 do flags[where_pro(common_times,'[]',attitude_time_ranges[ii,*])] = 1
     attitude_index = where(flags eq 1, attitude_count)
     store_data, prefix+'attitude_flag', common_times, flags
     options, prefix+'*_flag', 'yrange', [-0.2,1.2]
@@ -140,7 +140,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
             interp_times = section_times[0:nsection-1]+0.5*section_window
             for jj=0,ndim-1 do begin
                 for ii=0,nsection-1 do begin
-                    index = lazy_where(common_times, '[]', section_times[ii:ii+1], count=count)
+                    index = where_pro(common_times, '[]', section_times[ii:ii+1], count=count)
                     vec_interp[ii,jj] = median(vec[index,jj])
                 endfor
             endfor
@@ -149,7 +149,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
             vec = get_var_data(var)
             for maneuver_id=0, nmaneuver-1 do begin
                 maneuver_time_range = reform(maneuver_time_ranges[maneuver_id,*])
-                index = lazy_where(interp_times, '[]', maneuver_time_range, count=count)
+                index = where_prointerp_times, '[]', maneuver_time_range, count=count)
                 if count eq 0 then continue
                 vec_interp[index,*] = fillval
 
@@ -157,7 +157,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
                 for ii=0,1 do begin
                     dtime = (ii eq 0)? [-1,0]: [0,1]
                     the_time_range = maneuver_time_range[ii]+dtime*section_window
-                    index = lazy_where(common_times, '[]', the_time_range, count=count)
+                    index = where_pro(common_times, '[]', the_time_range, count=count)
                     if count eq 0 then continue
                     for jj=0,ndim-1 do vec_maneuver_edge[ii,jj] = median(vec[index,jj])
                 endfor
@@ -169,7 +169,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
                     vec_maneuver = dblarr(nmaneuver_section,ndim)+fillval
                     for jj=0,ndim-1 do begin
                         for ii=0,nmaneuver_section-1 do begin
-                            index = lazy_where(common_times,'[]',maneuver_section_times[ii:ii+1], count=count)
+                            index = where_pro(common_times,'[]',maneuver_section_times[ii:ii+1], count=count)
                             if count eq 0 then continue
                             vec_maneuver[ii,jj] = median(vec[index,jj])
                         endfor

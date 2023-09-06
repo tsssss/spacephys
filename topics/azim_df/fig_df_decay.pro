@@ -175,7 +175,7 @@ test = 0
     bin_yys = fltarr(nbin,nlevel)+!values.f_nan
     min_count = 10
     for ii=0, nbin-1 do begin
-        index = lazy_where(xxs, '[]', bins[ii:ii+1], count=count)
+        index = where_pro(xxs, '[]', bins[ii:ii+1], count=count)
         if count le min_count then continue
         the_data = yys[index]
         sorted_data = the_data[sort(the_data)]

@@ -155,7 +155,7 @@ pro pflux_grant_read_pflux_gen_file, time, probe=probe, filename=file, local_roo
     cdf_id = (file_test(file))? cdf_open(file): cdf_create(file)
 
     time_var = 'ut_sec'
-    time_index = lazy_where(common_times, '[)', day_time_range)
+    time_index = where_pro(common_times, '[)', day_time_range)
     times = common_times[time_index]
     time_var_settings = dictionary($
         'unit', 'sec', $
@@ -182,7 +182,7 @@ pro pflux_grant_read_pflux_gen_file, time, probe=probe, filename=file, local_roo
 
     ; Orbit time.
     time_var = 'ut_orbit'
-    time_index = lazy_where(orbit_times, '[]', day_time_range)
+    time_index = where_pro(orbit_times, '[]', day_time_range)
     times = orbit_times[time_index]
     time_var_settings = dictionary($
         'unit', 'sec', $

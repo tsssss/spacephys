@@ -82,7 +82,7 @@ pro pflux_grant_read_e_mgse_gen_file, time, probe=probe, filename=file;, pad_tim
 
 
 ;---Save data to file.
-    index = lazy_where(common_times, '[)', day_time_range)
+    index = where_pro(common_times, '[)', day_time_range)
     times = common_times[index]
     de_mgse = get_var_data(de_mgse_var)
     de_mgse = float(de_mgse[index,*])

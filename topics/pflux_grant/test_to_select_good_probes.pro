@@ -143,7 +143,7 @@ endforeach
             flag_time_ranges = time_to_range(times[index], time_step=flag_time_step)
             nflag_time_range = n_elements(flag_time_ranges)/2
             for ii=0, nflag_time_range-1 do begin
-                index = lazy_where(common_times, '[]', flag_time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+                index = where_pro(common_times, '[]', flag_time_ranges[ii,*]+[-1,1]*pad_time, count=count)
                 if count eq 0 then continue
                 vsvy[index,*] = !values.f_nan
             endfor
@@ -255,7 +255,7 @@ endforeach
 ;                ntime = n_elements(times)
 ;                index = where(the_flags eq 1, count)
 ;                if count le ntime*max_valid_dv0_ratio then continue
-;                index = lazy_where(lowres_times, '[]', current_time_range)
+;                index = where_pro(lowres_times, '[]', current_time_range)
 ;                probe_flags[index] = 1
 ;                store_data, flag_var, lowres_times, probe_flags
 ;            endfor

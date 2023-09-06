@@ -127,7 +127,7 @@ yticklen_chsz = -0.40
 ;---Histogram of ILat.
     plot_mlt_range = [11,13]
     plot_mlt_range = mlt_range
-    xids = lazy_where(mlt_vals, '[]', plot_mlt_range)
+    xids = where_pro(mlt_vals, '[]', plot_mlt_range)
     hist = total(total(cusp_counts[xids,*,*],1),2)
     bins = ilat_vals
     nbin = n_elements(bins)
@@ -171,7 +171,7 @@ yticklen_chsz = -0.40
 ;---Histogram of MLT.
     plot_dis_range = [1,3]
     plot_dis_range = dis_range
-    zids = lazy_where(dis_vals, '[]', plot_dis_range)
+    zids = where_pro(dis_vals, '[]', plot_dis_range)
     hist = total(total(cusp_counts[*,*,zids],3),2)
     bins = mlt_vals
     nbin = n_elements(bins)

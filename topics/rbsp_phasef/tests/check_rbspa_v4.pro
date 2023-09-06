@@ -16,7 +16,7 @@ ntime = n_elements(times)
 v4s = fltarr(ntime)
 foreach day, days do begin
     day_time_range = day+[0,secofday]
-    time_index = lazy_where(times, '[]', day_time_range, count=count)
+    time_index = where_pro(times, '[]', day_time_range, count=count)
     if count le 1 then continue
     rbsp_read_efw, day_time_range, probe=probe, id='l1%vsvy'
     the_times = times[time_index]

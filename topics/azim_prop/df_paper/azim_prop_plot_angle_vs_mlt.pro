@@ -185,7 +185,7 @@ pro azim_prop_plot_angle_vs_mlt, project
         foreach key, ['pre','post'] do begin
             tx = scheme[key+'_mlt']
             ty = scheme[key+'_phi']
-            index = lazy_where(xx, tx)
+            index = where_pro(xx, tx)
             yfit[index] = interpol(ty,tx, xx[index])
         endforeach
         

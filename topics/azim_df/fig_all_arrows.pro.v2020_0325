@@ -161,9 +161,9 @@ test = 0
         foreach probe_combo, probe_combos do begin
             combo_info = triad_timing[probe_combo]
 
-            index = lazy_where(combo_info.angles, '[]', triad_angle_range, count=count)
+            index = where_pro(combo_info.angles, '[]', triad_angle_range, count=count)
             if count ne nvertex then continue
-            index = lazy_where(combo_info.time_diffs, '[]', triad_tdiff_range, count=count)
+            index = where_pro(combo_info.time_diffs, '[]', triad_tdiff_range, count=count)
             if count ne nvertex then continue
 
             rsms = combo_info.rsms
@@ -181,9 +181,9 @@ test = 0
         foreach probe_combo, probe_combos do begin
             combo_info = triad_timing[probe_combo]
 
-            index = lazy_where(combo_info.angles, '[]', triad_angle_range, count=count)
+            index = where_pro(combo_info.angles, '[]', triad_angle_range, count=count)
             if count ne nvertex then continue
-            index = lazy_where(combo_info.time_diffs, '[]', triad_tdiff_range, count=count)
+            index = where_pro(combo_info.time_diffs, '[]', triad_tdiff_range, count=count)
             if count ne nvertex then continue
 
             rsms = combo_info.rsms
@@ -202,9 +202,9 @@ test = 0
         foreach probe_combo, probe_combos do begin
             combo_info = triad_timing[probe_combo]
 
-            index = lazy_where(combo_info.angles, '[]', triad_angle_range, count=count)
+            index = where_pro(combo_info.angles, '[]', triad_angle_range, count=count)
             if count ne nvertex then continue
-            index = lazy_where(combo_info.time_diffs, '[]', triad_tdiff_range, count=count)
+            index = where_pro(combo_info.time_diffs, '[]', triad_tdiff_range, count=count)
             if count ne nvertex then continue
 
             rsm_center = combo_info.center_rsm

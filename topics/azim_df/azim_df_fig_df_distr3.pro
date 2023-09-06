@@ -91,11 +91,11 @@ test = 0
     bin_map_index = ptrarr(nmlt_bin,nrxy_bin)
     the_mlts = df_mlts
     for ii=0, nmlt_bin-1 do begin
-        the_index = lazy_where(the_mlts, '[)', mlt_bin_boundarys[ii:ii+1], count=count)
+        the_index = where_pro(the_mlts, '[)', mlt_bin_boundarys[ii:ii+1], count=count)
         the_rxys = df_rxys[the_index]
         if count eq 0 then continue
         for jj=0, nrxy_bin-1 do begin
-            index = lazy_where(the_rxys, '[)', rxy_bin_boundarys[jj:jj+1], count=count)
+            index = where_pro(the_rxys, '[)', rxy_bin_boundarys[jj:jj+1], count=count)
             if count eq 0 then continue
             bin_map_index[ii,jj] = ptr_new(the_index[index])
         endfor

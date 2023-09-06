@@ -41,7 +41,7 @@ function rbsp_phasef_read_fit_times, probe=probe, filename=txt_file
 ;        dates = time_string(times,tformat='YYYY-MM-01')
 ;        dates = sort_uniq(dates)
 ;        times = time_double(dates)
-;        index = lazy_where(times,'()', mission_time_range, count=count)
+;        index = where_pro(times,'()', mission_time_range, count=count)
 ;        fit_times = [mission_time_range[0], times[index], mission_time_range[1]]
 ;        store_data, the_var, 0, fit_times
 ;    endif

@@ -94,7 +94,7 @@ function rbsp_phasef_read_fit_coef, time_range, probe=probe
 ;            nan_times = uts[time_to_range(index,time_step=1)]
 ;            nnan_time = n_elements(nan_times)*0.5
 ;            for ii=0,nnan_time-1 do begin
-;                index = lazy_where(times,'[]', nan_times[ii,*]+[-1,1]*pad_time, count=count)
+;                index = where_pro(times,'[]', nan_times[ii,*]+[-1,1]*pad_time, count=count)
 ;                if count eq 0 then continue
 ;                e_mgse[index,*] = fillval
 ;            endfor
@@ -113,7 +113,7 @@ function rbsp_phasef_read_fit_coef, time_range, probe=probe
         get_data, prefix+'fit_data', times, xxs, yys
         time_index = []
         for jj=0,nfit_time_range-1 do begin
-            index = lazy_where(times, '[]', fit_time_ranges[jj,*], count=count)
+            index = where_pro(times, '[]', fit_time_ranges[jj,*], count=count)
             if count eq 0 then continue
             time_index = [time_index,index]
         endfor

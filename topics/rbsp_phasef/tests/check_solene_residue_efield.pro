@@ -23,9 +23,9 @@ xyz = constant('xyz')
     uts = make_bins(time0+[0,86400], spin_period)
     b_gse = sinterpol(b_gse, times, uts)
     index = where(times[1:-1]-times[0:-2] ge spin_period*1.1, count)
-    for ii=0, count-1 do b_gse[lazy_where(uts,'[]',times[index[ii]+[0,1]]),*] = !values.f_nan
-    if times[0] gt uts[0] then b_gse[lazy_where(uts,'[]',[uts[0],times[0]]),*] = !values.f_nan
-    if times[-1] lt uts[-1] then b_gse[lazy_where(uts,'[]',[times[-1],uts[-1]]),*] = !values.f_nan
+    for ii=0, count-1 do b_gse[where_pro(uts,'[]',times[index[ii]+[0,1]]),*] = !values.f_nan
+    if times[0] gt uts[0] then b_gse[where_pro(uts,'[]',[uts[0],times[0]]),*] = !values.f_nan
+    if times[-1] lt uts[-1] then b_gse[where_pro(uts,'[]',[times[-1],uts[-1]]),*] = !values.f_nan
     store_data, prefix+'b_solene_gse', uts, b_gse
     add_setting, prefix+'b_solene_gse', /smart, dictionary($
         'display_type', 'vector', $
@@ -58,7 +58,7 @@ xyz = constant('xyz')
     rbsp_read_bfield, time_range, probe=probe
 
     
-    uts = uts[lazy_where(uts, '[]', time_range)]
+    uts = uts[where_pro(uts, '[]', time_range)]
     e_gsm = get_var_data(prefix+'e_gsm', at=uts)
     e_mgse = cotran(e_gsm, uts, 'gsm2mgse', probe=probe)
     store_data, prefix+'e_mgse', uts, e_mgse

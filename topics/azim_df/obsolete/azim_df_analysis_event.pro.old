@@ -143,7 +143,7 @@ test = 1
             x0s = round((uts-event_time_range[0])/time_step)
             nx0 = n_elements(x0s)
             get_data, sorted_probes[ii]+'_theta', uts, f1s
-            index = lazy_where(uts, event_time_range)
+            index = where_pro(uts, event_time_range)
             uts = uts[index]
             f1s = f1s[index]
             x1s = round((uts-event_time_range[0])/time_step)
@@ -239,7 +239,7 @@ test = 1
 
         var = probe+'_theta'
         get_data, var, uts, dat, limits=lim
-        index = lazy_where(uts, '[]', running_time_range+cc_info[probe].time_lag)
+        index = where_pro(uts, '[]', running_time_range+cc_info[probe].time_lag)
         store_data, var+'_sector', uts[index], dat[index], limits=lim
         cc_info[probe].var = probe+'_theta_sector'
     endforeach
@@ -441,7 +441,7 @@ test = 1
         the_flag = 1
         combo_info = timing_info[probe_combo]
         triangle_angles = combo_info.triangle_angles
-        index = lazy_where(triangle_angles, '[]', triad_angle_range, count=count)
+        index = where_pro(triangle_angles, '[]', triad_angle_range, count=count)
         if count ne ndim then the_flag = 0
         time_diffs = combo_info.time_diffs
         index = where(time_diffs ge triad_time_diff_limit, count)
@@ -602,7 +602,7 @@ test = 1
         foreach triangle, triangles, jj do begin
             msg = strtrim(string(triangle,format='(F5.1)'),2)
             if jj ne 2 then msg += ','
-            index = lazy_where(triangle, '][', triad_angle_range, count=count)
+            index = where_pro(triangle, '][', triad_angle_range, count=count)
             color = (count ne 0)? bad_triad_color: black
             ttx = tx+(6+3*jj)*xchsz
             xyouts, ttx,ty,/normal, msg, charsize=label_size, color=color

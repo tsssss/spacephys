@@ -27,7 +27,7 @@ foreach probe, probes do begin
         bad_time_ranges = uts[time_to_range(index,time_step=1)]
         nbad_time_range = n_elements(bad_time_ranges)*0.5
         for ii=0,nbad_time_range-1 do begin
-            index = lazy_where(times, '[]', bad_time_ranges[ii,*]+[-1,1]*600, count=count)
+            index = where_pro(times, '[]', bad_time_ranges[ii,*]+[-1,1]*600, count=count)
             if count eq 0 then continue
             de_mgse[index,*] = !values.f_nan
         endfor

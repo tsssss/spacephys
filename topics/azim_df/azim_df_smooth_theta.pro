@@ -29,7 +29,7 @@ pro azim_df_smooth_theta, theta_var, time_range, $
     theta_smooth = fltarr(nboxcar)
     theta_stddev = fltarr(nboxcar)
     for ii=0, nboxcar-1 do begin
-        index = lazy_where(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+        index = where_pro(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
         if count eq 0 then continue
         the_theta = theta[index]
         ; Remove nans.
@@ -53,7 +53,7 @@ pro azim_df_smooth_theta, theta_var, time_range, $
     ; Calculate dtheta and its stddev.
     dtheta_stddev = fltarr(nboxcar)+!values.f_nan
     for ii=0, nboxcar-1 do begin
-        index = lazy_where(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
+        index = where_pro(times, '[]', boxcar_boundary_times[ii:ii+1], count=count)
         if count lt 2 then continue
         the_dtheta = dtheta[index]
         dtheta_stddev[ii] = stddev(the_dtheta, /nan)

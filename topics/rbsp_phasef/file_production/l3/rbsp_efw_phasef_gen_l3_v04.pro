@@ -237,7 +237,7 @@ pro rbsp_efw_phasef_gen_l3_v04, date, probe=probe, filename=file, log_file=log_f
         perigee_times = common_times[time_to_range(index,time_step=1)]
         nperigee = n_elements(perigee_times)*0.5
         for perigee_id=0,nperigee-1 do begin
-            time_index = lazy_where(common_times, '[]', perigee_times[perigee_id,*])
+            time_index = where_pro(common_times, '[]', perigee_times[perigee_id,*])
             if mean(diff[time_index],/nan) ge 0 then begin
                 de[time_index,*] = !values.f_nan
             endif

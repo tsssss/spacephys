@@ -6,7 +6,7 @@
 pro fix_lanl_orbit, rvar_gsm, bad_time=bad_time, to=rvar_fix
 
     get_data, rvar_gsm, times, rgsm, limits=lim
-    index = lazy_where(times, bad_time, count=count)
+    index = where_pro(times, bad_time, count=count)
     if count eq 0 then return
 
     nan = !values.f_nan

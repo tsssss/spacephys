@@ -113,7 +113,7 @@ pro azim_df_filter_storm, project=project
 
     ;---Throw away storms out of the search time range.
         mid_time = mean(time_range)
-        index = lazy_where(mid_time, '][', search_time_range, count=count)
+        index = where_pro(mid_time, '][', search_time_range, count=count)
         if count ne 0 then begin
             lprmsg, 'Outside search time ...', log_file
             continue
@@ -132,7 +132,7 @@ pro azim_df_filter_storm, project=project
                 lprmsg, sc+' outside magnetopause ...', log_file
                 continue
             endif else mlt = mlt[index]
-            index = lazy_where(mlt, '][', mlt_range, count=count)
+            index = where_pro(mlt, '][', mlt_range, count=count)
             if count ne 0 then begin
                 lprmsg, sc+' round noon ...', log_file
                 continue

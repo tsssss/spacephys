@@ -65,7 +65,7 @@
     nrec = nsec_time-1
     b_mgse_bg = fltarr(nrec,ndim)
     for jj=1,nsec_time-1 do begin
-        time_index = lazy_where(times,'[]',sec_times[jj-1:jj])
+        time_index = where_pro(times,'[]',sec_times[jj-1:jj])
         for ii=0,ndim-1 do begin
             b_mgse_bg[jj-1,ii] = median(b_mgse[time_index,ii])
         endfor

@@ -40,7 +40,7 @@ get_data, prefix+var_type, times, data
 ;bad_time_ranges.add, time_double(['2014-08-20','2014-08-28'])
 ;bad_time_ranges.add, time_double(['2015-09-14','2015-09-17'])
 ;foreach bad_time_range, bad_time_ranges do begin
-;    index = lazy_where(times, '[]', bad_time_range)
+;    index = where_pro(times, '[]', bad_time_range)
 ;    data[index,*] = !values.f_nan
 ;endforeach
 

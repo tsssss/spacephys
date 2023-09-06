@@ -277,14 +277,14 @@ pro fig_ewogram_of_dp_gmag_and_current, time_range, probes=probes, $
         rsm = rsm[index,*]
 
         ; Filter spatially.
-        index = lazy_where(yys, '[]', yrange, count=count)
+        index = where_pro(yys, '[]', yrange, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]
         rxy = rxy[index]
         rsm = rsm[index,*]
 
-        index = lazy_where(rxy, '[]', rxy_range, count=count)
+        index = where_pro(rxy, '[]', rxy_range, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]
@@ -362,7 +362,7 @@ pro fig_ewogram_of_dp_gmag_and_current, time_range, probes=probes, $
     gmags = get_var_data(gmag_var2, in=time_range, times=times, limits=lim)
     mlons = lim.mlons
     mlats = lim.mlats
-    index = lazy_where(mlats, '[]', mlat_range, count=count)
+    index = where_pro(mlats, '[]', mlat_range, count=count)
     if count eq 0 then message, 'Invalid mlat_range ...'
     gmags = gmags[*,index]
     mlons = mlons[index]
@@ -374,7 +374,7 @@ pro fig_ewogram_of_dp_gmag_and_current, time_range, probes=probes, $
         yys = mlon2mlt(mlons, time)
         zzs = bytscl(gmags[time_id,*], min=zrange[0], max=zrange[1])
 
-        index = lazy_where(yys, '[]', yrange, count=count)
+        index = where_pro(yys, '[]', yrange, count=count)
         if count eq 0 then continue
         yys = yys[index]
         zzs = zzs[index]

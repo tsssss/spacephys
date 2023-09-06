@@ -163,7 +163,7 @@ function azim_dp_search_coherent_candidate, subseq_list, min_dp_count=min_dp_cou
             ; Angles.
             triad_angles = triangle_angles(reform(transpose(the_r_sms), [1,ntriad_vertex,ndim]))
             triad_angles = reform(triad_angles)
-            index = lazy_where(triad_angles, '()', triad_angle_range, count=count)
+            index = where_pro(triad_angles, '()', triad_angle_range, count=count)
             if count ne ndim then begin
                 lprmsg, 'bad geometry, skip ...', log_file
                 continue

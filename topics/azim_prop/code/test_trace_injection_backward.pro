@@ -62,7 +62,7 @@
 
 ;---Filter using energy.
     get_data, fvar0, times, flux, energy_bins, limits=lim
-    index = lazy_where(energy_bins, energy_range)
+    index = where_pro(energy_bins, energy_range)
 
     fvar = pre0+'_flux'
     store_data, fvar, times, flux[*,index], energy_bins[index], limits=lim

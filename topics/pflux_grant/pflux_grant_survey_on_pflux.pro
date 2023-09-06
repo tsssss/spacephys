@@ -68,7 +68,7 @@ test = 0
             fillval = !values.f_nan
             pad_time = 1800.
             for ii=0,nnan_time_range-1 do begin
-                index = lazy_where(lowres_times, '[]', nan_time_ranges[ii,*]+[-1,1]*pad_time, count=count)
+                index = where_pro(lowres_times, '[]', nan_time_ranges[ii,*]+[-1,1]*pad_time, count=count)
                 if count eq 0 then continue
                 pf_fac[index,*] = fillval
             endfor

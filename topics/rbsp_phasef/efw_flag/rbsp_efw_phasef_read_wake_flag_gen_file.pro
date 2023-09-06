@@ -83,7 +83,7 @@ pro rbsp_efw_phasef_read_wake_flag_gen_file, time, probe=probe, filename=file
 
             foreach time, section_times, ii do begin
                 section_time_range = time+[-0.5,0.5]*duration
-                index = lazy_where(common_times, section_time_range, count=N)
+                index = where_pro(common_times, section_time_range, count=N)
                 uts = common_times[index]
                 ees = edata[index]
                 wps = abs(ww[index,*])^2
@@ -227,7 +227,7 @@ pro rbsp_efw_phasef_read_wake_flag_gen_file, time, probe=probe, filename=file
 
 
 ;---Trim data to wanted time.
-    time_index = lazy_where(common_times,'[)', time_range)
+    time_index = where_pro(common_times,'[)', time_range)
     common_times = common_times[time_index]
     foreach var, prefix+['eu_wake_flag','ev_wake_flag','eu_fixed','ev_fixed','ew'] do begin
         data = get_var_data(var)

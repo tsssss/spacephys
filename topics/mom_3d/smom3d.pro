@@ -1,5 +1,8 @@
 ;+
 ; Passed checks on moments_3d, for density to efluxes.
+; 
+; This program calculates moments in a despun coord.
+; Ideally, it needs B vector and sc potential.
 ;-
 function smom3d, data, vsc=vsc, dmom=dmom, erange=erange
 
@@ -23,7 +26,7 @@ function smom3d, data, vsc=vsc, dmom=dmom, erange=erange
     q0 = dat3d.charge   ; q/qe.
     bvec = dat3d.magf   ; 3D B field, in nT.
 
-    ; sc potential in eV.
+    ; sc potential in V.
     if n_elements(vsc) eq 0 then vsc = 0d
     if stagexist('sc_pot',dat3d) then vsc = dat3d.sc_pot
     if ~finite(vsc) then vsc = 6d
@@ -39,7 +42,7 @@ function smom3d, data, vsc=vsc, dmom=dmom, erange=erange
     if cnt ne 0 then e0s = e0s>0.1  ; copied from L168 in moments_3d.
     ne0 = dat3d.nenergy
 
-    if stagexist(dat3d) then begin
+    if stagexist('denergy',dat3d) then begin
         des = dat3d.denergy
         de_e = des/e0s
     endif else begin
@@ -69,13 +72,26 @@ function smom3d, data, vsc=vsc, dmom=dmom, erange=erange
 
 
 ;---Calculate the moments.
+    ; The essential quantities need be integrated are:
+    ; dens (density), nflux (number flux), vften (velocity flux tensor), eflux (energy flux).
+    ; jsc_e (total current over q)
+    ; 
+    ; Other quantites are derived quantities:
+    ; mftens (mass flux tensor, from vftens)
+    ; v_bk (bulk velocity, from nflux and dens)
+    ; ptens (pressure tensor, from vftens, dens, and nflux)
+    ; tavg (averaged temperature, from ptens and dens)
+    ; vthermal (thermal velocity, from tavg)
+    ; t3 (temperature eigen values, from ptens and dens)
+    ; t3_mag (temperature eigen values in FAC, from ptens, dens, v_bk, and bvec)
+    
 
     ; density in 1/cm^3.
     dens = total(fdat*de_e*weight*e1s^0.5/e0s*do0,nan=1)*(sqrt(m_e*0.5)*1e-5)
-    if dens lt 0 then stop
+    if dens lt 0 then dens = !values.f_nan
     if ~finite(dens) then return, mom3d
 
-    ; total current into the s/c over q, in 1/cm^2-s.
+    ; total current over q into the s/c, in 1/cm^2-s.
     jsc_e = total(fdat*de_e*weight*do0)
 
     ; number flux, in 1/cm^2-s.

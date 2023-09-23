@@ -11,7 +11,7 @@
 ; Author: Sheng Tian.
 ; History: 2013-11-21, Sheng Tian, create.
 ;-
-pro stplot_split, var0, newnames = vnames, $
+function stplot_split, var0, newnames = vnames, $
     ytitles = ytitles, labels = labels, colors = colors
 
     vname = tnames(var0[0])
@@ -21,7 +21,7 @@ pro stplot_split, var0, newnames = vnames, $
         if n_elements(ytitles) ne 0 then options, vnames, 'ytitles', ytitles
         if n_elements(labels) ne 0 then options, vnames, 'labels', labels
         if n_elements(colors) ne 0 then options, vnames, 'colors', colors
-        return
+        return, []
     endif else ndim = (size(f0,/dimensions))[1]
     idstrs = string(indgen(ndim)+1,format='(I0)')
     
@@ -37,4 +37,6 @@ pro stplot_split, var0, newnames = vnames, $
         store_data, vnames[i], t0, f0[*,i], $
             limits = {ytitle:ytitles[i], labels:labels[i], color:colors[i]}
 
+    return, vnames
+    
 end

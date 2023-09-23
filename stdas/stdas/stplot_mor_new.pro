@@ -4,8 +4,8 @@
 ; Purpose: Wrap wavelet for quick spectrogram within tplot.
 ; Parameters: vname, in, type = string, required. Signal varname in tplot.
 ; Keywords:
-;   frequency, in, boolean. Set to make ytitle to be frequency. Default is period.
-;   scaleinfo, in, struct, opt. Default is
+;   period, in, boolean. Set to make ytitle to be period. Default is frequency.
+;   scale_info, in, struct, opt. Default is
 ;       {s0:4d*dr0, s1:0.5d*dur, dj:1d/8, ns:0d}.
 ;   tscale, in/out, dblarr[m], opt. Scales in time. Info used are
 ;       minscale, maxscale, nscale.
@@ -17,12 +17,13 @@
 ; Dependence: tplot,slib.
 ; Author: Sheng Tian.
 ; History: 2017-07-25, Sheng Tian, create.
+;   2023-09-22, Sheng Tian, change it to function, set frequency as default.
 ;-
-pro stplot_mor_new, vname, $
-    frequency = frequency, $
-    newname = newname, overwrite = overwrite, $
-    tscale = tscales, scaleinfo = scaleinfo, $
-    ytitle = ytitle, zrange = zrange
+function stplot_mor_new, vname, $
+    period=period, $
+    newname=newname, overwrite=overwrite, $
+    tscale=tscales, scale_info=scale_info, $
+    ytitle=ytitle, zrange=zrange
 
     get_data, vname, uts, f0, limits = lim
     if size(f0,/n_dimensions) eq 2 then f0 = snorm(f0)
@@ -37,16 +38,16 @@ pro stplot_mor_new, vname, $
 
     
 ;----prepare scales.
-    ; input: tscales, scaleinfo.
-    ; output: s0,s1,dj,ns,scaleinfo.
-    if n_elements(scaleinfo) eq 0 then $
-        scaleinfo = {s0:4d*dr0, s1:0.5d*dur, dj:1d/8, ns:0d}
+    ; input: tscales, scale_info.
+    ; output: s0,s1,dj,ns,scale_info.
+    if n_elements(scale_info) eq 0 then $
+        scale_info = {s0:4d*dr0, s1:0.5d*dur, dj:1d/8, ns:0d}
 
     if n_elements(tscales) eq 0 then begin          ; no scales.
-        s0 = scaleinfo.s0
-        s1 = scaleinfo.s1
-        dj = scaleinfo.dj
-        ns = scaleinfo.ns
+        s0 = scale_info.s0
+        s1 = scale_info.s1
+        dj = scale_info.dj
+        ns = scale_info.ns
 
         if s0 eq 0 then s0 = 4*dr0
         if s1 eq 0 then s1 = 0.5d*dur
@@ -67,16 +68,15 @@ pro stplot_mor_new, vname, $
     w0 = 6d
     cdelta = 0.776d     ; constant for w0=6, for normalization.
 
-    scaleinfo.s0 = s0   ; min scale.
-    scaleinfo.s1 = s1   ; max scale.
-    scaleinfo.dj = dj   ; 2^dj scale spacing.
-    scaleinfo.ns = ns   ; # of scales.
+    scale_info.s0 = s0   ; min scale.
+    scale_info.s1 = s1   ; max scale.
+    scale_info.dj = dj   ; 2^dj scale spacing.
+    scale_info.ns = ns   ; # of scales.
 
 
 
     if keyword_set(overwrite) then newname = vname
     if ~keyword_set(newname) then newname = vname+'_mor'
-    if ~keyword_set(ytitle) then ytitle = keyword_set(frequency)? 'Freq!C(Hz)': 'Period!C(sec)'
     ztitle = stagexist(lim,'ytitle')? lim.ytitle: ''
 
 ;----wavelet analysis.
@@ -131,7 +131,7 @@ pro stplot_mor_new, vname, $
     
     sigma2 = (moment(f0))[1]
     
-    if keyword_set(frequency) then coi = 1d/coi
+    if ~keyword_set(period) then coi = 1d/coi
     
 ;    sgopen, 0, xsize=8, ysize=5, /inch
 ;    plot, fftps, fftpsd, xlog=1
@@ -161,18 +161,30 @@ pro stplot_mor_new, vname, $
         psd:psd, $      ; Morlet power spectral density, in X^2/Hz.
         ngws:ngws, $    ; Morlet normalized GWS, in X^2.
         dof:dof}        ; degree of freedom.
-        
-    if keyword_set(frequency) then begin
-        store_data, newname, uts, npow, fs, $
-            limits = {spec:1, no_interp:1, $
-            ytitle:ytitle, ystyle:1, yrange:[s0,s1], ylog:1}
-    endif else begin
-        store_data, newname, uts, npow, ps, $
-            limits = {spec:1, no_interp:1, $
-            ytitle:ytitle, ystyle:1, yrange:[s0,s1], ylog:1}
-    endelse
     
+    unit = ''
+    var_unit = get_setting(vname, 'unit', exist)
+    if exist then unit = var_unit+'!U2!N'
+    if ~keyword_set(period) then begin
+        val = fs
+        yrange = minmax(1d/[s0,s1])
+        ytitle = 'Freq!C(Hz)'
+    endif else begin
+        val = ps
+        yrange = [s0,s1]
+        ytitle = 'Period!C(sec)'
+    endelse
+    store_data, newname, uts, npow, val
+    add_setting, newname, smart=1, dictionary($
+        'spec', 1, $
+        'ytitle', ytitle, $
+        'yrange', yrange, $
+        'ylog', 1, $
+        'unit', unit, $
+        'zlog', 1, $
+        'color_table', 60 )
     store_data, newname+'_fft_info', 0, fftinfo
+    return, newname
 end
 
 _2013_0607_load_data

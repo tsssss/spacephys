@@ -10,24 +10,43 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
 ;---Events.
     event_list = list()
 
+    ; Arc event.
+    event_list.add, dictionary($
+        'time_range', time_double(['2017-03-09/07:00','2017-03-09/08:00']), $
+        'onset_time_range', time_double(['2017-03-09/07:20','2017-03-09/07:30']), $
+        'probes', ['d','e'] )
+    event_list.add, dictionary($
+        'time_range', time_double(['2017-03-10/09:00','2017-03-10/10:30']), $
+        'onset_time_range', time_double(['2017-03-10/09:50','2017-03-10/10:00']), $
+        'probes', ['d','e'] )
+    event_list.add, dictionary($
+        'time_range', time_double(['2017-03-10/04:00','2017-03-10/10:00']), $
+        ;'onset_time_range', time_double(['2017-03-10/05:40','2017-03-10/05:55']), $
+        'onset_time_range', time_double(['2017-03-10/09:50','2017-03-10/10:00']), $
+        'probes', ['d','e'] )
+    event_list.add, dictionary($
+        'time_range', time_double(['2017-01-31/08:00','2017-01-31/10:00']), $
+        'onset_time_range', time_double(['2017-01-31/09:15','2017-01-31/09:25']), $
+        'probes', ['d','e'] )
+
 
     ; Streamer event.
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
-        'onset_time_range', time_double(['2008-01-21/07:40','2008-01-21/07:50']), $
-        'probes', ['a'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
-        'onset_time_range', time_double(['2008-01-21/07:10','2008-01-21/07:20']), $
-        'probes', ['a'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
-        'onset_time_range', time_double(['2008-01-21/07:22','2008-01-21/07:28']), $
-        'probes', ['a'] )
-    event_list.add, dictionary($
-        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
-        'onset_time_range', time_double(['2008-01-21/07:28','2008-01-21/07:38']), $
-        'probes', ['a'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
+;        'onset_time_range', time_double(['2008-01-21/07:40','2008-01-21/07:50']), $
+;        'probes', ['a'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
+;        'onset_time_range', time_double(['2008-01-21/07:10','2008-01-21/07:20']), $
+;        'probes', ['a'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
+;        'onset_time_range', time_double(['2008-01-21/07:22','2008-01-21/07:28']), $
+;        'probes', ['a'] )
+;    event_list.add, dictionary($
+;        'time_range', time_double(['2008-01-21/07:00','2008-01-21/08:00']), $
+;        'onset_time_range', time_double(['2008-01-21/07:28','2008-01-21/07:38']), $
+;        'probes', ['a'] )
 
 ;    ; Angeloupolos 2008.
 ;    event_list.add, dictionary($
@@ -114,24 +133,27 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
         time_range = event.time_range
         onset_time_range = event.onset_time_range
 
-    ;---Load basic data: E, B, R, density.
+    ;---Load basic data: E, B, R, density, and ion vel.
         foreach probe, probes do begin
             prefix = 'th'+probe+'_'
             themis_read_efield, time_range, probe=probe
             b_var = themis_read_bfield(time_range, probe=probe)
             r_var = themis_read_orbit(time_range, probe=probe)
             themis_read_density, time_range, probe=probe
+            themis_read_ion_vel, time_range, probe=probe
 
             get_data, prefix+'b_gsm', times
             interp_time, prefix+'r_gsm', times
             time_step = total(times[0:1]*[-1,1])
+            interp_time, prefix+'e_gsm', times
 
             vars = prefix+['e','b']+'_gsm'
             foreach var, vars do begin
                 get_data, var, times, data
                 mag = snorm(data)
-                index = where(finite(mag))
-                data = sinterpol(data[index,*], times[index], times)
+                index = where(finite(mag,nan=1))
+                ;data = sinterpol(data[index,*], times[index], times)
+                data[index,*] = 0
                 store_data, var, times, data
             endforeach
         endforeach
@@ -143,7 +165,7 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
         endforeach
         ;tplot, vars, trange=time_range
 
-    ;---Calc ExB vel.
+    ;---Calc ExB vel and E_vxB, B_tilt.
         foreach probe, probes do begin
             prefix = 'th'+probe+'_'
             e_gsm = get_var_data(prefix+'e_gsm', times=times)
@@ -159,6 +181,25 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
                 'coord', 'GSM', $
                 'coord_labels', constant('xyz') )
     
+            u_gsm = get_var_data(prefix+'u_gsm', at=times)
+            evxb_gsm = -vec_cross(u_gsm,b_gsm)
+            coef = 1e-3
+            for ii=0,2 do evxb_gsm[*,ii] *= coef
+            store_data, prefix+'evxb_gsm', times, evxb_gsm
+            add_setting, prefix+'evxb_gsm', /smart, dictionary($
+                'display_type', 'vector', $
+                'short_name', 'VxB E', $
+                'unit', 'mV/m', $
+                'coord', 'GSM', $
+                'coord_labels', constant('xyz') )
+           
+            b_vec = cotran(b_gsm, times, 'gsm2sm')
+            b_tilt = asin(b_vec[*,2]/snorm(b_vec))*constant('deg')
+            store_data, prefix+'b_tilt', times, b_tilt
+            add_setting, prefix+'b_tilt', smart=1, dictionary($
+                'display_type', 'scalar', $
+                'short_name', 'B tilt', $
+                'unit', 'deg' )
         endforeach
 
         stop
@@ -169,7 +210,13 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
 ;            define_fac, prefix+'b_gsm', prefix+'r_gsm'
 ;            foreach var, prefix+['e','b']+'_' do to_fac, var+'gsm', to=var+'fac'
             pf_var = prefix+'pf_gsm'
-            stplot_calc_pflux_mor, prefix+'e_gsm', prefix+'b_gsm', pf_var
+            stplot_calc_pflux_mor, prefix+'evxb_gsm', prefix+'b_gsm', pf_var
+            
+;            cpoynt = 1d/(400d*!dpi) ; from mV/m x nT -> mW/m^2.
+;            get_data, prefix+'e_gsm', times, e_gsm
+;            get_data, prefix+'b_gsm', times, b_gsm
+;            pf_gsm = vec_cross(e_gsm, b_gsm)*cpoynt
+;            store_data, pf_var, times, pf_gsm
             add_setting, pf_var, /smart, dictionary($
                 'display_type', 'vector', $
                 'short_name', 'S', $
@@ -240,7 +287,7 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
                 'short_name', 'S!D||!N in-situ' )
 
 
-            vars = prefix+['e_gsm','b_gsm1','pf_para','ele_n']
+            vars = prefix+['e_gsm','b_gsm1','b_tilt','pf_para','ele_n']
             nvar = n_elements(vars)+1
             ypans = fltarr(nvar)+1 & ypans[-1] = 2
             margins = [12,5,10,4]

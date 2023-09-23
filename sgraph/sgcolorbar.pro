@@ -30,24 +30,23 @@ pro sgcolorbar, colors, zrange = zr, ztitle = ztitle, position = pos, $
     sgtv, cb, position=pos, /resize, _extra = ex
     
     if keyword_set(horizontal) then begin
-        plot, zr, xr, position = pos, /normal, /nodata, /noerase, $
-            color = sgcolor('black'), background = sgcolor('white'), $
-            xrange = zr, ystyle = 1, xstyle = 1, $
-            xlog = log, xticks=1, xminor=0, $
-            yminor = 0, yticks = 1, ytickformat = '(A1)', xtickformat = '(A1)'
-        axis, xaxis = 1, xtitle = ztitle, xcharsize = zcharsize, $
-            xrange = zr, xstyle = 1, xticks = zticks, xminor = zminor, $
-            xtickv = ztickv, xtickname = ztickn, xtickformat=ztickformat, xticklen=zticklen, $
+        plot, zr, xr, position=pos, normal=1, nodata=1, noerase=1, $
+            color=sgcolor('black'), background=sgcolor('white'), $
+            xstyle=9, xlog=log, xrange=zr, xticks=1, xminor=0, $
+            ystyle=1, yminor=0, yticks=1, ytickformat='(A1)', xtickformat='(A1)', $
+            xticklen=0, yticklen=0
+        axis, xaxis=1, save=1, xtitle=ztitle, xcharsize=zcharsize, $
+            xstyle=1, xlog=log, xrange=zr, xtickv=ztickv, xticks=zticks, xminor=zminor, $
+            xtickname=ztickn, xtickformat=ztickformat, xticklen=zticklen, $
             color = sgcolor('black')
     endif else begin
-        plot, xr, zr, position = pos, /normal, /nodata, /noerase, $
-            color = sgcolor('black'), background = sgcolor('white'), $
-            yrange = zr, xstyle = 1, ystyle = 1, $
-            ylog = log, $
-            xminor = 0, xticks = 1, xtickformat = '(A1)', ytickformat = '(A1)'
-        axis, yaxis = 1, ytitle = ztitle, ycharsize = zcharsize, $
-            yrange = zr, ystyle = 1, yticks = zticks, yminor = zminor, $
-            ytickv = ztickv, ytickname = ztickn, ytickformat=ztickformat, yticklen=zticklen, $
+        plot, xr, zr, position=pos, normal=1, nodata=1, noerase=1, $
+            color=sgcolor('black'), background=sgcolor('white'), $
+            ystyle=9, ylog=log, yrange=zr, yticks=1, yminor=0, $
+            xstyle=1, xminor=0, xticks=1, xtickformat='(A1)', ytickformat='(A1)'
+        axis, yaxis=1, sav=1, ytitle=ztitle, ycharsize=zcharsize, $
+            ystyle=1, ylog=log, yrange=zr, ytickv=ztickv, yticks=zticks, yminor=zminor, $
+            ytickname=ztickn, ytickformat=ztickformat, yticklen=zticklen, $
             color = sgcolor('black')
     endelse
 

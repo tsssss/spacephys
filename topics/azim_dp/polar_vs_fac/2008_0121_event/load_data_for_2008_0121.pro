@@ -7,7 +7,7 @@ pro load_data_for_2008_0121_footpoint, default_settings
 
 ;---Settings.
     time_range = default_settings.event_time_range+[-1,1]*1800d
-    probes = themis_probes()
+    probes = themis_get_probes()
     probes = ['a']
     models = ['t89','t96','t01','t04s']
 
@@ -44,7 +44,7 @@ pro load_data_for_2008_0121_themis_data, default_settings
 
 ;---Settings.
     time_range = default_settings.event_time_range+[-1,1]*1800d
-    probes = themis_probes()
+    probes = themis_get_probes()
     coord = 'sm'
     var = 'themis_data'
     energy_range = [0,400d]

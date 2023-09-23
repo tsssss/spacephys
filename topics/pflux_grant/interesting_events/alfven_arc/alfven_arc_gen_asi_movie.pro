@@ -4,28 +4,23 @@
 ; Adopted from fig_si_movie
 ;-
 
-function fig_2013_0501_0850_si_movie_v02, movie_file, event_info=event_info
+function alfven_arc_gen_asi_movie, input_time_range, sites=sites, min_elevs=min_elevs, event_info=event_info, $
+    test=test, calibration_method=calibration_method, merge_method=merge_method
 
 
 ;---Load data and settings.
-    if n_elements(event_info) eq 0 then event_info = _2013_0501_0850_load_data()
-test = 0
-
     probe = event_info['probe']
     prefix = event_info['prefix']
 
-    time_range = event_info['asi_time_range']
-    model_setting = event_info['model_setting']
-    internal_model = model_setting['internal_model']
-    models = model_setting['models']
-    models = ['t89']
-    asi_setting = event_info['asi_setting']
-    site = (asi_setting['sites'])[0]
+    internal_model = 'dipole'
+    models = 't89'
     time_step = 3d
+    version = 'v01'
+    time_range = time_double(input_time_range)
 
 
 ;---Prepare MLT image for ASI.
-    mlt_image_var = 'thg_asf_mlt_image'
+    mlt_image_var = themis_asf_read_mlt_image(time_range, sites=sites, min_elev=min_elevs, merge_method=merge_method, calibration_method=calibration_method)
     get_data, mlt_image_var, times, asi_mlt_images
     index = where_pro(times, '[]', time_range)
     common_times = times[index]
@@ -47,7 +42,7 @@ test = 0
     if n_elements(movie_file) eq 0 then begin
         plot_dir = event_info['plot_dir']
         movie_file = join_path([plot_dir,$
-            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD_hhmm')+'_v02.mp4'])
+            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD_hhmm')+'_'+version+'.mp4'])
     endif
 
     xticklen_chsz = -0.2
@@ -86,7 +81,7 @@ test = 0
 
 ;---ASI.
     asi_ct = 49
-    asi_zrange = [2e2,1e4]
+    asi_zrange = [2e2,2e4]
     asi_log_zrange = alog10(asi_zrange)
     asi_tpos = reform(poss[*,0])
     asi_cbpos = asi_tpos
@@ -125,7 +120,7 @@ test = 0
     plot_files = []
     foreach time, common_times, time_id do begin
         plot_file = join_path([plot_dir,'thg_asf_mlt_image_v02',$
-            'thg_asf_mlt_image_'+time_string(time,tformat='YYYY_MMDD_hhmm_ss')+'_v02.png'])
+            'thg_asf_mlt_image_'+time_string(time,tformat='YYYY_MMDD_hhmm_ss')+'_'+version+'.png'])
         plot_files = [plot_files, plot_file]
         if keyword_set(test) then plot_file = 0
         if keyword_set(test) then magn = 1 else magn = 2
@@ -345,6 +340,50 @@ test = 0
 
 end
 
+test = 0
 
-print, fig_2013_0501_0850_si_movie_v02(event_info=event_info)
+event_info = orderedhash()
+event_info['2015_0312'] = dictionary($
+    'time_range', ['2015-03-12/08:00','2015-03-12/11:00'], $
+    'probes', ['b'], $
+    'bad_e_time_ranges', list(['2015-03-12/09:04:51','2015-03-12/09:04:54']), $
+    'asi_setting', dictionary($
+        'sites', ['fykn','mcgr'], $
+        'best_site', 'fykn', $
+        'min_elevs', float([5,10]), $
+        'merge_method', 'max_elev', $
+        'calibration_method', 'simple', $
+        'mlt_range', [-6d,0], $
+        'mlat_range', [55d,70] ) )
+    
+;event_info['2015_0302_11'] = dictionary($
+;    'time_range', ['2015-03-02/10:30','2015-03-02/11:30'], $
+;    'probes', ['a'], $
+;    ;    'asi_sites', ['nrsq','snkq','gill','rank','chbg'], $
+;    'asi_sites', ['nrsq','snkq'], $
+;    'asi_min_elevs', !null, $
+;    'asi_has_moon', 0 )
+;event_info['2015_0105_00'] = dictionary($
+;    'time_range', ['2015-01-05/00:10','2015-01-05/02:00'], $
+;    'probes', ['a'], $
+;;    'asi_sites', ['nrsq','snkq','gill','rank','chbg'], $
+;    'asi_sites', ['nrsq','snkq'], $
+;    'asi_min_elevs', [1,1]*2.5, $
+;    'asi_has_moon', 1 )
+
+foreach info, event_info do begin
+    time_range = info.time_range
+    
+    asi_setting = info.asi_setting
+    tmp = alfven_arc_load_ground_data(time_range, asi_setting=asi_setting)
+    stop
+    
+    probes = info.probes
+    foreach probe, probes do begin
+        tmp = alfven_arc_load_rbsp_data(time_range, probe=probe, _extra=info.tostruct())
+    endforeach
+
+    print, alfven_arc_gen_asi_movie(time_range, sites=sites, min_elevs=min_elevs, test=test, merge_method='max_elev', event_info=pinfo)
+    stop
+endforeach
 end

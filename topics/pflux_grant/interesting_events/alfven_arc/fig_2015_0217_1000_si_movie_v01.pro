@@ -4,11 +4,11 @@
 ; Adopted from fig_si_movie
 ;-
 
-function fig_2013_0501_0850_si_movie_v02, movie_file, event_info=event_info
+function fig_2015_0217_1000_si_movie_v01, movie_file, event_info=event_info
 
 
 ;---Load data and settings.
-    if n_elements(event_info) eq 0 then event_info = _2013_0501_0850_load_data()
+    if n_elements(event_info) eq 0 then event_info = _2015_0217_1000_load_data()
 test = 0
 
     probe = event_info['probe']
@@ -22,6 +22,7 @@ test = 0
     asi_setting = event_info['asi_setting']
     site = (asi_setting['sites'])[0]
     time_step = 3d
+    version = 'v01'
 
 
 ;---Prepare MLT image for ASI.
@@ -47,7 +48,7 @@ test = 0
     if n_elements(movie_file) eq 0 then begin
         plot_dir = event_info['plot_dir']
         movie_file = join_path([plot_dir,$
-            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD_hhmm')+'_v02.mp4'])
+            'thg_asf_movie_'+time_string(time_range[0],tformat='YYYY_MMDD_hhmm')+'_'+version+'.mp4'])
     endif
 
     xticklen_chsz = -0.2
@@ -86,7 +87,7 @@ test = 0
 
 ;---ASI.
     asi_ct = 49
-    asi_zrange = [2e2,1e4]
+    asi_zrange = [2e2,5e3]
     asi_log_zrange = alog10(asi_zrange)
     asi_tpos = reform(poss[*,0])
     asi_cbpos = asi_tpos
@@ -125,7 +126,7 @@ test = 0
     plot_files = []
     foreach time, common_times, time_id do begin
         plot_file = join_path([plot_dir,'thg_asf_mlt_image_v02',$
-            'thg_asf_mlt_image_'+time_string(time,tformat='YYYY_MMDD_hhmm_ss')+'_v02.png'])
+            'thg_asf_mlt_image_'+time_string(time,tformat='YYYY_MMDD_hhmm_ss')+'_'+version+'.png'])
         plot_files = [plot_files, plot_file]
         if keyword_set(test) then plot_file = 0
         if keyword_set(test) then magn = 1 else magn = 2
@@ -346,5 +347,5 @@ test = 0
 end
 
 
-print, fig_2013_0501_0850_si_movie_v02(event_info=event_info)
+print, fig_2015_0217_1000_si_movie_v01(event_info=event_info)
 end

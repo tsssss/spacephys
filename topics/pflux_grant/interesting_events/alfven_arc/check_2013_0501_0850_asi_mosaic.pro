@@ -7,6 +7,6 @@ min_elev = [1,1,1,1,10]
 sites = ['fsmi','gako','atha','tpas','fsim']
 min_elev = [0.5,0.5,0.5,0.5,10]
 merge_method = 'merge_elev'
-mlt_image_var = themis_read_asf_mlt_image(time_range, sites=sites, min_elev=min_elev, merge_method=merge_method)
+mlt_image_var = themis_asf_read_mlt_image(time_range, sites=sites, min_elev=min_elev, merge_method=merge_method)
 
 end

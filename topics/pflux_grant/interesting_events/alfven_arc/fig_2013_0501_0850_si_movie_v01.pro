@@ -79,7 +79,7 @@ test = 1
 
     mlt_image_var = 'thg_asf_mlt_image'
     get_data, mlt_image_var, times, mlt_images
-    index = lazy_where(times, '[]', time_range)
+    index = where_pro(times, '[]', time_range)
     times = times[index]
     npx = n_elements(mlt_images[0,0,*])
     mlt_images = mlt_images[index,*,0:npx*0.5-1]

@@ -2,26 +2,30 @@
 ; Plot quantities showing the observed waves are Alfven waves.
 ;-
 
-function fig_2013_0501_0850_alfven_wave_v01, plot_file, event_info=event_info
+function fig_2015_0302_1100_alfven_wave_v01, plot_file, event_info=event_info
+
+    version = 'v01'
+    id = '2015_0302_1100'
 
 ;---Load data and settings.
-    if n_elements(event_info) eq 0 then event_info = _2013_0501_0850_load_data()
-test = 0
+    if n_elements(event_info) eq 0 then event_info = alfven_arc_load_data(id, event_info=event_info)
+test = 1
 
-    probe = event_info['probe']
-    prefix = event_info['prefix']
+    rbsp_info = event_info.rbsp.rbspa
+    probe = rbsp_info['probe']
+    prefix = rbsp_info['prefix']
 
-    time_range = time_double(['2013-05-01/07:00','2013-05-01/09:30'])
-    bar_times = time_double('2013-05-01/'+['07:38','08:44'])
-    model_setting = event_info['model_setting']
-    internal_model = model_setting['internal_model']
-    external_model = model_setting['external_model']
+    time_range = time_double('2015-03-02/'+['10:45','11:15:00'])
+    bar_times = time_double('2015-03-12/'+['08:58','09:04:00','09:36'])
+    model_setting = rbsp_info['model_setting']
     all_models = model_setting['models']
+    internal_model = event_info.internal_model
+    external_model = event_info.external_model
 
     if n_elements(plot_file) eq 0 then begin
         plot_dir = event_info['plot_dir']
         plot_file = join_path([plot_dir,$
-            'fig_2013_0501_0850_alfven_wave_v01.pdf'])
+            'fig_'+event_info.id+'_alfven_wave_'+version+'.pdf'])
     endif
     if keyword_set(test) then plot_file = 0
 
@@ -29,7 +33,7 @@ test = 0
 ;---plot_vars options
     label_size = 0.8
 
-
+    ; E field.
     edot0_fac_var = prefix+'edot0_fac'
     stplot_split, edot0_fac_var
     e_vars = edot0_fac_var+'_comp'+['1','2','3']
@@ -39,18 +43,19 @@ test = 0
             'display_type', 'scalar', $
             'short_name', 'E!D'+labels[var_id]+'!N', $
             'unit', 'mV/m' )
-        options, var, 'yrange', [-200,200]
+        options, var, 'yrange', [-1,1]*80
+        options, var, 'ytickv', [-1,0,1]*50
         options, var, 'yticks', 2
         options, var, 'yminor', 5
     endforeach
 
+
     pf_spec_var = prefix+'pf_fac_mor_spec_1'
-    
     pf_var = prefix+'pf_fac_map'
     get_data, pf_var, times, pf_fac, limits=lim
     
     pf_para_var = prefix+'pf_fac_para'
-    store_data, pf_para_var, times, [[snorm(pf_fac)],[pf_fac[*,0]]]
+    store_data, pf_para_var, times, [[snorm(pf_fac)],[-pf_fac[*,0]]]
     add_setting, pf_para_var, smart=1, dictionary($
         'display_type', 'stack', $
         'labels', strarr(2)+' ', $
@@ -58,8 +63,8 @@ test = 0
         'the_labels', ['|S|','S!D||!N'], $
         'the_ytitle', '(mW/m!U2!N)', $
         'constant', 1, $
-        'yrange', [-20,50], $
-        'ytickv', [0,1]*50, $
+        'yrange', [-20,20], $
+        'ytickv', [0,1]*30, $
         'yticks', 1, $
         'yminor', 5, $
         'ystyle', 1, $
@@ -68,9 +73,9 @@ test = 0
     pf_para_var_above = pf_para_var+'_above'
     copy_data, pf_para_var, pf_para_var_above
     var = pf_para_var_above
-    options, var, 'yrange', [50,400]
+    options, var, 'yrange', [30,100]
     options, var, 'ystyle', 1
-    options, var, 'ytickv', [150,300]
+    options, var, 'ytickv', [50,100]
     options, var, 'yticks', 1
     options, var, 'yminor', 3
     pf_para_vars = [pf_para_var_above, pf_para_var]
@@ -181,7 +186,7 @@ test = 0
     b_var = stplot_index(b_fac_var, b_index, output=b_var)
 
     ebr_var = prefix+'ebr'
-    pflux_setting = event_info['pflux_setting']
+    pflux_setting = rbsp_info['pflux_setting']
     scale_info = pflux_setting['scale_info']
     ebr_var = stplot_calc_ebratio(time_range, e_var=e_var, b_var=b_var, output=ebr_var, scale_info=scale_info)
     
@@ -249,7 +254,7 @@ test = 0
         ypans[pid-1] = 0.5
     endif
     
-    sgopen, plot_file, fig_size=[6,6]
+    sgopen, plot_file, size=[6,7]
     poss = sgcalcpos(nvar, margins=margins, ypad=ypads, ypans=ypans, xchsz=xchsz, ychsz=ychsz)
     
     tplot, plot_vars, trange=time_range, position=poss
@@ -336,5 +341,5 @@ test = 0
 
 end
 
-print, fig_2013_0501_0850_alfven_wave_v01(event_info=event_info)
+print, fig_2015_0302_1100_alfven_wave_v01(event_info=event_info)
 end

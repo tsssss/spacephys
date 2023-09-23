@@ -92,6 +92,8 @@ pro rbsp_calc_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
         flux_var = strupcase('f'+the_species+'du')
         get_data, flux_var, times, fdat
         fdat = fdat*1e-3    ; from 1/s-cm^2-sr-keV to 1/s-cm^2-sr-eV.
+        index = where(fdat le 0, count)
+        if count ne 0 then fdat[index] = 0
         nrec = n_elements(times)
         dims = size(reform(fdat[0,*,*,*]),/dimensions)
         nen0 = dims[0]

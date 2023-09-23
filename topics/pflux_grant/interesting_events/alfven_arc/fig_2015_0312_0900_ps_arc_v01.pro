@@ -2,26 +2,28 @@
 ; Showing RBSP conjunction with ASI.
 ;-
 
-function fig_2013_0501_0850_ps_arc_v01, plot_file, event_info=event_info
+function fig_2015_0312_0900_ps_arc_v01, plot_file, event_info=event_info
 
 ;---Load data and settings.
-    if n_elements(event_info) eq 0 then event_info = _2013_0501_0850_load_data()
-test = 0
+    id = '2015_0312_0900'
+    if n_elements(event_info) eq 0 then event_info = alfven_arc_load_data(id, event_info=event_info)
+test = 1
 
-    probe = event_info['probe']
-    prefix = event_info['prefix']
+    rbsp_info = event_info.rbsp.rbspb
+    probe = rbsp_info['probe']
+    prefix = rbsp_info['prefix']
 
-    time_range = time_double(['2013-05-01/07:00','2013-05-01/09:30'])
-    bar_times = time_double('2013-05-01/'+['07:38','08:44'])
-    model_setting = event_info['model_setting']
-    internal_model = model_setting['internal_model']
-    external_model = model_setting['external_model']
+    time_range = time_double(['2015-03-12/08:30','2015-03-12/10:30'])
+    bar_times = time_double('2015-03-12/'+['08:58','09:04:00','09:36'])
+    model_setting = rbsp_info['model_setting']
     all_models = model_setting['models']
+    internal_model = event_info.internal_model
+    external_model = event_info.external_model
 
     if n_elements(plot_file) eq 0 then begin
         plot_dir = event_info['plot_dir']
         plot_file = join_path([plot_dir,$
-            'fig_2013_0501_0850_ps_arc_v01.pdf'])
+            'fig_'+event_info.id+'_ps_arc_v01.pdf'])
     endif
     if keyword_set(test) then plot_file = 0
 
@@ -34,7 +36,7 @@ test = 0
     mlt_image_rect_var = themis_asf_read_mlt_image_rect(time_range, get_name=1)
     fmlt_var = prefix+'fmlt_'+internal_model+'_north'
     dmlt = 0.1
-    mlat_range = [59,67]
+    mlat_range = [60,71]
 
     get_data, mlt_image_rect_var, times, data, limits=lim
     ntime = n_elements(times)
@@ -59,7 +61,7 @@ test = 0
     yrange = mlat_range
     ytitle = 'MLat (deg)'
     
-    if n_elements(ystep) eq 0 then ystep = 2
+    if n_elements(ystep) eq 0 then ystep = 5
     ytickv = make_bins(yrange, ystep, inner=1)
     yticks = n_elements(ytickv)-1
     yminor = ystep
@@ -86,7 +88,8 @@ test = 0
         'display_type', 'scalar', $
         'short_name', 'E', $
         'unit', 'mV/m' )
-    options, var, 'yrange', [-200,200]
+    options, var, 'yrange', [-1,1]*120
+    options, var, 'ytickv', [-1,1]*100
     options, var, 'yticks', 2
     options, var, 'yminor', 5
     options, var, 'labels', 'E!D'+tex2str('perp')+',out'
@@ -113,8 +116,8 @@ test = 0
         'display_type', 'scalar', $
         'short_name', 'arcsin(B!Dz!N/|B|)', $
         'unit', 'deg', $
-        'yrange', [10,40], $
-        'ytickv', [10,30], $
+        'yrange', [10,50], $
+        'ytickv', [20,40], $
         'yticks', 1, $
         'yminor', 4, $
         'ystyle', 1 )
@@ -214,24 +217,96 @@ test = 0
         data[index] = 0.001
         store_data, var, times, data, val, limits=lim
     endif
+    
+    
+    ; O+ spec.
+    o_spec_var = prefix+'o_en_spec_para'
+    ct_oxygen = 64
+    zrange_proton = [1e4,1e6]
+
+    zrange = zrange_proton
+    log_zrange = alog10(zrange)
+    log_ztickv = make_bins(log_zrange,1,inner=1)
+    ztickv = 10.^log_ztickv
+    zticks = n_elements(ztickv)-1
+
+    var = o_spec_var
+    options, var, 'zrange', zrange
+    options, var, 'ztickv', ztickv
+    options, var, 'zticks', zticks
+    options, var, 'zcharsize', label_size
+    options, var, 'color_table', ct_oxygen
+
+    yrange = [15,5e4]
+    log_yrange = alog10(yrange)
+    log_yrange = [ceil(log_yrange[0]),floor(log_yrange[1])]
+    log_ytickv = make_bins(log_yrange,1,inner=1)
+    ytickv = 10d^log_ytickv
+    yticks = n_elements(ytickv)-1
+    ytickn = '10!U'+string(log_ytickv,format='(I0)')
+    yminor = 10
+    foreach tx, ytickv, ii do begin
+        if tx eq 1 then begin
+            ytickn[ii] = '1'
+        endif else if tx eq 10 then begin
+            ytickn[ii] = '10'
+        endif
+    endforeach
+    options, var, 'yrange', yrange
+    options, var, 'ytickv', ytickv
+    options, var, 'yticks', yticks
+    options, var, 'yminor', yminor
+    options, var, 'ytickname', ytickn
+    options, var, 'constant', ytickv
+    options, var, 'ytitle', 'Energy!C(eV)'
+    
+    get_data, var, times, data, val, limits=lim
+    index = where(finite(data,nan=1) or data eq 0, count)
+    if count ne 0 then begin
+        data[index] = 0.001
+        store_data, var, times, data, val, limits=lim
+    endif
+    
+    
+    ; Poynting flux.
+    pf_var = prefix+'pfdot0_fac_map'
+    var = pf_var
+    options, var, 'yrange', [-80,50]
+    options, var, 'ytickv', [-80,-40,0,40]
+    options, var, 'yticks', 3
+    options, var, 'yminor', 4
+    options, var, 'constant', [0]
 
    
 
 ;---Set plot_vars.
     rbsp_vars = [e_var,prefix+['density_hope','e_en_spec','p_en_spec']]
-    rbsp_vars = [e_var,prefix+['b_tilt','density_hope','e_en_spec']]
+    rbsp_vars = [e_var,pf_var,prefix+['b_tilt','density_hope','e_en_spec','o_en_spec_para']]
     asi_vars = 'thg_asf_keo'
     plot_vars = [asi_vars,rbsp_vars]
     nvar = n_elements(plot_vars)
     fig_labels = letters(nvar)+') '+['Aurora','E field','N','e- spec','H+ spec']
-    fig_labels = letters(nvar)+') '+['Aurora','E','B tilt','N!De!N','e- spec']
-    ypans = [1.2,1,0.8,0.8,1]
+    fig_labels = letters(nvar)+') '+['Aurora','E','S','B tilt','N!De!N','e-','O+']
+    ypans = [1.2,1,1,0.8,0.8,1,1]
 
    
 ;---Plot.
-    sgopen, plot_file, size=[6,4.5], xchsz=xchsz, ychsz=ychsz
+    sgopen, plot_file, size=[6,5.5], xchsz=xchsz, ychsz=ychsz
     margins = [12,4,10,1]
-    poss = sgcalcpos(nvar, margins=margins, ypans=ypans)
+    poss = sgcalcpos(nvar, margins=margins, ypans=ypans, ypad=0.2)
+    
+    ; ticklen.
+    xticklen_chsz = -0.2
+    yticklen_chsz = -0.5
+    for pid=0,nvar-1 do begin
+        tpos = poss[*,pid]
+        xticklen = xticklen_chsz*ychsz/(tpos[3]-tpos[1])
+        yticklen = yticklen_chsz*xchsz/(tpos[2]-tpos[0])
+        options, plot_vars[pid], 'xticklen', xticklen
+        options, plot_vars[pid], 'yticklen', yticklen
+    endfor
+    
+    
     tplot, plot_vars, position=poss, trange=time_range
     for pid=0,nvar-1 do begin
         tpos = poss[*,pid]
@@ -260,11 +335,11 @@ test = 0
             ystyle=5, yrange=yrange, $
             position=tpos, nodata=1, noerase=1
         oplot, times, fmlats[*,model_index], color=rbsp_color, linestyle=2
-        tx = times[0]
-        ty = fmlats[0,model_index]
+        tx = time_range[0]
+        ty = interpol(fmlats[*,model_index],times,tx)
         tmp = convert_coord(tx,ty, data=1, to_normal=1)
         tx = tmp[0]+xchsz*0.5
-        ty = tmp[1]+ychsz*0.35
+        ty = tmp[1]+ychsz*0.3
         xyouts, tx,ty,normal=1, 'RBSP-'+strupcase(probe), charsize=label_size, alignment=0, color=rbsp_color
     endif
 
@@ -301,6 +376,57 @@ test = 0
         get_data, prefix+'p_temp', times, data
         oplot, times, data
     endif
+    
+    ; Add oxygen labels.
+    var = o_spec_var
+    pid = where(plot_vars eq var, count)
+    if count ne 0 then begin
+        tpos = poss[*,pid]
+
+        xrange = time_range
+        yrange = get_setting(var, 'yrange')
+        plot, xrange, yrange, $
+            xstyle=5, xrange=xrange, $
+            ystyle=5, yrange=yrange, ylog=1, $
+            nodata=1, noerase=1, position=tpos
+        
+        tx = tpos[0]+xchsz*0.5
+        ty = tpos[1]+ychsz*0.3
+        msg = 'Away from Earth in S-hem, PA [0,45] deg'
+        xyouts, tx,ty,msg, normal=1, charsize=label_size
+    endif
+    
+    ; Add labels for Pflux.
+    var = pf_var
+    pid = where(plot_vars eq var, count)
+    if count ne 0 then begin
+        tpos = poss[*,pid]
+        
+        xrange = time_range
+        yrange = get_setting(var, 'yrange')
+        plot, xrange, yrange, $
+            xstyle=5, xrange=xrange, $
+            ystyle=5, yrange=yrange, ylog=0, $
+            nodata=1, noerase=1, position=tpos
+        
+        filter = (rbsp_info['pflux_setting']).filter
+        
+
+        tx = tpos[2]-xchsz*0.5
+        ty = tpos[1]+ychsz*0.3
+        msg = 'Normalized to 100 km altitude'
+        xyouts, tx,ty,normal=1, alignment=1, msg, charsize=label_size
+        ty = tpos[3]-ychsz*0.9
+        msg = 'Filtered in '+string(1d3/filter[1],format='(F3.1)')+'mHz-'+string(1d/filter[0],format='(I0)')+'Hz'
+        xyouts, tx,ty,normal=1, alignment=1, msg, charsize=label_size
+        
+        tmp = convert_coord(xrange[0],0, data=1, to_normal=1)
+        tx = tpos[0]+xchsz*0.5
+        ty = tmp[1]+ychsz*0.3
+        xyouts, tx,ty,normal=1, alignment=0, 'Away from Earth', charsize=label_size, color=sgcolor('red')
+        ty = tmp[1]-ychsz*0.9
+        xyouts, tx,ty,normal=1, alignment=0, 'Toward Earth', charsize=label_size, color=sgcolor('red')
+    endif
 
     if keyword_set(test) then stop
     sgclose
@@ -311,5 +437,5 @@ end
 
 
 
-print, fig_2013_0501_0850_ps_arc_v01(event_info=event_info)
+print, fig_2015_0312_0900_ps_arc_v01(event_info=event_info)
 end

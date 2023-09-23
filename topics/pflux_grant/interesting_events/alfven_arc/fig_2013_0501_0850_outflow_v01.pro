@@ -102,7 +102,7 @@ test = 1
     foreach the_info, obs_info do begin
 
         get_data, the_info['spec_var'], times, data, vals, limits=lim
-        time_index = lazy_where(times, '[]', the_info['trs'], count=ntest_time)
+        time_index = where_pro(times, '[]', the_info['trs'], count=ntest_time)
         if ntest_time eq 0 then message, 'Inconsistency ...'
 
         test_times = times[time_index]
@@ -113,7 +113,7 @@ test = 1
 ;        energy_range = minmax(the_info['ens'])
 ;        test_energys = fltarr(ntest_time)
 ;        foreach ii, time_index, test_id do begin
-;            energy_index = lazy_where(reform(vals[ii,*]), '[]', energy_range, count=count)
+;            energy_index = where_pro(reform(vals[ii,*]), '[]', energy_range, count=count)
 ;            if count eq 0 then message, 'Inconsistency ...'
 ;            max_flux = max(data[ii,energy_index], index)
 ;            test_energys[test_id] = vals[ii,energy_index[index]]

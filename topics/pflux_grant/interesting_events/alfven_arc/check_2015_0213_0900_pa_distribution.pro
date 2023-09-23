@@ -1,15 +1,15 @@
 
 
-
 units = ['energy','velocity']
 test_species = ['p','o','e','he']
+id = '2015_0312_0900'
 
-if n_elements(event_info) eq 0 then event_info = _2013_0501_0850_load_data()
-prefix = event_info['prefix']
-probe = event_info['probe']
-time_range = event_info['time_range']
-time_range = time_double(['2013-05-01/08:30','2013-05-01/09:30'])
-plot_dir = join_path([event_info['plot_dir'],'rbsp_hope','rbsp'+probe])
+if n_elements(event_info) eq 0 then event_info = alfven_arc_load_data(id, event_info=event_info)
+rbsp_info = event_info.rbsp.rbspb
+prefix = rbsp_info['prefix']
+probe = rbsp_info['probe']
+time_range = event_info['time_range']+[1,-1]*1800
+plot_dir = join_path([event_info['plot_dir'],'rbsp_hope_pa','rbsp'+probe])
 
 foreach species, test_species do begin
     case species of

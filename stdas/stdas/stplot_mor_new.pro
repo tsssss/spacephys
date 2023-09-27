@@ -81,7 +81,7 @@ function stplot_mor_new, vname, $
 
 ;----wavelet analysis.
     ; wavelet transform, in X.
-    mor = wavelet(f0, dr0, /pad, s0=s0, dj=dj, j=j1, $
+    mor = wavelet(f0, dr0, pad=1, s0=s0, dj=dj, j=j1, $
         mother='Morlet', param=w0, $
         period = ps, scale=ss, coi=coi)
     fs = 1d/ps
@@ -152,7 +152,7 @@ function stplot_mor_new, vname, $
         fftpsd:fftpsd, $; FFT PSD, in X^2/Hz.
         ps:ps, $        ; Morlet periods.
         fs:fs, $        ; Morlet frequency.
-        ss:ss, $        ; Morlet scalea.
+        ss:ss, $        ; Morlet scales.
         dj:dj, $        ; 2^dj is spacing b/w scales.
         coi:coi, $      ; Morlet COI in period, or in Hz if frequency is set.
         gsignif:gsignif, $  ; Morlet significant level.

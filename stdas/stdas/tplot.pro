@@ -119,6 +119,7 @@ pro tplot,datanames,      $
    datagap = datagap,     $  ;It looks like this keyword isn't actually used.  pcruce 10/4/2012
    get_plot_position=pos, $
    help = help, $
+   single_line_uttick=single_line_uttick, $ ; sheng.
    novtitle = novtitle, $; sheng.
    noerase = noerase, $  ; sheng.
    uttick = uttick,$     ; sheng.
@@ -362,6 +363,23 @@ endif else begin    ; remove the extra line with date.
 ;    str_element, def_opts, 'xtickname', ts, /add_replace
     ;endif
 endelse
+
+
+; sheng.
+if keyword_set(single_line_uttick) then begin
+    e0 = '!C'
+    time_setup = time_ticks(trg)
+    tickv = time_setup.xtickv+time_offset
+    ntick = n_elements(tickv)
+    ts = strarr(ntick)
+    for i = 0, ntick-1 do begin
+        ts[i] = time_string(tickv[i], tformat='hhmm')
+        if i eq 0 then ts[i] = time_string(tickv[i], tformat='MTH DD')
+    endfor
+    vtitle = time_string(tickv[0], tformat='YYYY')
+    vlab_marg = 6
+    str_element, def_opts, 'xtickname', ts, /add_replace
+endif
 
 
 ; sheng.

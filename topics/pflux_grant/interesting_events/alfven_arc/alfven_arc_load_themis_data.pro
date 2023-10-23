@@ -70,7 +70,7 @@ end
 
 
 
-function alfven_arc_load_themis_data_load_model_vars, event_info, time_var=time_var
+function alfven_arc_load_themis_data_load_model_vars, event_info, time_var=time_var, update=update
 
     if n_elements(time_var) eq 0 then time_var = alfven_arc_load_themis_data_orbit_ut(get_name=1)
     data_file = event_info['data_file']
@@ -107,11 +107,27 @@ function alfven_arc_load_themis_data_load_model_vars, event_info, time_var=time_
                     break
                 endif
             endforeach
+            if keyword_set(update) then load_data = 1
             if load_data then begin
                 r_var = alfven_arc_load_themis_data_r_gsm(event_info, time_var=time_var)
                 igrf = (internal_model eq 'igrf')? 1: 0
                 vinfo = geopack_trace_to_ionosphere(r_var, models=models, $
                     igrf=igrf, south=south, north=north, refine=refine, suffix=suffix)
+
+                ; need to smooth fmlat.
+                window = 600.
+                time_step = event_info['orbit_time_step']
+                width = window/time_step
+                ; fmlon may contain discontinuity. fmlt is in [-12,12], so it's unlikely to contain discontinuity.
+                smooth_vars = prefix+['fmlat','fmlt']+suffix
+                foreach var, smooth_vars do begin
+                    get_data, var, times, data
+                    foreach model, models, model_id do begin
+                        data[*,model_id] = smooth(data[*,model_id], width, nan=1, edge_mirror=edge_mirror)
+                    endforeach
+                    store_data, var, times, data
+                endforeach
+
                 foreach var, the_vars do begin
                     if tnames(var) eq '' then stop
                     data = get_var_data(var, limits=limits)
@@ -382,18 +398,18 @@ function alfven_arc_load_themis_data_b1_gsm, event_info
 
     ; Themis B background too small, so we use B-B_mod as B1.
     b_gsm_var = alfven_arc_load_themis_data_b_gsm(event_info)
-;    b0_gsm_var = alfven_arc_load_themis_data_b0_gsm(event_info)
-;    b_gsm = get_var_data(b_gsm_var, times=times)
-;    b0_gsm = get_var_data(b0_gsm_var, at=times)
-;    b1_gsm = b_gsm-b0_gsm
-    igrf = 0
-    internal_model = (igrf eq 1)? 'igrf': 'dipole'
-    external_model = 't89'
-    suffix = '_'+internal_model
-    bmod_gsm_var = prefix+'bmod_gsm_'+external_model+suffix
+    b0_gsm_var = alfven_arc_load_themis_data_b0_gsm(event_info)
     b_gsm = get_var_data(b_gsm_var, times=times)
-    bmod_gsm = get_var_data(bmod_gsm_var, at=times)
-    b1_gsm = b_gsm-bmod_gsm
+    b0_gsm = get_var_data(b0_gsm_var, at=times)
+    b1_gsm = b_gsm-b0_gsm
+;    igrf = 0
+;    internal_model = (igrf eq 1)? 'igrf': 'dipole'
+;    external_model = 't89'
+;    suffix = '_'+internal_model
+;    bmod_gsm_var = prefix+'bmod_gsm_'+external_model+suffix
+;    b_gsm = get_var_data(b_gsm_var, times=times)
+;    bmod_gsm = get_var_data(bmod_gsm_var, at=times)
+;    b1_gsm = b_gsm-bmod_gsm
 
     b1_gsm_var = prefix+'b1_gsm'
     store_data, b1_gsm_var, times, b1_gsm
@@ -408,6 +424,34 @@ function alfven_arc_load_themis_data_b1_gsm, event_info
 end
 
 
+function alfven_arc_load_themis_data_b0_dsl, event_info, time_var=time_var
+
+    prefix = event_info['prefix']
+    probe = event_info['probe']
+    data_file = event_info['data_file']
+    time_range = event_info['time_range']
+
+    b0_dsl_var = prefix+'b0_themis_dsl'
+    if ~cdf_has_var(b0_dsl_var, filename=data_file) then begin
+        b0_gsm_var = alfven_arc_load_themis_data_b0_gsm(event_info)
+        common_times = alfven_arc_load_themis_data_field_ut(event_info)
+        b0_gsm = get_var_data(b0_gsm_var, at=common_times)
+        b0_dsl = cotran_pro(b0_gsm, common_times, 'gsm2themis_dsl', probe=probe)
+        store_data, b0_dsl_var, common_times, b0_dsl
+        add_setting, b0_dsl_var, id='bfield', dictionary('coord', 'themis_dsl')
+
+        data = get_var_data(b0_dsl_var, limits=limits)
+        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
+        settings['depend_0'] = time_var
+        settings['var_type'] = 'data'
+        cdf_save_setting, settings, filename=data_file, varname=b0_dsl_var
+    endif
+
+    if check_if_update(b0_dsl_var, time_range) then cdf_load_var, b0_dsl_var, filename=data_file
+    return, b0_dsl_var
+    
+end
+
 function alfven_arc_load_themis_data_edot0_dsl, event_info, time_var=time_var
 
     prefix = event_info['prefix']
@@ -416,16 +460,15 @@ function alfven_arc_load_themis_data_edot0_dsl, event_info, time_var=time_var
     time_range = event_info['time_range']
 
     if n_elements(time_var) eq 0 then time_var = alfven_arc_load_themis_data_field_ut(get_name=1)
+
     var = prefix+'edot0_dsl'
-    
     if ~cdf_has_var(var, filename=data_file) then begin
-        e_dsl_var = alfven_arc_load_themis_data_e_dsl(event_info, time_var=time_var)
-        b0_gsm_var = alfven_arc_load_themis_data_b0_gsm(event_info)
         common_times = alfven_arc_load_themis_data_field_ut(event_info)
+        e_dsl_var = alfven_arc_load_themis_data_e_dsl(event_info, time_var=time_var)
         interp_time, e_dsl_var, common_times   ; deal with nan.
         e_dsl = get_var_data(e_dsl_var, limits=lim)
-        b0_gsm = get_var_data(b0_gsm_var, at=common_times)
-        b0_dsl = cotran_pro(b0_gsm, common_times, 'gsm2themis_dsl', probe=probe)
+        b0_dsl_var = alfven_arc_load_themis_data_b0_dsl(event_info, time_var=time_var)
+        b0_dsl = get_var_data(b0_dsl_var)
         e_dsl[*,2] = -(e_dsl[*,0]*b0_dsl[*,0]+e_dsl[*,1]*b0_dsl[*,1])/b0_dsl[*,2]
 
         store_data, var, common_times, e_dsl
@@ -433,7 +476,7 @@ function alfven_arc_load_themis_data_edot0_dsl, event_info, time_var=time_var
             'display_type', 'vector', $
             'short_name', 'Edot0', $
             'unit', 'mV/m', $
-            'coord', 'THEMIS_DSL', $
+            'coord', 'themis_dsl', $
             'coord_labels', constant('xyz') )
             
 
@@ -484,6 +527,7 @@ function alfven_arc_load_themis_data_fac_vars, event_info
 
         b1_gsm_var = alfven_arc_load_themis_data_b1_gsm(event_info)
         e_dsl_var = alfven_arc_load_themis_data_e_dsl(event_info)
+        b0_dsl_var = alfven_arc_load_themis_data_b0_dsl(event_info)
         edot0_dsl_var = alfven_arc_load_themis_data_edot0_dsl(event_info)
 
         dsl_vars = [e_dsl_var,edot0_dsl_var]
@@ -539,9 +583,9 @@ function alfven_arc_load_themis_data_pflux_setting, event_info
 
     key = 'pflux_setting'
     if ~event_info.haskey(key) then begin
-        filter = [0.25d,600]    ; sec.
-;        filter = [10d,1800]    ; sec.
-        scale_info = {s0:min(filter), s1:max(filter), dj:1d/8, ns:0d}
+        time_step = event_info['field_time_step']
+        filter = [time_step,300]    ; sec.
+        scale_info = {s0:time_step, s1:1200, dj:1d/8, ns:0d}
         event_info[key] = dictionary($
             'filter', filter, $
             'scale_info', scale_info )
@@ -723,7 +767,7 @@ function alfven_arc_load_themis_data_particle_data, event_info
             endforeach
             
         ;---Moment vars.
-            mom_combo = themis_read_moment_combo(time_range, probe=probe, species=species_name, coord=coord)
+            mom_combo = themis_read_moment_combo(time_range, probe=probe, species=species_name, coord=coord, id='esa_sst_add')
             mom_vars = mom_combo.values()
             foreach var, mom_vars do begin
                 get_data, var, times, data, limits=limits
@@ -858,7 +902,7 @@ function alfven_arc_load_themis_data, input_time_range, probe=probe, filename=da
     event_info['orbit_time_range'] = time_range+[-1,1]*pad_time
     times = alfven_arc_load_themis_data_orbit_ut(event_info, time_var=orbit_time_var)
     r_gsm_var = alfven_arc_load_themis_data_r_gsm(event_info, time_var=orbit_time_var)
-    model_vars = alfven_arc_load_themis_data_load_model_vars(event_info, time_var=orbit_time_var)
+    model_vars = alfven_arc_load_themis_data_load_model_vars(event_info, time_var=orbit_time_var,update=0)
 
 
 ;---Field related vars.
@@ -873,9 +917,10 @@ function alfven_arc_load_themis_data, input_time_range, probe=probe, filename=da
     e_dsl_var = alfven_arc_load_themis_data_e_dsl(event_info, time_var=field_time_var, _extra=ex)
 
     ; Seperate B0 and B1.
-    event_info['b0_window'] = 10d
+    event_info['b0_window'] = 120.
     bmod_var = alfven_arc_load_themis_data_bmod_gsm(event_info)
     b0_gsm_var = alfven_arc_load_themis_data_b0_gsm(event_info, time_var=field_time_var)
+    b0_dsl_var = alfven_arc_load_themis_data_b0_dsl(event_info, time_var=field_time_var)
     b1_gsm_var = alfven_arc_load_themis_data_b1_gsm(event_info)
     
     ; Calculate Edot0.

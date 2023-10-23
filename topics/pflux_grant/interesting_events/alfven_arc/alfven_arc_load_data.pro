@@ -1,11 +1,66 @@
 function alfven_arc_load_data, id, event_info=event_info
 
     if n_elements(id) eq 0 then id = event_info.id
-    if n_elements(event_info) ne 0 then if even_info.id eq id then return, event_info
+    if n_elements(event_info) ne 0 then if event_info.id eq id then return, event_info
 
     plot_dir = join_path([googledir(),'works','pflux_grant','alfven_arc','plot',id])
     data_dir = join_path([googledir(),'works','pflux_grant','alfven_arc','data'])
     version = 'v01'
+
+    if id eq '2015_0416_0800' then begin
+        version = 'v02'
+
+
+    ;---Overall setting.
+        event_time_range = time_double(['2015-04-16/07:30','2015-04-16/09:00'])
+        event_info = dictionary($
+            'time_range', event_time_range, $
+            'id', id, $
+            'plot_dir', plot_dir, $
+            'data_dir', data_dir, $
+            'version', version, $
+            'external_model', 't04s', $
+            'internal_model', 'dipole', $
+            'themis', dictionary(), $
+            'rbsp', dictionary(), $
+            'dmsp', dictionary(), $
+            'ground', dictionary() )
+
+    ;---Ground data.
+        ground_time_range = event_time_range
+        asi_setting = dictionary($
+            'sites', ['mcgr','whit'], $
+            'min_elevs', [1d,1]+4, $
+            'merge_method', 'max_elev', $
+            'calibration_method', 'simple', $
+            'mlt_range', [-1,0]*6, $
+            'mlat_range', [55d,70] )
+        event_info.ground = alfven_arc_load_ground_data_2015_0416($
+            filename=ground_file, $
+            ground_time_range, asi_setting=asi_setting, version=version)
+    
+    ;---DMSP data.
+        dmsp_probes = ['f19']
+        foreach probe, dmsp_probes do begin
+            event_info.dmsp['dmsp'+probe] = dictionary($
+                'sc_name', 'DMSP', $
+                'probe', probe, $
+                'prefix', 'dmsp'+probe+'_', $
+                'sc_color', sgcolor('teal') )
+        endforeach
+    
+    ;---RBSP data.
+        rbsp_probes = ['a','b']
+        rbsp_colors = sgcolor(['magenta','purple'])
+        rbsp_time_range = event_time_range
+        foreach probe, rbsp_probes, probe_id do begin
+            sc_info = alfven_arc_load_rbsp_data_2015_0416(rbsp_time_range, probe=probe, version=version)
+            sc_info['sc_name'] = 'RBSP'
+            sc_info['sc_color'] = rbsp_colors[probe_id]
+            event_info.rbsp['rbsp'+probe] = sc_info
+        endforeach
+
+    endif
 
     if id eq '2017_0309_0700' then begin
         version = 'v01'
@@ -236,7 +291,9 @@ function alfven_arc_load_data, id, event_info=event_info
         rbsp_probes = ['b']
         foreach probe, rbsp_probes do begin
             if probe eq 'b' then bad_e_time_ranges = (probe eq 'b')? list(['2015-03-12/09:04:51','2015-03-12/09:04:54']): !null
-            event_info.rbsp['rbsp'+probe] = alfven_arc_load_rbsp_data(time_range, probe=probe, bad_e_time_ranges=bad_e_time_ranges)
+            the_info = alfven_arc_load_rbsp_data(time_range, probe=probe, bad_e_time_ranges=bad_e_time_ranges)
+            the_info['sc_name'] = 'RBSP'
+            event_info.rbsp['rbsp'+probe] = the_info
         endforeach
         
         ;---DMSP settings.
@@ -253,6 +310,8 @@ function alfven_arc_load_data, id, event_info=event_info
 end
 
 
+event_info = alfven_arc_load_data('2015_0416_0800')
+stop
 event_info = alfven_arc_load_data('2017_0309_0700')
 stop
 event_info = alfven_arc_load_data('2015_0302_1100')

@@ -149,7 +149,7 @@ pro rbsp_fix_q_uvw2gse, time_range, probe=probe, test=test, $
             vec = get_var_data(var)
             for maneuver_id=0, nmaneuver-1 do begin
                 maneuver_time_range = reform(maneuver_time_ranges[maneuver_id,*])
-                index = where_prointerp_times, '[]', maneuver_time_range, count=count)
+                index = where_pro(interp_times, '[]', maneuver_time_range, count=count)
                 if count eq 0 then continue
                 vec_interp[index,*] = fillval
 

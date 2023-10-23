@@ -40,6 +40,7 @@ pro rbsp_efw_phasef_read_e_uvw_diagonal_gen_file, time, probe=probe, filename=fi
     get_data, l1_var, times, vsvy
     if n_elements(times) le 2 then return
 
+
 ;---Construct E combo.
     ; Get boom length.
     cp0 = rbsp_efw_get_cal_params(tr[0])

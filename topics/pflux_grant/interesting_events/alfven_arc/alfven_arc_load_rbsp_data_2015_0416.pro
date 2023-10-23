@@ -221,75 +221,6 @@ function alfven_arc_load_rbsp_data_density, event_info
 
 end
 
-function alfven_arc_load_rbsp_data_e_mgse, event_info, time_var=field_time_var, bad_e_time_ranges=bad_e_time_ranges, spinfit_pair=spinfit_pair
-
-    prefix = event_info['prefix']
-    probe = event_info['probe']
-    data_file = event_info['data_file']
-
-    if n_elements(time_var) eq 0 then time_var = alfven_arc_load_rbsp_data_field_ut(get_name=1)
-    times = alfven_arc_load_rbsp_data_field_ut(event_info)
-    time_range = event_info['field_time_range']
-
-    coord = 'mgse'
-    resolution = 'survey'
-    var = rbsp_read_efield(time_range, probe=probe, coord=coord, resolution=resolution, get_name=1)
-    if ~cdf_has_var(var, filename=data_file) then begin
-        var = rbsp_read_efield(time_range, probe=probe, coord=coord, resolution=resolution)
-        if n_elements(spinfit_pair) ne 0 then begin
-            var = rbsp_read_efield_spinfit_phasef(time_range, probe=probe, coord=coord, id=spinfit_pair, suffix='')
-        endif
-        interp_time, var, times
-        data = get_var_data(var, limits=limits)
-        if n_elements(bad_e_time_ranges) eq 0 then bad_e_time_ranges = list()
-        bad_time_ranges = bad_e_time_ranges.toarray()
-        foreach tr, bad_e_time_ranges do begin
-            index = where_pro(times,'[]',time_double(tr), count=count)
-            if count eq 0 then continue
-            data[index,*] = !values.f_nan
-        endforeach
-        store_data, var, times, data
-        options, var, 'bad_time_ranges', bad_time_ranges
-        cdf_save_var, var, value=data, filename=data_file
-        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
-        settings['depend_0'] = time_var
-        settings['var_type'] = 'data'
-        cdf_save_setting, settings, filename=data_file, varname=var
-    endif
-
-    if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
-
-    return, var
-end
-
-function alfven_arc_load_rbsp_data_b_gsm, event_info, time_var=field_time_var
-
-    prefix = event_info['prefix']
-    probe = event_info['probe']
-    data_file = event_info['data_file']
-
-    if n_elements(time_var) eq 0 then time_var = alfven_arc_load_rbsp_data_field_ut(get_name=1)
-    times = alfven_arc_load_rbsp_data_field_ut(event_info)
-    time_range = event_info['field_time_range']
-
-    coord = 'gsm'
-    resolution = 'hires'
-    var = rbsp_read_bfield(time_range, probe=probe, coord=coord, resolution=resolution, get_name=1)
-    if ~cdf_has_var(var, filename=data_file) then begin
-        var = rbsp_read_bfield(time_range, probe=probe, coord=coord, resolution=resolution)
-        interp_time, var, times
-        data = get_var_data(var, limits=limits)
-        cdf_save_var, var, value=data, filename=data_file
-        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
-        settings['depend_0'] = time_var
-        settings['var_type'] = 'data'
-        cdf_save_setting, settings, filename=data_file, varname=var
-    endif
-
-    if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
-
-    return, var
-end
 
 function alfven_arc_load_rbsp_data_r_gsm, event_info, time_var=time_var
 
@@ -472,6 +403,37 @@ function alfven_arc_load_rbsp_data_bmod_gsm, event_info, time_var=time_var
 end
 
 
+function alfven_arc_load_rbsp_data_b_gsm, event_info, time_var=field_time_var
+
+    prefix = event_info['prefix']
+    probe = event_info['probe']
+    data_file = event_info['data_file']
+
+    if n_elements(time_var) eq 0 then time_var = alfven_arc_load_rbsp_data_field_ut(get_name=1)
+    times = alfven_arc_load_rbsp_data_field_ut(event_info)
+    time_range = event_info['field_time_range']
+
+    coord = 'gsm'
+    resolution = 'hires'
+    var = rbsp_read_bfield(time_range, probe=probe, coord=coord, resolution=resolution, get_name=1)
+    if ~cdf_has_var(var, filename=data_file) then begin
+        var = rbsp_read_bfield(time_range, probe=probe, coord=coord, resolution=resolution)
+        interp_time, var, times
+        data = get_var_data(var, limits=limits)
+        cdf_save_var, var, value=data, filename=data_file
+        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
+        settings['depend_0'] = time_var
+        settings['var_type'] = 'data'
+        cdf_save_setting, settings, filename=data_file, varname=var
+    endif
+
+    if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
+
+    return, var
+end
+
+
+
 function alfven_arc_load_rbsp_data_b0_gsm, event_info, time_var=time_var
 
     prefix = event_info['prefix']
@@ -484,7 +446,7 @@ function alfven_arc_load_rbsp_data_b0_gsm, event_info, time_var=time_var
     if ~cdf_has_var(var, filename=data_file) then begin
         b_gsm_var = alfven_arc_load_rbsp_data_b_gsm(event_info, time_var=time_var)
         bmod_gsm_vars = alfven_arc_load_rbsp_data_bmod_gsm(event_info)
-        
+
         model = 't89'
         igrf = 0
         internal_model = (igrf eq 1)? 'igrf': 'dipole'
@@ -501,7 +463,7 @@ function alfven_arc_load_rbsp_data_b0_gsm, event_info, time_var=time_var
         for ii=0,ndim-1 do begin
             b1_gsm[*,ii] -= smooth(b1_gsm[*,ii], width, edge_mirror=1, nan=1)
         endfor
-        
+
         b0_gsm = b_gsm-b1_gsm
         store_data, var, times, b0_gsm
         add_setting, var, smart=1, dictionary($
@@ -513,7 +475,7 @@ function alfven_arc_load_rbsp_data_b0_gsm, event_info, time_var=time_var
             'model', model, $
             'internal_model', internal_model )
 
-        
+
         data = get_var_data(var, limits=limits)
         cdf_save_var, var, value=data, filename=data_file
         settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
@@ -551,222 +513,187 @@ function alfven_arc_load_rbsp_data_b1_gsm, event_info
 end
 
 
-function alfven_arc_load_rbsp_data_edot0_mgse, event_info, time_var=time_var
+
+function alfven_arc_load_rbsp_data_e_mgse_2015_0416, event_info, time_var=field_time_var
 
     prefix = event_info['prefix']
     probe = event_info['probe']
     data_file = event_info['data_file']
-    time_range = event_info['time_range']
 
     if n_elements(time_var) eq 0 then time_var = alfven_arc_load_rbsp_data_field_ut(get_name=1)
-    var = prefix+'edot0_mgse'
-    
-    if ~cdf_has_var(var, filename=data_file) then begin
-        e_mgse_var = alfven_arc_load_rbsp_data_e_mgse(event_info, time_var=time_var)
-        b0_gsm_var = alfven_arc_load_rbsp_data_b0_gsm(event_info)
-        common_times = alfven_arc_load_rbsp_data_field_ut(event_info)
-        interp_time, e_mgse_var, common_times   ; deal with nan.
-        e_mgse = get_var_data(e_mgse_var, limits=lim)
-        b0_gsm = get_var_data(b0_gsm_var, at=common_times)
-        b0_mgse = cotran(b0_gsm, common_times, 'gsm2mgse', probe=probe)
-        e_mgse[*,0] = -(e_mgse[*,1]*b0_mgse[*,1]+e_mgse[*,2]*b0_mgse[*,2])/b0_mgse[*,0]
+    times = alfven_arc_load_rbsp_data_field_ut(event_info)
+    time_range = event_info['field_time_range']
 
-        store_data, var, common_times, e_mgse
-        add_setting, var, smart=1, dictionary($
-            'display_type', 'vector', $
-            'short_name', 'Edot0', $
-            'unit', 'mV/m', $
-            'coord', 'mGSE', $
-            'coord_labels', constant('xyz') )
-            
+    if probe eq 'a' then pair = '24' else pair = '12'
+    ; rbspa_e_mgse_[v24,spinfit_phasef] and rbspb_e_mgse_[survey,spinfit_phasef]
+    if probe eq 'a' then begin
+        ; V1 is bad, V2 and V4 are good, V3 is mostly good around the time of the event (but bad before).
+        vsvy_var = rbsp_read_vsc(time_range, probe=probe, id='spin_plane')
+        interp_time, vsvy_var, times
+        vsvy = get_var_data(vsvy_var)
+        rbsp_efw_read_boom_flag, time_range, probe=probe
+        flag_var = prefix+'boom_flag'
+        interp_time, flag_var, times
+        boom_flags = get_var_data(flag_var) ne 0
+        for ii=0,3 do begin
+            bad_index = where(boom_flags[*,ii] eq 0, count)
+            if count ne 0 then vsvy[bad_index,ii] = !values.f_nan
+        endfor
 
-        data = get_var_data(var, limits=limits)
-        cdf_save_var, var, value=data, filename=data_file
-        settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
-        settings['depend_0'] = time_var
-        settings['var_type'] = 'data'
-        cdf_save_setting, settings, filename=data_file, varname=var
-    endif
+        ; Get vsc.
+        vsc = (vsvy[*,2]+vsvy[*,3])*0.5
+        spin_period = 11d   ; the rough number works fine, no need to get the accurate number
+        dt = sdatarate(times)
+        width = spin_period/dt
+        vsc = smooth(vsc, width, nan=1, edge_zero=1)
 
-    if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
-    return, var
+        cp0 = rbsp_efw_get_cal_params(time_range[0])
+        cp = (probe eq 'a')? cp0.a: cp0.b
+        boom_length = cp.boom_length
+        boom_shorting_factor = cp.boom_shorting_factor
+        the_boom_length = boom_length*boom_shorting_factor
+        ntime = n_elements(times)
 
-end
+        ; Try to use V2,V3,V4.
+        ; calc e_uvw
+        eu = (vsc-vsvy[*,1])/(the_boom_length[0]*0.5)*1000
+        ev = (vsvy[*,2]-vsvy[*,3])/the_boom_length[1]*1000
+        ew = fltarr(ntime)
+        e_uvw = [[eu],[ev],[ew]]
+        for ii=0,1 do begin
+            data = e_uvw[*,ii]
+            offset1 = smooth(data, width, nan=1, edge_zero=1)
+            offset2 = smooth(offset1, width, nan=1, edge_zero=1)
+            data -= offset2
+            e_uvw[*,ii] = data
+        endfor
+        var = prefix+'e_uvw_v234'
+        store_data, var, times, e_uvw
+        add_setting, var, smart=1, dictionary('coord','uvw', 'coord_labels',constant('uvw'), 'colors',constant('rgb'))
+        e_mgse_var = prefix+'e_mgse_v234'
+        e_mgse = cotran(e_uvw, times, 'uvw2mgse', probe=probe)
+        store_data, e_mgse_var, times, e_mgse
+        add_setting, e_mgse_var, smart=1, id='efield', dictionary('coord', 'mgse')
+
+        ; Try to use V2 and V4 only.
+        ; calc e_uvw
+        ev = (vsvy[*,2]-vsvy[*,3])/the_boom_length[1]*1000
+        eu = shift(ev,width*0.25)
+        ew = fltarr(ntime)
+        e_uvw = [[eu],[ev],[ew]]
+        for ii=0,1 do begin
+            data = e_uvw[*,ii]
+            offset1 = smooth(data, width, nan=1, edge_zero=1)
+            offset2 = smooth(offset1, width, nan=1, edge_zero=1)
+            data -= offset2
+            e_uvw[*,ii] = data
+        endfor
+        var = prefix+'e_uvw_v24'
+        store_data, var, times, e_uvw
+        add_setting, var, smart=1, dictionary('coord','uvw', 'coord_labels',constant('uvw'), 'colors',constant('rgb'))
+        e_mgse = cotran(e_uvw, times, 'uvw2mgse', probe=probe)
+        e_mgse_var = prefix+'e_mgse_v24'
+        store_data, e_mgse_var, times, e_mgse
+        add_setting, e_mgse_var, smart=1, id='efield', dictionary('coord', 'mgse')
 
 
-function alfven_arc_load_rbsp_data_ebr_vars, event_info, fac_vars
+        ; Try spinfit.
+        e_mgse_var = rbsp_read_efield_spinfit_phasef(time_range, probe=probe, id=pair)
 
-    prefix = event_info['prefix']
-    probe = event_info['probe']
-    data_file = event_info['data_file']
-    time_range = event_info['ebr_time_range']
+        e_mgse_vars = prefix+'e_mgse_'+['spinfit_phasef','v'+pair]
+    endif else begin
+        ; Try spinfit
+        e_mgse_var = rbsp_read_efield_spinfit_phasef(time_range, probe=probe, id=pair)
 
-    pflux_setting = alfven_arc_load_rbsp_data_pflux_setting(event_info)
-    scale_info = pflux_setting['scale_info']
+        ; Load survey resolutions efield.
+        e_mgse_var = rbsp_read_efield_survey(time_range, probe=probe)
 
-    e_index = 2
-    b_index = 1
-    fac_labels = ['b','w','o']
-    vars = list()
-    foreach type, ['','dot0'] do begin
-        ; |E| and |B1|
-        e_var = prefix+'e'+type+'_fac'
-        b_var = prefix+'b1_fac'
-        ebr_var = prefix+'ebr_total'
-        vars.add, stplot_calc_ebratio(time_range, $
-            e_var=e_var, b_var=b_var, $
-            scale_info=scale_info, output=ebr_var)
-        vars.add, [e_var,b_var]+'_mor', extract=1
-        
-        ; E_out and B_west.
-        e_var = stplot_index(e_var, e_index, output=prefix+'e'+type+fac_labels[e_index])
-        b_var = stplot_index(b_var, b_index, output=prefix+'b'+fac_labels[b_index])
-        ebr_var = prefix+'ebr_component'
-        vars.add, stplot_calc_ebratio(time_range, $
-            e_var=e_var, b_var=b_var, $
-            scale_info=scale_info, output=ebr_var)
-        vars.add, [e_var,b_var]+'_mor', extract=1
+        e_mgse_vars = prefix+'e_mgse_'+['spinfit_phasef','survey']
+    endelse
+
+
+    ; Calculate edot0.
+    b0_gsm_var = alfven_arc_load_rbsp_data_b0_gsm(event_info)
+    b0_mgse = cotran(get_var_data(b0_gsm_var), times, 'gsm2mgse', probe=probe)
+    edot0_angle_var = prefix+'edot0_angle'
+    edot0_angle = asin(b0_mgse[*,0]/snorm(b0_mgse))*constant('deg')
+    store_data, edot0_angle_var, times, edot0_angle
+    add_setting, edot0_angle_var, smart=1, dictionary($
+        'display_type', 'scalar', $
+        'short_name', 'edot0 angle', $
+        'unit', 'deg' )
+    edot0_vars = e_mgse_vars
+    foreach e_var, e_mgse_vars, var_id do begin
+        edot0_var = streplace(e_var,'e_mgse','edot0_mgse')
+        edot0_vars[var_id] = edot0_var
+        interp_time, e_var, times
+        e_mgse = get_var_data(e_var)
+        edot0_mgse = e_mgse
+        edot0_mgse[*,0] = -total(e_mgse[*,1:2]*b0_mgse[*,1:2],2)/b0_mgse[*,0]
+
+        var = edot0_var
+        store_data, var, times, edot0_mgse
+        add_setting, var, smart=1, id='efield', dictionary('coord', 'mgse')
     endforeach
 
-    vars = vars.toarray()
-    return, vars
-
-end
-
-
-function alfven_arc_load_rbsp_data_fac_vars, event_info
-
-    prefix = event_info['prefix']
-    probe = event_info['probe']
-    data_file = event_info['data_file']
-    time_range = event_info['time_range']
-
-    fac_labels = ['||',tex2str('perp')+','+['west','out']]
-    event_info['fac_labels'] = fac_labels
-
-    q_gsm2fac_var = prefix+'q_gsm2fac'
-    b1_fac_var = prefix+'b1_fac'
-    e_fac_var = prefix+'e_fac'
-    edot0_fac_var = prefix+'edot0_fac'
-    fac_vars = [b1_fac_var,e_fac_var,edot0_fac_var]
-    save_vars = [q_gsm2fac_var,fac_vars]
-
-    load_data = 0
-    foreach var, save_vars do begin
-        if cdf_has_var(var, filename=data_file) then continue
-        load_data = 1
-        break
+    e_mgse_vars = edot0_vars
+    e_gsm_vars = e_mgse_vars
+    foreach mgse_var, e_mgse_vars, var_id do begin
+        gsm_var = streplace(mgse_var, 'mgse', 'gsm')
+        e_gsm_vars[var_id] = gsm_var
+        vec_mgse = get_var_data(mgse_var, times=times)
+        vec_gsm = cotran(vec_mgse, times, 'mgse2gsm', probe=probe)
+        store_data, gsm_var, times, vec_gsm
+        add_setting, gsm_var, smart=1, id='efield', dictionary('coord', 'gsm')
     endforeach
 
-    if load_data then begin
-        time_var = alfven_arc_load_rbsp_data_field_ut(get_name=1)
-        b0_gsm_var = alfven_arc_load_rbsp_data_b0_gsm(event_info)
-        r_gsm_var = alfven_arc_load_rbsp_data_r_gsm(event_info)
-        define_fac, b0_gsm_var, r_gsm_var, time_var=b0_gsm_var
+    ; Calc Poynting flux.
+    r_gsm_var = prefix+'r_gsm'
+    define_fac, b0_gsm_var, r_gsm_var, time_var=b0_gsm_var
 
-        b1_gsm_var = alfven_arc_load_rbsp_data_b1_gsm(event_info)
-        e_mgse_var = alfven_arc_load_rbsp_data_e_mgse(event_info)
-        edot0_mgse_var = alfven_arc_load_rbsp_data_edot0_mgse(event_info)
+    b1_gsm_var = alfven_arc_load_rbsp_data_b1_gsm(event_info)
+    b1_fac_var = streplace(b1_gsm_var, 'gsm', 'fac')
+    to_fac, b1_gsm_var, to=b1_fac_var
 
-        mgse_vars = [e_mgse_var,edot0_mgse_var]
-        e_gsm_var = prefix+'e_gsm'
-        edot0_gsm_var = prefix+'edot0_gsm'
-        gsm_vars = [e_gsm_var,edot0_gsm_var]
-        foreach mgse_var, mgse_vars, var_id do begin
-            get_data, mgse_var, times, vec_mgse
-            vec_gsm = cotran(vec_mgse, times, 'mgse2gsm', probe=probe)
-            gsm_var = gsm_vars[var_id]
-            store_data, gsm_var, times, vec_gsm
-            add_setting, gsm_var, smart=1, dictionary($
-                'display_type', 'vector', $
-                'short_name', get_setting(mgse_var,'short_name'), $
-                'unit', 'mV/m', $
-                'coord', 'GSM', $
-                'coord_labels', constant('xyz') )
-        endforeach
-
-        gsm_vars = [b1_gsm_var,e_gsm_var,edot0_gsm_var]
-        foreach var, gsm_vars, var_id do begin
-            to_fac, var, to=fac_vars[var_id]
-            add_setting, fac_vars[var_id], smart=1, dictionary($
-                'display_type', 'vector', $
-                'short_name', get_setting(var,'short_name'), $
-                'unit', get_setting(var,'unit'), $
-                'coord', 'FAC', $
-                'coord_labels', fac_labels)
-        endforeach
-
-
-        foreach var, save_vars do begin
-            if tnames(var) eq '' then stop
-            data = get_var_data(var, limits=limits)
-            cdf_save_var, var, value=data, filename=data_file
-            settings = (isa(limits,'struct'))? dictionary(limits): dictionary()
-            settings['depend_0'] = time_var
-            settings['var_type'] = 'data'
-            cdf_save_setting, settings, filename=data_file, varname=var
-        endforeach
-    endif
-
-    
-    foreach var, save_vars do begin
-        if check_if_update(var, time_range) then cdf_load_var, var, filename=data_file
+    e_fac_vars = e_gsm_vars
+    foreach e_gsm_var, e_gsm_vars, var_id do begin
+        e_fac_var = streplace(e_gsm_var, 'gsm', 'fac')
+        e_fac_vars[var_id] = e_fac_var
+        to_fac, e_gsm_var, to=e_fac_var
     endforeach
-    return, save_vars
 
-end
-
-
-
-function alfven_arc_load_rbsp_data_pflux, event_info, fac_vars
-
-    prefix = event_info['prefix']
-
-    pflux_setting = alfven_arc_load_rbsp_data_pflux_setting(event_info)
-    scale_info = pflux_setting['scale_info']
-    if n_elements(fac_vars) eq 0 then begin
-        fac_vars = alfven_arc_load_rbsp_data_fac_vars(event_info)
-    endif
-    
-    pf_fac_vars = []
-    pf_spec_vars = []
-    spec_unit = tex2str('mu')+'W/m!E2!N'
-    spec_ct = 66
-    spec_zrange = [-1,1]*10
-    spec_zstep = 10
-    spec_zminor = 5
-    spec_ztickv = make_bins(spec_zrange, spec_zstep, inner=1)
-    spec_zticks = n_elements(spec_ztickv)-1
-    spec_zticklen = -0.3
-    types = ['','dot0']
-    
     model_setting = event_info['model_setting']
-    model = model_setting['external_model']
+    external_model = model_setting['external_model']
     internal_model = model_setting['internal_model']
-    bf_var = prefix+'bf_gsm_'+model+'_'+internal_model+'_north'
+    bf_var = prefix+'bf_gsm_'+external_model+'_'+internal_model+'_south'
     b0_var = prefix+'b0_gsm'
     b0_gsm = get_var_data(b0_var, times=times)
     bf_gsm = get_var_data(bf_var, at=times)
     cmap = snorm(bf_gsm)/snorm(b0_gsm)
-    ndim = 3
-    
-    foreach type, types do begin
-        b1_fac_var = prefix+'b1_fac'
-        e1_fac_var = prefix+'e'+type+'_fac'
-        pf_fac_var = prefix+'pf'+type+'_fac'
-        stplot_calc_pflux_mor, e1_fac_var, b1_fac_var, pf_fac_var, scaleinfo=scale_info
+
+
+    pflux_setting = alfven_arc_load_rbsp_data_pflux_setting(event_info)
+    scale_info = pflux_setting['scale_info']
+
+    fac_labels = ['||',tex2str('perp')+','+['west','out']]
+    event_info['fac_labels'] = fac_labels
+    pf_fac_vars = e_fac_vars
+    foreach e_fac_var, e_fac_vars, var_id do begin
+        pf_fac_var = streplace(e_fac_var, 'edot0', 'pfdot0')
+        pf_fac_vars[var_id] = pf_fac_var
+        stplot_calc_pflux_mor, e_fac_var, b1_fac_var, pf_fac_var, scaleinfo=scale_info
         add_setting, pf_fac_var, smart=1, dictionary($
             'display_type', 'vector', $
             'short_name', 'S', $
             'unit', 'mW/m!E2!N', $
             'coord', 'FAC', $
-            'coord_labels', event_info['fac_labels'] )
-        pf_fac_vars = [pf_fac_vars,pf_fac_var]
+            'coord_labels', fac_labels )
 
         ; Normalize to 100 km.
         pf_fac_map_var = pf_fac_var+'_map'
         pf_fac = get_var_data(pf_fac_var, times=times)
         pf_fac_map = pf_fac
+        ndim = 3
         for ii=0,ndim-1 do pf_fac_map[*,ii] = cmap*pf_fac[*,ii]
         store_data, pf_fac_map_var, times, pf_fac_map
         add_setting, pf_fac_map_var, smart=1, dictionary($
@@ -779,8 +706,16 @@ function alfven_arc_load_rbsp_data_pflux, event_info, fac_vars
             'coord_labels', event_info['fac_labels'] )
         pf_fac_vars = [pf_fac_vars,pf_fac_map_var]
 
-        ; Spec.
-        pf_spec_var = prefix+'pf'+type+'_fac_mor_spec_1'
+        ; pflux spec.
+        spec_unit = tex2str('mu')+'W/m!E2!N'
+        spec_ct = 66
+        spec_zrange = [-1,1]*10
+        spec_zstep = 10
+        spec_zminor = 5
+        spec_ztickv = make_bins(spec_zrange, spec_zstep, inner=1)
+        spec_zticks = n_elements(spec_ztickv)-1
+
+        pf_spec_var = pf_fac_var+'_mor_spec_1'
         get_data, pf_spec_var, times, pfspec, ps
         fs = 1d3/ps
         store_data, pf_spec_var, times, pfspec*1e3, fs
@@ -798,22 +733,17 @@ function alfven_arc_load_rbsp_data_pflux, event_info, fac_vars
             'zminor', spec_zminor, $
             'zticklen', spec_zticklen, $
             'color_table', spec_ct )
-        pf_spec_vars = [pf_spec_vars,pf_spec_var]
-    endforeach
-    
-    ; Calculate ExB velocity.
-    b0_gsm_var = prefix+'b0_gsm'
-    b0_gsm = get_var_data(b0_gsm_var, times=times)
-    b0_fac = b0_gsm
-    b0_fac[*,0] = snorm(b0_gsm)
-    b0_fac[*,1:2] = 0
-    coef_fac = b0_fac
-    coef_fac[*,0] /= (b0_fac[*,0])^2
-    foreach type, ['','dot0'] do begin
-        e_fac_var = prefix+'e'+type+'_fac'
+
+
+        ; Calculate ExB velocity.
+        b0_fac = b0_gsm
+        b0_fac[*,0] = snorm(b0_gsm)
+        b0_fac[*,1:2] = 0
+        coef_fac = b0_fac
+        coef_fac[*,0] /= (b0_fac[*,0])^2
         e_fac = get_var_data(e_fac_var, at=times)
         vexb_fac = vec_cross(e_fac,coef_fac)*1e3
-        vexb_fac_var = prefix+'vexb'+type+'_fac'
+        vexb_fac_var = streplace(e_fac_var, 'edot0','vexbdot0')
         store_data, vexb_fac_var, times, vexb_fac
         add_setting, vexb_fac_var, smart=1, dictionary($
             'display_type', 'vector', $
@@ -822,10 +752,10 @@ function alfven_arc_load_rbsp_data_pflux, event_info, fac_vars
             'coord', 'FAC', $
             'coord_labels', event_info['fac_labels'] )
     endforeach
-    
-    return, pf_spec_vars
-    
+
+    return, pf_fac_vars
 end
+
 
 
 function alfven_arc_load_rbsp_data_plasma_param, event_info
@@ -940,11 +870,11 @@ function alfven_arc_load_rbsp_data_plasma_param, event_info
     plasma_param['vf_fac'] = vf_fac
     plasma_param['vf'] = vf_fac[1]
     
-    vf_exb_fac = fltarr(ndim)
-    vexb_fac = get_var_data(prefix+'vexbdot0_fac', in=the_time_range)
-    for ii=0,ndim-1 do vf_fac[ii] = mean(abs(vexb_fac[*,ii]),nan=1)
-    plasma_param['vf_exb_fac'] = vf_fac
-    plasma_param['vf_exb'] = vf_fac[1]
+;    vf_exb_fac = fltarr(ndim)
+;    vexb_fac = get_var_data(prefix+'vexbdot0_fac', in=the_time_range)
+;    for ii=0,ndim-1 do vf_fac[ii] = mean(abs(vexb_fac[*,ii]),nan=1)
+;    plasma_param['vf_exb_fac'] = vf_fac
+;    plasma_param['vf_exb'] = vf_fac[1]
 
     ; Plasma beta.
     mu0 = !dpi*4e-7
@@ -981,10 +911,10 @@ function alfven_arc_load_rbsp_data_plasma_param, event_info
     plasma_param['r_p'] = r_p
     plasma_param['r_o'] = r_o
 
-    the_time = event_info['snapshot_time']
-    r_gsm = get_var_data(prefix+'r_gsm', at=the_time)
-    plasma_param['r_gsm'] = r_gsm
-    plasma_param['r_sm'] = cotran(r_gsm, the_time, 'gsm2sm')
+;    the_time = event_info['snapshot_time']
+;    r_gsm = get_var_data(prefix+'r_gsm', at=the_time)
+;    plasma_param['r_gsm'] = r_gsm
+;    plasma_param['r_sm'] = cotran(r_gsm, the_time, 'gsm2sm')
 
     event_info['plasma_param'] = plasma_param
     return, plasma_param
@@ -993,14 +923,14 @@ end
 
 
 
-function alfven_arc_load_rbsp_data, input_time_range, probe=probe, filename=data_file, _extra=ex
+function alfven_arc_load_rbsp_data_2015_0416, input_time_range, probe=probe, filename=data_file, version=version, _extra=ex
 
     time_range = time_double(input_time_range)
     if n_elements(probe) eq 0 then message, 'No input probe ...'
     
-
+    if n_elements(version) eq 0 then version = 'v01'
     if n_elements(data_file) eq 0 then begin
-        base = time_string(time_range[0],tformat='YYYY_MMDD_hh')+'_rbsp'+probe+'_data_v01.cdf'
+        base = time_string(time_range[0],tformat='YYYY_MMDD_hh')+'_rbsp'+probe+'_data_'+version+'.cdf'
         data_file = join_path([googledir(),'works','pflux_grant','alfven_arc','data',base])
     endif
     
@@ -1045,7 +975,6 @@ function alfven_arc_load_rbsp_data, input_time_range, probe=probe, filename=data
     event_info['field_time_range'] = time_range+[-1,1]*pad_time
     times = alfven_arc_load_rbsp_data_field_ut(event_info, time_var=field_time_var)
     b_gsm_var = alfven_arc_load_rbsp_data_b_gsm(event_info, time_var=field_time_var)
-    e_mgse_var = alfven_arc_load_rbsp_data_e_mgse(event_info, time_var=field_time_var, _extra=ex)
     density_var = alfven_arc_load_rbsp_data_density(event_info)
 
     ; Seperate B0 and B1.
@@ -1054,27 +983,30 @@ function alfven_arc_load_rbsp_data, input_time_range, probe=probe, filename=data
     var = alfven_arc_load_rbsp_data_b0_gsm(event_info, time_var=field_time_var)
     b1_gsm_var = alfven_arc_load_rbsp_data_b1_gsm(event_info)
     
-    ; Calculate Edot0.
-    edot0_mgse_var = alfven_arc_load_rbsp_data_edot0_mgse(event_info, time_var=field_time_var)
+    ; Load E and Edot0 convert to FAC and Calculate Poynting flux.
+    e_mgse_var = alfven_arc_load_rbsp_data_e_mgse_2015_0416(event_info, time_var=field_time_var, _extra=ex)
     
     ; Convert data to FAC.
-    fac_vars = alfven_arc_load_rbsp_data_fac_vars(event_info)
+;    fac_vars = alfven_arc_load_rbsp_data_fac_vars(event_info)
     
     ; Calc fields PS and E/B ratio.
     event_info['ebr_time_range'] = time_range
 ;    event_info['ebr_time_range'] = time_double(['2013-05-01/07:35','2013-05-01/07:42'])
-    ebr_vars = alfven_arc_load_rbsp_data_ebr_vars(event_info, fac_vars)
+;    ebr_vars = alfven_arc_load_rbsp_data_ebr_vars(event_info, fac_vars)
 
     ; Calculae pflux.
-    pf_vars = alfven_arc_load_rbsp_data_pflux(event_info, fac_vars)
+    ;pf_vars = alfven_arc_load_rbsp_data_pflux(event_info, fac_vars)
 
 
 ;---Plasma parameters.
-;    event_info['plasma_param_time_range'] = time_double(['2013-05-01/08:40','2013-05-01/08:50'])
-;    param_vars = alfven_arc_load_rbsp_data_plasma_param(event_info)
+    event_info['plasma_param_time_range'] = time_double(['2015-04-16/08:08','2015-04-17/08:12'])
+    ;param_vars = alfven_arc_load_rbsp_data_plasma_param(event_info)
 
 
 
     return, event_info
 
+end
+
+event_info = alfven_arc_load_data('2015_0416_0800')
 end

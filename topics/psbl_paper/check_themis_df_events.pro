@@ -13,7 +13,7 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
     ; Arc event.
     event_list.add, dictionary($
         'time_range', time_double(['2017-03-09/07:00','2017-03-09/08:00']), $
-        'onset_time_range', time_double(['2017-03-09/07:20','2017-03-09/07:30']), $
+        'onset_time_range', time_double(['2017-03-09/07:25','2017-03-09/07:30']), $
         'probes', ['d','e'] )
     event_list.add, dictionary($
         'time_range', time_double(['2017-03-10/09:00','2017-03-10/10:30']), $
@@ -136,18 +136,18 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
     ;---Load basic data: E, B, R, density, and ion vel.
         foreach probe, probes do begin
             prefix = 'th'+probe+'_'
-            themis_read_efield, time_range, probe=probe
-            b_var = themis_read_bfield(time_range, probe=probe)
+            e_var = themis_read_efield(time_range, probe=probe, coord='gsm', id='spinfit', edot0_e56=1)
+            b_var = themis_read_bfield(time_range, probe=probe, coord='gsm')
             r_var = themis_read_orbit(time_range, probe=probe)
             themis_read_density, time_range, probe=probe
-            themis_read_ion_vel, time_range, probe=probe
+            u_var = themis_read_ion_vel(time_range, probe=probe)
 
-            get_data, prefix+'b_gsm', times
+            get_data, b_var, times
             interp_time, prefix+'r_gsm', times
             time_step = total(times[0:1]*[-1,1])
-            interp_time, prefix+'e_gsm', times
+            interp_time, e_var, times
 
-            vars = prefix+['e','b']+'_gsm'
+            vars = [e_var,b_var]
             foreach var, vars do begin
                 get_data, var, times, data
                 mag = snorm(data)
@@ -161,14 +161,14 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
         vars = []
         foreach probe, probes do begin
             prefix = 'th'+probe+'_'
-            vars = [vars, prefix+['e_gsm','b_gsm','ele_n']]
+            vars = [vars, prefix+['edot0_gsm','b_gsm','ele_n']]
         endforeach
         ;tplot, vars, trange=time_range
 
     ;---Calc ExB vel and E_vxB, B_tilt.
         foreach probe, probes do begin
             prefix = 'th'+probe+'_'
-            e_gsm = get_var_data(prefix+'e_gsm', times=times)
+            e_gsm = get_var_data(prefix+'edot0_gsm', times=times)
             b_gsm = get_var_data(prefix+'b_gsm')
             vexb_gsm = vec_cross(e_gsm,b_gsm)
             coef = 1e3/snorm(b_gsm)^2
@@ -202,16 +202,19 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
                 'unit', 'deg' )
         endforeach
 
-        stop
+        
 
    ;---Calculate higher level quantities.
        foreach probe, probes do begin
            prefix = 'th'+probe+'_'
-;            define_fac, prefix+'b_gsm', prefix+'r_gsm'
-;            foreach var, prefix+['e','b']+'_' do to_fac, var+'gsm', to=var+'fac'
-            pf_var = prefix+'pf_gsm'
-            stplot_calc_pflux_mor, prefix+'evxb_gsm', prefix+'b_gsm', pf_var
+           e_var = prefix+'edot0_gsm'
+           b_var = prefix+'b_gsm'
+           pf_var = prefix+'pf_gsm'
+
+           ;define_fac, prefix+'b_gsm', prefix+'r_gsm'
+           ;foreach var, prefix+['edot0','b']+'_' do to_fac, var+'gsm', to=var+'fac'
             
+           stplot_calc_pflux_mor, e_var, b_var, pf_var
 ;            cpoynt = 1d/(400d*!dpi) ; from mV/m x nT -> mW/m^2.
 ;            get_data, prefix+'e_gsm', times, e_gsm
 ;            get_data, prefix+'b_gsm', times, b_gsm
@@ -227,7 +230,7 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
 
 
         ;---Calc E/B ratio.
-            vars = prefix+['e','b']+'_gsm'
+            vars = [e_var,b_var]
 
             ; settings for wavelet transform.
             s0 = 4d*time_step
@@ -254,7 +257,7 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
                 store_data, tvar+'_tmp', ps, [[gws],[ngws]]
             endforeach
 
-            get_data, prefix+'e_gsm_tmp', ps, edat
+            get_data, prefix+'edot0_gsm_tmp', ps, edat
             get_data, prefix+'b_gsm_tmp', ps, bdat
             ebratio = sqrt(edat[*,0]/bdat[*,0])*1e3
 
@@ -287,7 +290,7 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
                 'short_name', 'S!D||!N in-situ' )
 
 
-            vars = prefix+['e_gsm','b_gsm1','b_tilt','pf_para','ele_n']
+            vars = prefix+['edot0_gsm','b_gsm1','b_tilt','pf_para','ele_n']
             nvar = n_elements(vars)+1
             ypans = fltarr(nvar)+1 & ypans[-1] = 2
             margins = [12,5,10,4]
@@ -326,7 +329,7 @@ plot_dir = join_path([shomedir(),'check_themis_df_events'])
             msg = '|B| (nT): '+string(bmag, format='(F6.2)')
             xyouts, tx,ty,/normal, msg
 
-            tpos = poss[*,3]
+            tpos = poss[*,4]
             tx = tpos[0]+xchsz*0.5
             ty = tpos[3]-ychsz*1
             bmag = val[1]

@@ -1,39 +1,54 @@
 ;+
-; DMSP data.
-; Try to fix the bad data.
+; Show conjunction b/t Alfven wave and arc.
 ;-
 
-function fig_2017_0309_0700_dmsp_overview_v01, plot_file, event_info=event_info, test=test
+function fig_2015_0416_0800_dmsp_overview_v01, plot_file, event_info=event_info, test=test
 
-;---Settings.
+;---Load data and settings.
     version = 'v01'
-    id = '2017_0309_0700'
-test=0
-
+    id = '2015_0416_0800'
     if n_elements(event_info) eq 0 then event_info = alfven_arc_load_data(id, event_info=event_info)
+test = 0
+
     base_name = 'fig_'+id+'_dmsp_overview_'+version+'.pdf'
-    ssusi_time = time_double('2017-03-09/07:32')
-    asi_time = time_double('2017-03-09/07:32')
-    time_range = time_double('2017-03-09/'+['07:30','07:35'])
-    dmsp_orbit_time_range = time_double('2017-03-09/'+['07:30','07:35'])
-    dmsp_plot_time_range = time_range     ; for tplot.
-    invertedv_times = time_double(['2017-03-09/07:32'])
+
+;---DMSP settings.
+    dmsp_info = event_info.dmsp.dmspf19
+    dmsp_orbit_time_range = time_double(['2015-04-16/08:01','2015-04-16/08:06'])
+    dmsp_plot_time_range = time_double(['2015-04-16/08:00','2015-04-16/08:07'])
+    invertedv_times = time_double('2015-04-16/'+['08:02:50','08:03:30'])
     invertedv_color = sgcolor('red')
     invertedv_text = 'Inverted-V'
-    pos_xrange = [2,-15]
-    pos_yrange = [-1,1]*3.5
+    dmsp_color = dmsp_info.sc_color
+    ssusi_id = 'energy'
+    ssusi_wavelength = strupcase(ssusi_id)
+
+;---ASI settings.
+    asi_time = time_double('2015-04-16/08:03:30')
     asi_setting = (event_info.ground)['asi_setting']
     asi_sites = sort_uniq(asi_setting.sites)
-    tplot_options, 'version', 2
-    
+    min_mlat = 50d
 
-    ; Figure out figure size.
+;---Pos panel settings.
+    pos_xrange = [2,-10]
+    pos_yrange = [-1,1]*3
+
+
+;---RBSP settings.
+    rbsp_info = event_info.rbsp.rbspa
+
+
+;---Other settings.
+    tplot_options, 'version', 2
+    rad = constant('rad')
+    deg = constant('deg')
+
     sgopen, 0, size=[1,1], xchsz=abs_xchsz, ychsz=abs_ychsz
     asi_ypan_size = 2d
     asi_xpan_size = asi_ypan_size*1
     xpad = 5
     ypad = 1
-    margins = [9,1,6,1]
+    margins = [9,1,7,1]
     fig_ysize = asi_ypan_size*2+(total(ypad)+margins[1]+margins[3])*abs_ychsz
     pos_margins = [0,3,0,0]
     dmsp_margins = [0,2.5,3,0]
@@ -42,53 +57,116 @@ test=0
     pos_xpan_size = pos_ypan_size/pos_aspect_ratio
     xpans = [pos_xpan_size,asi_xpan_size]
 
+    plot_dir = event_info.plot_dir
+    if n_elements(plot_file) eq 0 then plot_file = join_path([plot_dir,base_name])
+    if keyword_set(test) then plot_file = 0
+    poss = panel_pos(plot_file, $
+        xpans=xpans,ypans=[1,1], xpad=xpad, ypad=ypad, pansize=[asi_xpan_size,asi_ypan_size], panid=[1,1], $
+        fig_size=fig_size, margins=margins)
 
-
-
-;---Load data.
-    sc_info = event_info.themis.thd
-    sc_color = sgcolor('magenta')
-    model_setting = sc_info['model_setting']
+    model_setting = rbsp_info['model_setting']
     internal_model = event_info['internal_model']
     external_model = event_info['external_model']
-    external_model = 't89'
+    ;external_model = 't04s'
     models = model_setting.models
     model_index = where(models eq external_model)
-    
-    dmsp_info = event_info.dmsp.dmspf18
-    dmsp_color = dmsp_info.sc_color
 
+    fac_labels = [tex2str('perp')+','+['north','west'],tex2str('parallel')]
+    label_size = 0.8
+    sc_label_size = 1
+    tmp = smkarthm(0,2*!dpi,50,'n')
+    circ_xs = cos(tmp)
+    circ_ys = sin(tmp)
+    usersym, circ_xs[0:*:2], circ_ys[0:*:2], fill=1
+    uniform_ticklen = -abs_ychsz*0.15;*fig_size[0]
+
+
+
+;---Load DMSP data.
     probe = dmsp_info['probe']
-    ssusi_id = 'lbhs'
-;    ssusi_id = '1356'
-;    ssusi_id = '1216'
-    ssusi_id = 'lbhl'
-    ssusi_id = 'energy'
-    if ssusi_id eq '1356' then begin
-        ssusi_wavelength = '135.6 nm'
-    endif else if ssusi_id eq '1216' then begin
-        ssusi_wavelength = '121.6 nm'
-    endif else if ssusi_id eq 'energy' then begin
-        ssusi_wavelength = 'energy'
-    endif else ssusi_wavelength = strupcase(ssusi_id)
+    prefix = dmsp_info['prefix']
 
-    dmsp_mlt_image_var = dmsp_read_mlt_image(time_range, probe=probe, id=ssusi_id)
-;    mlt_image_var = dmsp_read_mlt_image(time_range, probe=probe, id='1216')
-    mlat_vars = dmsp_read_mlat_vars(time_range, probe=probe, errmsg=errmsg)
-    ele_spec_var = dmsp_read_en_spec(time_range, probe=probe, species='e', errmsg=errmsg)
-    ion_spec_var = dmsp_read_en_spec(time_range, probe=probe, species='p', errmsg=errmsg)
-    ele_eflux_var = dmsp_read_eflux(time_range, probe=probe, species='e', errmsg=errmsg)
-    db_xyz_var = dmsp_read_bfield_madrigal(time_range, probe=probe)
-    r_var = dmsp_read_orbit(time_range, probe=probe)
+    dmsp_mlt_image_var = dmsp_read_mlt_image(dmsp_plot_time_range+[-1800,0], probe=probe, id=ssusi_id)
+    mlat_vars = dmsp_read_mlat_vars(dmsp_plot_time_range, probe=probe, errmsg=errmsg)
+    ele_spec_var = dmsp_read_en_spec(dmsp_plot_time_range, probe=probe, species='e', errmsg=errmsg)
+    ion_spec_var = dmsp_read_en_spec(dmsp_plot_time_range, probe=probe, species='p', errmsg=errmsg)
+    ele_eflux_var = dmsp_read_eflux(dmsp_plot_time_range, probe=probe, species='e', errmsg=errmsg)
+    db_xyz_var = dmsp_read_bfield_madrigal(dmsp_plot_time_range, probe=probe)
+    r_var = dmsp_read_orbit(dmsp_plot_time_range, probe=probe)
 
     mlat_var = mlat_vars[0]
     mlt_var = mlat_vars[1]
     mlon_var = mlat_vars[2]
 
 
+    ; ssusi eflux along sc track.
+    mlats = get_var_data(mlat_var, in=dmsp_orbit_time_range, times=the_times)
+    mlons = get_var_data(mlon_var, at=the_times)
+    ; use aacgm mlon.
+    mlts = aacgm_mlon2mlt(mlons, the_times)
+    sc_tt = (mlts*15-90)*constant('rad')
+    sc_rr = (90-abs(mlats))/(90-min_mlat)
+    sc_xx = sc_rr*cos(sc_tt)
+    sc_yy = sc_rr*sin(sc_tt)
+    ntime = n_elements(the_times)
+    sussi_eflux = fltarr(ntime)
+
+    ; mlt image.
+    get_data, dmsp_mlt_image_var, times, mlt_images, limits=lim
+    tmp = min(times-mean(dmsp_plot_time_range), abs=1, time_id)
+    mlt_image = reform(mlt_images[time_id,*,*])
+    pixel_mlat = lim.pixel_mlat
+    pixel_mlt = lim.pixel_mlt
+
+    min_mlat = 50
+    pixel_tt = (pixel_mlt*15-90)*constant('rad')
+    pixel_rr = (90-pixel_mlat)/(90-min_mlat)
+    pixel_xx = pixel_rr*cos(pixel_tt)
+    pixel_yy = pixel_rr*sin(pixel_tt)
+
+    mlt_image = mlt_image[*]
+    for ii=0,ntime-1 do begin
+        dis = sqrt((pixel_xx-sc_xx[ii])^2+(pixel_yy-sc_yy[ii])^2)
+        tmp = min(dis[*], abs=1, index)
+        sussi_eflux[ii] = mlt_image[index]
+    endfor
+    ssusi_eflux_var = prefix+'ssusi_eflux'
+    store_data, ssusi_eflux_var, the_times, sussi_eflux
+    dmsp_eflux_yrange = [1e-1,1e2]
+    add_setting, ssusi_eflux_var, smart=1, dictionary($
+        'ylog', 1, $
+        'yrange', dmsp_eflux_yrange, $
+        'display_type', 'scalar', $
+        'short_name', 'Aurora eflux', $
+        'unit', 'mW/m!U2!N' )
+
+
+    ; map eflux and convert unit.
+    get_data, prefix+'e_eflux', times, eflux, limits=lim
+    var = prefix+'e_eflux_map'
+    cmap = 1.4  ; this is for 800 km.
+    theta_loss_cones = [45,60]
+    ndim = n_elements(theta_loss_cones)
+    ntime = n_elements(times)
+    eflux_map = fltarr(ntime,ndim+1)
+    foreach theta_loss_cone, theta_loss_cones, lc_id do begin
+        sr = !dpi*sin(theta_loss_cone*constant('rad'))^2
+        eflux_map[*,lc_id+1] = eflux*cmap*sr*1.6e-19*1e4*1e3  ; convert from eV/cm^2-s-sr to mW/m^2.
+    endforeach
+    store_data, var, times, eflux_map
+    yrange = [2e-1,9e2]
+    constant = 10d^[0,1,2]
+    add_setting, var, smart=1, dictionary($
+        'ylog', 1, $
+        'yrange', yrange, $
+        'constant', constant, $
+        'display_type', 'stack', $
+        'labels', ['Aurora',tex2str('theta')+'!DLC!N='+string(theta_loss_cones,format='(I0)')+'!U'+tex2str('circ')], $
+        'colors', sgcolor(['red','green','blue']), $
+        'ytitle', '(mW/m!U2!N)' )
+    
+
     ; convert dB from xyz to fac.
-    prefix = dmsp_info['prefix']
-    fac_labels = [tex2str('perp')+','+['north','west'],tex2str('parallel')]
     db_xyz = get_var_data(db_xyz_var, times=times)
     db_fac = db_xyz
     fmlt = get_var_data(mlt_var, at=times)
@@ -117,28 +195,14 @@ test=0
     options, var, 'yminor', yminor
 
 
-;---Plot settings.
-    label_size = 0.8
-    sc_label_size = 1
-    tmp = smkarthm(0,2*!dpi,50,'n')
-    circ_xs = cos(tmp)
-    circ_ys = sin(tmp)
-    usersym, circ_xs[0:*:2], circ_ys[0:*:2], fill=1
 
-    plot_dir = event_info.plot_dir
-    if n_elements(plot_file) eq 0 then plot_file = join_path([plot_dir,base_name])
-    if keyword_set(test) then plot_file = 0
-    poss = panel_pos(plot_file, $
-        xpans=xpans,ypans=[1,1], xpad=xpad, ypad=ypad, pansize=[asi_xpan_size,asi_ypan_size], panid=[1,1], $
-        fig_size=fig_size, margins=margins)
-
+;---Create the plot.
     sgopen, plot_file, size=fig_size, xchsz=xchsz, ychsz=ychsz
 
 
-
 ;---SC position.
-    probe = sc_info['probe']
-    prefix = sc_info['prefix']
+    probe = rbsp_info['probe']
+    prefix = rbsp_info['prefix']
     tpos = sgcalcpos(1, region=poss[*,0,0], margins=pos_margins)
     fig_label = 'a) Config'
 
@@ -167,7 +231,7 @@ test=0
     the_mlt = pseudo_mlt(r_sm)
     line_mlts = the_mlt+dblarr(nline)
 
-    par_var = geopack_read_par(time_range, model=external_model, t89_par=t89_par)
+    par_var = geopack_read_par(dmsp_plot_time_range, model=external_model, t89_par=t89_par)
     par = get_var_data(par_var, at=the_time)
 
     model_info = geopack_resolve_model(external_model)
@@ -203,8 +267,6 @@ test=0
         yr = minmax(make_bins(yr,step))
     endif else yr = yrange
 
-
-    uniform_ticklen = -ychsz*0.15*fig_size[0]
     xticklen = uniform_ticklen/(tpos[3]-tpos[1])/fig_size[1]
     yticklen = uniform_ticklen/(tpos[2]-tpos[0])/fig_size[0]
 
@@ -252,9 +314,7 @@ test=0
         srotate, fline, (24-the_mlt)*15*rad, 2
         oplot, fline[*,0], fline[*,2], linestyle=0, color=fline_colors[ii], thick=fline_thick
         
-        
         sc_neighbors.add, reform(fline[1,*])
-        
         
         ; Add Fpt.
         if dir eq -1 then begin
@@ -262,15 +322,6 @@ test=0
             f_mag = cotran(f_gsm, the_time, 'gsm2mag')
             fmlat = asin(f_mag[2]/r0)*deg
             tmp = convert_coord(fline[0,0],fline[0,2], data=1, to_normal=1)
-;            tx = tmp[0]+xchsz*0.5
-;            ty = tmp[1]-ychsz*1
-;            msg = 'F/MLat: '+strtrim(string(fmlat,format='(F4.1)'))+' deg'
-;            xyouts, tx,ty,normal=1, msg, charsize=label_size, color=sgcolor('red')
-;            ty = tmp[1]-ychsz*1
-;            msg = string(the_mlt,format='(F4.1)')
-;            if the_mlt le 0 then msg = string(the_mlt+24,format='(F4.1)')
-;            msg = 'MLT: '+strtrim(msg,2)+' h'
-;            xyouts, tx,ty,normal=1, msg, charsize=label_size, color=sgcolor('red')
         endif
     endforeach
 
@@ -281,11 +332,14 @@ test=0
 
 
     ; Add SC.
+    sc_color = rbsp_info['sc_color']
+    sc_name = rbsp_info['sc_name']
+    probe = rbsp_info['probe']
     sc_p0 = the_sc_pos[[0,2]]
     plots, sc_p0[0], sc_p0[1], psym=6, color=sc_color;, symsize=label_size
     tx = tmp[0]+xchsz*1
     ty = tmp[1]-ychsz*0.3
-    msg = 'TH-'+strupcase(probe)
+    msg = sc_name+'-'+strupcase(probe)
     xyouts, tx,ty,normal=1, msg, charsize=sc_label_size, color=sc_color
 
     ; Add DMSP.
@@ -305,7 +359,6 @@ test=0
     sc_name = dmsp_info['sc_name']
     xyouts, tx1+xchsz*0.5, ty1-ychsz*0.2, normal=1, strupcase(sc_name+' '+probe), charsize=sc_label_size, color=dmsp_color
 
-    
 
     ; Add earth.
     tmp = smkarthm(0,2*!dpi, 40, 'n')
@@ -327,33 +380,14 @@ test=0
     tx = tpos[0]-xchsz*8
     ty = tpos[3]-ychsz*0.6
     xyouts, tx,ty,fig_label, normal=1
-
     
 
 
 ;---DMSP panels.
     prefix = dmsp_info['prefix']
     dmsp_vars = prefix+['e_en_spec','e_eflux_map']
-    dmsp_labels = 'b-'+['1) e-','2) Eflux']
-    dmsp_vars = prefix+['e_en_spec','db_fac']
-    dmsp_labels = 'b-'+['1) e-','2) dB']
+    dmsp_labels = 'b-'+['1) e-','2) KEflux']
     ndmsp_var = n_elements(dmsp_vars)
-    
-    ; map eflux and convert unit.
-    get_data, prefix+'e_eflux', times, eflux, limits=lim
-    var = prefix+'e_eflux_map'
-    cmap = 1.4  ; this is for 800 km.
-    theta_loss_cone = 45d
-    sr = !dpi*sin(theta_loss_cone*constant('rad'))^2
-    eflux_map = eflux*cmap*sr*1.6e-19*1e4*1e3  ; convert from eV/cm^2-s-sr to mW/m^2.
-    store_data, var, times, eflux_map
-    yrange = [1e-1,8e2]
-    add_setting, var, smart=1, dictionary($
-        'ylog', 1, $
-        'yrange', yrange, $
-        'display_type', 'scalar', $
-        'short_name', tex2str('Gamma')+'!De!N', $
-        'unit', 'mW/m!U2!N' )
     
     
     var = prefix+'e_en_spec'
@@ -407,15 +441,14 @@ test=0
     foreach invertedv_time, invertedv_times do begin
         tmp = convert_coord(invertedv_time,1, data=1, to_normal=1)
         tx = tmp[0]
-        ty = tpos[3]+ychsz*0.4
-        msg = invertedv_text
-        xyouts, tx,ty,normal=1, msg, charsize=sc_label_size, alignment=0.5, color=invertedv_color
-        ;tys = [ty+ychsz*1, tpos[1]+(tpos[3]-tpos[1])*0.4]
-        ;plots, tx+[0,0],tys, normal=1, color=invertedv_color
         plots, tx,tpos[3],normal=1, psym=8, symsize=0.5, color=invertedv_color
     endforeach
-    ;arrow, tx,tys[0], tx,tys[1], normal=1, color=invertedv_color, solid=1, hsize=arrow_hsize
-    ;    timebar, invertedv_time, color=invertedv_color
+    invertedv_time = mean(invertedv_times)
+    tmp = convert_coord(invertedv_time,1, data=1, to_normal=1)
+    tx = tmp[0]
+    ty = tpos[3]+ychsz*0.4
+    msg = invertedv_text
+    xyouts, tx,ty,normal=1, msg, charsize=sc_label_size, alignment=0.5, color=invertedv_color
     
     for pid=0,ndmsp_var-1 do begin
         tpos = the_poss[*,pid]
@@ -426,6 +459,23 @@ test=0
     endfor
     
     
+    ; Add SSUSI eflux.
+    e_eflux_var = prefix+'e_eflux_map'
+    invertedv_time_range = time_double('2015-04-16/'+['08:02:20','08:04:00'])
+    pid = where(dmsp_vars eq e_eflux_var, count)
+    if count ne 0 then begin
+        xrange = dmsp_plot_time_range
+        yrange = get_setting(e_eflux_var,'yrange')
+        ylog = get_setting(e_eflux_var,'ylog', exist)
+        if ~exist then ylog=0
+        tpos = the_poss[*,pid]
+        plot, xrange, yrange, ylog=ylog, xlog=0, $
+            xstyle=5, ystyle=5, position=tpos, nodata=1, noerase=1
+        ssusi_eflux = get_var_data(prefix+'ssusi_eflux', times=times, in=invertedv_time_range)
+        oplot, times-3, ssusi_eflux, psym=6, symsize=0.25, color=sgcolor('red')
+    endif
+
+
     
     ; Add FAC.
     fac_times = list($
@@ -466,7 +516,7 @@ test=0
             xyouts, mean(txs),ty+ychsz*1, normal=1, alignment=0.5, msg, color=the_color, charsize=label_size
         endforeach
     endif
-    
+
 
 
 ;---Auroral snapshots.
@@ -475,19 +525,16 @@ test=0
     min_mlat = 50d
     mlat_range = [min_mlat,90]
     ct_ssusi = 70
-    ;ct_ssusi = 49
-    ssusi_zrange = [-1,1]*20
-    ;ssusi_zrange = [0,1]*2
-    ct_asi = 49
-    asi_zlog = 1
-    asi_zrange = [5e2,2e4]
+    ssusi_zrange = [-1,1]*100
+    ct_asi = 70
+    asi_zlog = 0
+    asi_zrange = [-1,1]*5e2
     color_top = 254
     nangle = 50
     dangle = !dpi/nangle
     angles = make_bins([-!dpi,0], dangle)
-    
-    
-    
+
+
     ; xlabels.
     xtickn_pos = (90.-min_mlat)/(90.-min_mlat+6)
     xrange = mlt_range
@@ -521,14 +568,23 @@ test=0
     if asi_zlog eq 1 then begin
         asi_log_zrange = alog10(asi_zrange)
         asi_zzs = bytscl(alog10(mlt_image), min=asi_log_zrange[0],max=asi_log_zrange[1], top=color_top)
+        asi_log_ztickv = make_bins(asi_log_zrange,1, inner=1)
+        asi_ztickv = 10^asi_log_ztickv
+        asi_zticks = n_elements(asi_ztickv)-1
+        asi_zminor = 9
+        asi_ztickn = '10!U'+string(asi_log_ztickv,format='(I0)')
     endif else begin
         asi_zzs = bytscl((mlt_image), min=asi_zrange[0],max=asi_zrange[1], top=color_top)
+        asi_ztickv = sort_uniq([asi_zrange,0])
+        asi_zticks = n_elements(asi_ztickv)-1
+        asi_zminor = 10
+        asi_ztickn = string(asi_ztickv,format='(I0)')
     endelse
     ;asi_zrange = [0,5e3]
     ;asi_zzs = bytscl((mlt_image), min=asi_zrange[0],max=asi_zrange[1], top=color_top)
     
     mlt_images = get_var_data(dmsp_mlt_image_var, times=times, limits=lim)
-    time_id = 1
+    tmp = min(times-mean(dmsp_plot_time_range), abs=1, time_id)
     npx = n_elements(mlt_images[0,0,*])
 ;    mlt_image = reform(mlt_images[time_id,*,0:npx*0.5-1])
     mlt_image = reform(mlt_images[time_id,0:npx*0.5-1,0:npx*0.5-1])
@@ -540,15 +596,16 @@ test=0
     ssusi_unit = lim.unit
 
     aurora_info.asi = dictionary($
-        'msg', 'c-1) North | white light!C'+strjoin(strupcase(asi_sites),' ')+' | '+time_string(asi_time,tformat='hh:mm')+' UT', $
+        'msg', ['c-1) North | white light',strjoin(strupcase(asi_sites),' ')+' | '+$
+        time_string(asi_time,tformat='hh:mm:ss')+' UT'], $
         'hemisphere', 'north', $
         'position', poss[*,1,0], $
         'zzs', asi_zzs, $
         'ct', ct_asi )
     dmsp_name = dmsp_info['sc_name']
     aurora_info.ssusi = dictionary($
-        'msg', 'c-2) South | '+ssusi_wavelength+'!C'+strupcase(dmsp_name+' '+dmsp_probe)+' | '+$
-            strjoin(time_string(ssusi_time_range,tformat='hh:mm'),'-')+' UT', $
+        'msg', ['c-2) South | '+ssusi_wavelength,strupcase(dmsp_name+' '+dmsp_probe)+' | '+$
+            strjoin(time_string(ssusi_time_range,tformat='hh:mm'),'-')+' UT'], $
         'hemisphere', 'south', $
         'position', poss[*,1,1], $
         'zzs', ssusi_zzs, $
@@ -622,12 +679,10 @@ test=0
             xyouts, tx,ty-ychsz*0.3,/normal, alignment=0.5, msg, charsize=label_size, color=mltimg_linecolor
         endforeach
         
-        ; add label.
-        label_x = -3
-        label_y = 69
-        if the_info.hemisphere eq 'south' then begin
-            label_y = 68.5
-        endif
+        ; add label of arc.
+        label_x = -4
+        label_y = 65
+        if the_info.hemisphere eq 'south' then label_y = 64
         rr = (90-label_y)/(90-min_mlat)
         tt = (label_x*15-90)*constant('rad')
         tx = rr*cos(tt)
@@ -645,7 +700,7 @@ test=0
         ; Add panel label.
         tx = tpos[0]+xchsz*0.5
         ty = tpos[1]+ychsz*0.2
-        msgs = strsplit(the_info.msg,'!C',extract=1)
+        msgs = the_info.msg
         xyouts, tx,ty,normal=1, msgs[1], charsize=label_size
         xyouts, tx,ty+ychsz*1,normal=1, msgs[0]
     endforeach
@@ -656,12 +711,6 @@ test=0
     asi_cbpos[0] = asi_cbpos[2]+xchsz*1
     asi_cbpos[2] = asi_cbpos[0]+xchsz*0.7
     asi_ztitle = 'N-hem ASI (#)'
-    asi_log_ztickv = make_bins(asi_log_zrange,1, inner=1)
-    asi_ztickv = 10^asi_log_ztickv
-    asi_zticks = n_elements(asi_ztickv)-1
-    asi_zminor = 9
-    asi_ztickn = '10!U'+string(asi_log_ztickv,format='(I0)')
-    asi_zlog = 1
     asi_linestyle = 1
     zticklen = uniform_ticklen/(asi_cbpos[2]-asi_cbpos[0])/fig_size[0]
     sgcolorbar, findgen(color_top), $
@@ -693,10 +742,6 @@ test=0
     mlons = get_var_data(mlon_var, at=the_times)
     ; use aacgm mlon.
     mlts = aacgm_mlon2mlt(mlons, the_times)
-    ; trace.
-    ;res = geopack_trace_to_ionosphere(r_var, models='t89', igrf=0, south=1)
-    ;mlts = get_var_data(prefix+'fmlt_t89', in=time_range, times=the_times)
-    ;mlats = get_var_data(prefix+'fmlat_t89', at=the_times)
     
     
     tts = (mlts*15-90)*rad
@@ -744,7 +789,7 @@ test=0
         tx = tmp[0]
         ty = tmp[1]
         plots, tx,ty, normal=1, psym=8, symsize=0.5, color=invertedv_color
-        label_mlt = -2.5
+        label_mlt = -3.5
         label_mlat = 72
         tr = (90-label_mlat)/(90-min_mlat)
         tt = (label_mlt*15-90)*!dtor
@@ -764,7 +809,7 @@ test=0
         plot, [-1,0], [-1,0], /nodata, /noerase, $
             xstyle=5, ystyle=5, position=tpos
 
-        foreach sc_info, event_info.themis do begin
+        foreach sc_info, event_info.rbsp do begin
             prefix = sc_info['prefix']
             probe = sc_info['probe']
             sc_name = sc_info['sc_name']
@@ -784,9 +829,10 @@ test=0
             tx = tmp[0]
             ty = tmp[1]
             plots, tx,ty,normal=1, psym=6, symsize=label_size, color=sc_color
-            if probe eq 'd' then tx = tx-xchsz*2
-            xyouts, tx-xchsz*0.5,ty-ychsz*1.0, alignment=0.5,normal=1, $
-                strupcase(sc_name)+'-'+strupcase(probe), color=sc_color, charsize=sc_label_size
+            msg = strupcase(sc_name)+'-'+strupcase(probe)
+            msg = strupcase(probe)
+            xyouts, tx-xchsz*1.2,ty-ychsz*0.5, alignment=0.5,normal=1, $
+                msg, color=sc_color, charsize=sc_label_size
         endforeach
     endforeach
 
@@ -795,9 +841,11 @@ test=0
     
     return, plot_file
     
+stop
 
 end
 
+
 test = 0
-print, fig_2017_0309_0700_dmsp_overview_v01(event_info=event_info, test=test)
+print, fig_2015_0416_0800_dmsp_overview_v01(event_info=event_info, test=test)
 end

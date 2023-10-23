@@ -126,6 +126,17 @@ zlog = 1
 zrange = [5e2,1e4]
 
 
+time_range = time_double(['2015-04-16/07:30','2015-04-16/09:00'])
+sites = ['mcgr','whit']
+min_elevs = [5,5]
+resolutions = !null
+merge_method = 'max_elev'
+calibration_method = 'moon_smooth'
+zlog = 0
+zrange = [1e2,8e3]
+zrange = [-1,1]*1e3
+
+
 ;time_range = time_double(['2015-02-17/09:00','2015-02-17/11:00'])
 ;sites = ['inuv','fsmi'];,'whit','fsmi','atha'];,'rank','snkq','kuuj']
 ;min_elev = !null
@@ -149,14 +160,15 @@ endelse
 stop
 angles = smkarthm(0,2*!dpi,40,'n')
 foreach time, times, time_id do begin
-    sgtv, bytscl(reform(zzs[time_id,*,*]),top=254, min=zr[0], max=zr[1]), position=[0,0,1,1], ct=49
+    sgtv, bytscl(reform(zzs[time_id,*,*]),top=254, min=zr[0], max=zr[1]), position=[0,0,1,1], ct=70
     plot, [-1,1],[-1,1], nodata=1, noerase=1, position=[0,0,1,1], xstyle=5, ystyle=5
     foreach rr, smkarthm(0,1,0.125,'dx') do plots, rr*cos(angles),rr*sin(angles), color=sgcolor('silver'), linestyle=1
     foreach rr, smkarthm(0,1,0.25,'dx') do plots, rr*cos(angles),rr*sin(angles), color=sgcolor('silver'), linestyle=0
     foreach tt, smkarthm(0,2*!dpi,25,'n') do plots, [0,1]*cos(tt),[0,1]*sin(tt), color=sgcolor('silver'), linestyle=1
     foreach tt, smkarthm(0,2*!dpi,13,'n') do plots, [0,1]*cos(tt),[0,1]*sin(tt), color=sgcolor('silver'), linestyle=0
     xyouts, 10,10, device=1, time_string(time)
-    if time eq time_double('2017-03-09/07:33') then stop
+    if time eq time_double('2015-04-16/08:03') then stop
+    if time eq time_double('2015-04-16/08:06') then stop
     if time eq time_double('2017-03-09/07:45') then stop
 endforeach
 

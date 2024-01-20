@@ -139,17 +139,12 @@ function stplot_mor_new, vname, $
 ;    oplot, ps, ngws, color=sgcolor('blue')
 
     ; info contain FFT and Morlet spectrum, etc.
-    fftinfo = {$
+    cwt_info = dictionary({$
         n:nrec, $       ; # of record.
         dt:dr0, $       ; delta t, in sec.
         cdelta:cdelta, $; constant.
         c_tau:c_tau, $  ; converts scale to period.
         sigma2:sigma2, $; variance.
-        fft:fft, $      ; FFT, in X.
-        fftps:fftps, $  ; periods, FFT periods, in sec.
-        fftfs:fftfs, $  ; frequency, in Hz.
-        fps:fftfps, $   ; Fourier power spectrum, in X^2.
-        fftpsd:fftpsd, $; FFT PSD, in X^2/Hz.
         ps:ps, $        ; Morlet periods.
         fs:fs, $        ; Morlet frequency.
         ss:ss, $        ; Morlet scales.
@@ -160,7 +155,13 @@ function stplot_mor_new, vname, $
         gws:gws, $      ; Morlet global wavelet spectrum, in X^2.
         psd:psd, $      ; Morlet power spectral density, in X^2/Hz.
         ngws:ngws, $    ; Morlet normalized GWS, in X^2.
-        dof:dof}        ; degree of freedom.
+        dof:dof})        ; degree of freedom.
+    fft_info = dictionary({$
+        fft:fft, $      ; FFT, in X.
+        ps:fftps, $     ; periods, FFT periods, in sec.
+        fs:fftfs, $     ; frequency, in Hz.
+        fps:fftfps, $   ; Fourier power spectrum, in X^2.
+        psd:fftpsd })    ; FFT PSD, in X^2/Hz.
     
     unit = ''
     var_unit = get_setting(vname, 'unit', exist)
@@ -183,57 +184,7 @@ function stplot_mor_new, vname, $
         'unit', unit, $
         'zlog', 1, $
         'color_table', 60 )
-    store_data, newname+'_fft_info', 0, fftinfo
+    options, newname, 'fft_info', fft_info
+    options, newname, 'cwt_info', cwt_info
     return, newname
-end
-
-_2013_0607_load_data
-pre0 = 'rbspa_'
-
-var = pre0+'de_fac'
-tvar = pre0+'de_mor'
-
-;var = 'nino'
-;tvar = 'nino2'
-
-
-stplot_mor, var, newname=tvar
-
-
-erase
-device, decompose=1
-
-get_data, var, uts, dat
-
-get_data, tvar, uts, dat, val
-get_data, tvar+'_fft_info', tmp, fftinfo
-
-zr = [0,max(dat)*0.5]
-ct = 40
-top = 254
-dat = bytscl(dat,min=zr[0],max=zr[1],top=top)
-tpos = sgcalcpos() & tpos[2] = 0.7
-sgtv, dat, position=tpos, ct=ct, /resize
-ts = uts-uts[0]
-yr = minmax(val)
-plot, ts, val, /nodata, /noerase, position=tpos, $
-    xstyle=1, xlog=0, xticklen=-0.01, xtitle='Time (sec)', $
-    ystyle=1, ylog=1, yticklen=-0.01, yrange=yr, ytitle='Period!C(sec)'
-oplot, ts, fftinfo.coi, color=sgcolor('white')
-
-xchsz = double(!d.x_ch_size)/!d.x_size
-ychsz = double(!d.y_ch_size)/!d.y_size
-tpos1 = [tpos[0],tpos[3]+ychsz*0.5,tpos[2],tpos[3]+ychsz*1]
-sgcolorbar, findgen(top), /horizontal, zrange=zr, position=tpos1, ct=ct, $
-    ztitle='Morlet |E|!U2!N (mV/m)!U2!N'
-
-tpos2 = [tpos[2]+xchsz*1,tpos[1],tpos[2]+xchsz*1+(tpos[2]-tpos[0])*0.25,tpos[3]]
-plot, fftinfo.ngws, fftinfo.ps, /noerase, position=tpos2, $
-    xstyle=0, xlog=0, xticklen=-0.01, xticks=1, xtitl='PS (mV/m)!U2!N', $
-    ystyle=1, ylog=1, yticklen=-0.01, yrange=yr, ytickformat='(A1)'
-oplot, fftinfo.ngsignif, fftinfo.ps, linestyle=1
-;oplot, fftinfo.psd, fftinfo.fftps, color=sgcolor('red')
-;oplot, fftinfo.gws/n_elements(ts), fftinfo.ps, color=sgcolor('blue')
-
-
 end

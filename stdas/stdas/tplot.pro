@@ -129,6 +129,7 @@ pro tplot,datanames,      $
    xstyle = xstyle, $   ; sheng.
    ystyle = ystyle, $   ; sheng.
    vlab_margin = vlab_marg, $ ; sheng.
+   label_yspace = label_yspace, $   ; sheng, addjust the distance b/w xlabel and axis.
    position = pos0       ; sheng.
 
 
@@ -688,6 +689,7 @@ if ~keyword_set(novtitle) then begin                 ; finish var_labels
   if n_elements(xticklen) eq 0 then str_element,tplot_vars,'settings.x', value=xticklen
   if n_elements(xticklen) eq 0 then xticklen = 0
   if xticklen ge 0 then xticklen = 0
+  if n_elements(label_yspace) ne 0 then yspace = label_yspace
   ypos = pos[1,nd-1] - 1.5 * yspace + xticklen*(pos[3,nd-1]-pos[1,nd-1])
   if n_elements(vtitle) eq 0 then vtitle = ''
   xyouts,xpos,ypos,vtitle,/norm,charsize=vchsz

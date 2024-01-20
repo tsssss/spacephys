@@ -1193,6 +1193,6 @@ function fig_2015_0416_0800_rbsp_v01, event_info=event_info, test=test
 
 end
 
-test = 0
+test = 1
 print, fig_2015_0416_0800_rbsp_v01(event_info=event_info, test=test)
 end

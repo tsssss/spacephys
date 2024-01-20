@@ -607,6 +607,7 @@ function alfven_arc_load_rbsp_data_e_mgse_2015_0416, event_info, time_var=field_
 
         ; Load survey resolutions efield.
         e_mgse_var = rbsp_read_efield_survey(time_range, probe=probe)
+        e_mgse_var = rename_var(e_mgse_var,output=prefix+'e_mgse_survey')
 
         e_mgse_vars = prefix+'e_mgse_'+['spinfit_phasef','survey']
     endelse
@@ -622,6 +623,7 @@ function alfven_arc_load_rbsp_data_e_mgse_2015_0416, event_info, time_var=field_
         'display_type', 'scalar', $
         'short_name', 'edot0 angle', $
         'unit', 'deg' )
+
     edot0_vars = e_mgse_vars
     foreach e_var, e_mgse_vars, var_id do begin
         edot0_var = streplace(e_var,'e_mgse','edot0_mgse')

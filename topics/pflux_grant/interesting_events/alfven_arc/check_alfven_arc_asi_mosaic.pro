@@ -136,6 +136,18 @@ zlog = 0
 zrange = [1e2,8e3]
 zrange = [-1,1]*1e3
 
+time_range = time_double(['2015-03-17/04:00','2015-03-17/09:00'])
+time_range = time_double(['2015-03-17/06:00','2015-03-17/10:00'])
+sites = ['inuv','whit','atha','fsim','fsmi','pina','kapu','snkq','gbay','nrsq']
+min_elevs = [10,5,5,10,10,5,5,10,5,5]/2
+resolutions = !null
+merge_method = 'merge_elev'
+calibration_method = 'simple'
+zlog = 1
+if zlog eq 0 then zrange = [-1,1]*4e3 else zrange = [5e1,1e4]
+update = 0
+;zrange = [1e1,1e4]
+
 
 ;time_range = time_double(['2015-02-17/09:00','2015-02-17/11:00'])
 ;sites = ['inuv','fsmi'];,'whit','fsmi','atha'];,'rank','snkq','kuuj']
@@ -143,10 +155,12 @@ zrange = [-1,1]*1e3
 ;merge_method = 'merge_elev'
 
 mlt_image_var = themis_read_mlt_image(time_range, sites=sites, $
-    min_elevs=min_elevs, resolutions=resolutions, $
+    min_elevs=min_elevs, resolutions=resolutions, update=update, $
     merge_method=merge_method, calibration_method=calibration_method)
 
 get_data, mlt_image_var, times, mlt_images
+index = where(finite(mlt_images,nan=1), count)
+if count ne 0 then mlt_images[index] = 0
 sgopen, 0, size=[1,1]*6
 
 if zlog then begin
@@ -160,7 +174,9 @@ endelse
 stop
 angles = smkarthm(0,2*!dpi,40,'n')
 foreach time, times, time_id do begin
-    sgtv, bytscl(reform(zzs[time_id,*,*]),top=254, min=zr[0], max=zr[1]), position=[0,0,1,1], ct=70
+    ct = 70
+    if zlog eq 1 then ct = 49
+    sgtv, bytscl(reform(zzs[time_id,*,*]),top=254, min=zr[0], max=zr[1]), position=[0,0,1,1], ct=ct
     plot, [-1,1],[-1,1], nodata=1, noerase=1, position=[0,0,1,1], xstyle=5, ystyle=5
     foreach rr, smkarthm(0,1,0.125,'dx') do plots, rr*cos(angles),rr*sin(angles), color=sgcolor('silver'), linestyle=1
     foreach rr, smkarthm(0,1,0.25,'dx') do plots, rr*cos(angles),rr*sin(angles), color=sgcolor('silver'), linestyle=0

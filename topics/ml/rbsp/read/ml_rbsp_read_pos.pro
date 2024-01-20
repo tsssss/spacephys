@@ -41,7 +41,10 @@ function ml_rbsp_read_pos, input_time_range, probe=probe, $
 ;---Read vars.
     var_list = list()
     r_sm_var = prefix+'r_sm'
-    var_list.add, dictionary('in_vars', r_sm_var)
+    var_list.add, dictionary($
+        'in_vars', r_sm_var, $
+        'time_var_name', 'unix_time', $
+        'time_var_type', 'unix' )
     read_vars, time_range, files=files, var_list=var_list, errmsg=errmsg
     if errmsg ne '' then return, retval
 
@@ -51,6 +54,7 @@ function ml_rbsp_read_pos, input_time_range, probe=probe, $
         store_data, r_coord_var, times, r_coord
     endif
     add_setting, r_coord_var, smart=1, dictionary($
+        'requested_time_range', time_range, $
         'display_type', 'vector', $
         'unit', 'Re', $
         'short_name', 'R', $

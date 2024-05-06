@@ -1,12 +1,55 @@
 
-function fig_asi_movie_v01, movie_file, event_info=event_info
+function fig_asi_movie_v01, test=test
 
-
-;---Load data and settings.
-test = 0
-    id = '2015_0317'
     version = 'v02'
-    if n_elements(event_info) eq 0 then event_info = low_lshell_outflow_load_data(id)
+    id = '2013_0317'
+
+    root_dir = join_path([googledir(),'works','2024_daps',id])
+    plot_dir = join_path([root_dir,'plot'])
+
+    time_range = time_double(['2013-03-17/08:30','2013-03-17/09:30'])
+    sites = ['kapu','snkq','gill','pina','fsmi','fsim']
+    nsite = n_elements(sites)
+    min_elevs = fltarr(nsite)+5
+    index = where(sites eq 'rank', count)
+    if count ne 0 then min_elevs[index] = 10
+    index = where(sites eq 'fsmi', count)
+    if count ne 0 then min_elevs[index] = 10
+    merge_method = 'merge_elev'
+    calibration_method = 'simple'
+    
+    mlt_image_var = themis_asf_read_mlt_image(time_range, sites=sites, $
+        min_elev=min_elevs, merge_method=merge_method, calibration_method=calibration_method)
+
+
+;---RBSP fpt.
+    sc_list = list()
+    probes = ['a']
+    internal_model = 'igrf'
+    external_model = 't01'
+    sc_colors = sgcolor(['purple','blue'])
+    foreach probe, probes, probe_id do begin
+        prefix = 'rbsp'+probe+'_'
+        sc_name = strupcase('rbsp')
+        sc_color = sc_colors[probe_id]
+        probe_info = dictionary($
+            'prefix', prefix, $
+            'probe', probe, $
+            'sc_name', sc_name, $
+            'sc_color', sc_color, $
+            'internal_model', internal_model, $
+            'external_model', external_model )
+        sc_list.add, probe_info
+
+        data_dir = join_path([root_dir,'data'])
+        base = id+'_rbsp'+probe+'_data_'+version+'.cdf'
+        rbsp_file = join_path([data_dir,base])
+
+        sc_info = low_lshell_outflow_load_rbsp_data($
+            time_range, filename=rbsp_file, probe=probe)
+
+    endforeach
+
 
 ;---Settings.
     add_jver = 0
@@ -15,32 +58,14 @@ test = 0
     if asi_zlog eq 0 then asi_zrange = [-1,1]*4e3 else asi_zrange = [5e1,1e4]
     asi_ct = 70
 
-
-;---SC setting.
-    sc_list = list()
-    sc_list.add, event_info.rbsp.rbspa
-    sc_list.add, event_info.rbsp.rbspb
-    nprobe = n_elements(sc_list)
-;    model_setting = event_info.rbsp.rbspa['model_setting']
-;    internal_model = event_info['internal_model']
-;    external_model = event_info['external_model']
-;    models = model_setting.models
-;    model_index = where(models eq external_model)
-
-
-;---Auto settings.
-    time_range = event_info.ground_time_range
     time_step = 3d
     common_times = make_bins(time_range, time_step)
     ntime = n_elements(common_times)
-
-    asi_setting = event_info['asi_setting']
-    asi_sites = sort_uniq(asi_setting.sites)
+    asi_sites = sites
 
     if n_elements(movie_file) eq 0 then begin
-        plot_dir = event_info['plot_dir']
         movie_file = join_path([plot_dir,$
-            'thg_asf_movie_'+event_info.id+'_'+version+'.mp4'])
+            'thg_asf_movie_'+id+'_'+version+'.mp4'])
     endif
 
     margins = [1,0.5,1,4]
@@ -53,7 +78,11 @@ test = 0
     endif else if mlt_type eq 'all_mlt' then begin
         pansize = [6,6]
     endif
-    sgopen, 0, size=[1,1], xchsz=abs_xchsz, ychsz=abs_ychsz
+
+    tmp = get_abs_chsz()
+    abs_xchsz = tmp[0]
+    abs_ychsz = tmp[1]
+
     uniform_ticklen = -abs_ychsz*0.15
     if add_jver then begin
         poss = panel_pos(nxpan=2, $
@@ -115,7 +144,7 @@ test = 0
     xtickn_pos = (90.-min_mlat)/(90.-min_mlat+6)
     xrange = mlt_range
     xstep = 6d
-    xtickv = smkarthm(xrange[0],xrange[1], 2, 'dx')
+    xtickv = smkarthm(xrange[0]+2,xrange[1]-2, 2, 'dx')
     xtick_minor = make_bins(xrange, 1, inner=1)
     xtickn = xtickv
     index = where(xtickv lt 0, count)
@@ -130,7 +159,6 @@ test = 0
     ytickv = make_bins(yrange, 10, inner=1)
     ytick_minor = make_bins(yrange, ystep, inner=1)
     ytickn = string(ytickv,format='(I0)')
-
 
 ;---asi.
     asi_var = 'thg_asf_mlt_image'
@@ -209,7 +237,6 @@ test = 0
 ;---Loop through the times.
     plot_files = []
     foreach time, common_times, time_id do begin
-        if time_id mod 10 ne 0 then continue
         plot_file = join_path([plot_dir,'thg_asf_mlt_image_'+version,$
             'thg_asf_mlt_image_'+time_string(time,tformat='YYYY_MMDD_hhmm_ss')+'_'+version+'.png'])
         plot_files = [plot_files, plot_file]
@@ -244,7 +271,7 @@ test = 0
     ;---Add axis, labels, etc.
         info_list = list()
         info_list.add, dictionary($
-            'msg', ['a-1) North | white light',strjoin(strupcase(asi_sites),' ')+' | '+$
+            'msg', ['a) North | white light',strjoin(strupcase(asi_sites),' ')+' | '+$
             time_string(time,tformat='hh:mm:ss')+' UT'], $
             'hemisphere', 'north', $
             'position', asi_tpos, $
@@ -347,31 +374,34 @@ test = 0
             endforeach
 
             ; add sc fpt.
-            foreach sc_info, sc_list do begin
-                prefix = sc_info['prefix']
-                probe = sc_info['probe']
-                sc_name = sc_info['sc_name']
-                sc_color = sc_info['sc_color']
-                internal_model = (sc_info.haskey('internal_model'))? sc_info['internal_model']: 'dipole'
-                external_model = (sc_info.haskey('external_model'))? sc_info['external_model']: 't89'
+            if n_elements(sc_list) ne 0 then begin
+                foreach sc_info, sc_list do begin
+                    prefix = sc_info['prefix']
+                    probe = sc_info['probe']
+                    sc_name = sc_info['sc_name']
+                    sc_color = sc_info['sc_color']
+                    internal_model = (sc_info.haskey('internal_model'))? sc_info['internal_model']: 'dipole'
+                    external_model = (sc_info.haskey('external_model'))? sc_info['external_model']: 'dipole'
 
-                suffix = '_'+internal_model+'_'+external_model+'_'+the_info.hemisphere
-                fmlt = get_var_data(prefix+'fmlt'+suffix, at=time)+24
-                fmlat = abs(get_var_data(prefix+'fmlat'+suffix, at=time))
+                    suffix = '_'+internal_model+'_'+external_model+'_north'
+                    fmlt = get_var_data(prefix+'fmlt'+suffix, at=time)+24
+                    fmlat = abs(get_var_data(prefix+'fmlat'+suffix, at=time))+5
 
-                tr = (90-fmlat)/(90-min_mlat)
-                tt = (fmlt*15-90)*!dtor
-                tx = tr*cos(tt)
-                ty = tr*sin(tt)
-                tmp = convert_coord(tx, ty, /data, /to_normal)
-                tx = tmp[0]
-                ty = tmp[1]
-                plots, tx,ty,normal=1, psym=6, symsize=label_size, color=sc_color
-                msg = strupcase(sc_name)+'-'+strupcase(probe)
-                ;msg = strupcase(probe)
-                xyouts, tx-xchsz*1.2,ty-ychsz*0.5, alignment=1,normal=1, $
-                    msg, color=sc_color, charsize=sc_label_size
-            endforeach
+                    tr = (90-fmlat)/(90-min_mlat)
+                    tt = (fmlt*15-90)*!dtor
+                    tx = tr*cos(tt)
+                    ty = tr*sin(tt)
+                    tmp = convert_coord(tx, ty, /data, /to_normal)
+                    tx = tmp[0]
+                    ty = tmp[1]
+                    plots, tx,ty,normal=1, psym=6, symsize=label_size, color=sc_color
+                    msg = strupcase(sc_name)+'-'+strupcase(probe)
+                    ;msg = strupcase(probe)
+                    xyouts, tx-xchsz*1.2,ty-ychsz*0.5, alignment=1,normal=1, $
+                        msg, color=sc_color, charsize=sc_label_size
+                endforeach
+            endif
+            
             
             
             ; Add panel label.
@@ -386,10 +416,11 @@ test = 0
         sgclose
     endforeach
 
-    fig2movie, movie_file, fig_files=plot_files, fps=50
+    fig2movie, movie_file, fig_files=plot_files, fps=20
     return, movie_file
+
+
 end
 
-
-print, fig_asi_movie_v01(event_info=event_info)
+print, fig_asi_movie_v01(test=0)
 end

@@ -250,7 +250,9 @@ function fig_2015_0416_0800_rbsp_v02_rbsp_panel, rbsp_poss, event_info=event_inf
         tpos[1] = poss[1,2]
         ty = (tpos[1]+tpos[3])*0.5
         tx = tpos[0]-xchsz*4.5
-        xyouts, tx,ty,msg, normal=1, alignment=0.5, orientation=90
+        if probe eq 'a' then begin
+            xyouts, tx,ty,msg, normal=1, alignment=0.5, orientation=90
+        endif
 
         ; manual xticknames.
         tpos = poss[*,-1]

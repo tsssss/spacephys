@@ -2,7 +2,7 @@
 ; Show SAPS E field and the association of auroral boundary.
 ;-
 
-function fig_saps_v01_rbsp_panel, rbsp_pos, event_info=event_info
+function fig_saps_v02_rbsp_panel, rbsp_pos, event_info=event_info
 
     label_size = 0.8
     fig_size = double([!d.x_size,!d.y_size])
@@ -14,10 +14,14 @@ function fig_saps_v01_rbsp_panel, rbsp_pos, event_info=event_info
     saps_times = orderedhash()
     saps_times['rbspa'] = ['2015-03-17/15:30','2015-03-17/16:00']
     saps_times['rbspb'] = ['2015-03-17/21:05','2015-03-17/21:35']
+    
+    pp_times = ((event_info['rbsp'])['rbspa'])['pp_times']
+    pp_time = pp_times[where_pro(pp_times,'[]',time_double(saps_times['rbspa']))]
+    pp_color = sgcolor('red')
     colors = sgcolor(['purple','red'])
 
     margins = [10,3,0,0]
-    poss = sgcalcpos(2, region=rbsp_pos, margins=margins)
+    poss = sgcalcpos(3, region=rbsp_pos, margins=margins)
 
 ;---L shell as x-axis.
     xrange = [2,3.5]
@@ -29,60 +33,165 @@ function fig_saps_v01_rbsp_panel, rbsp_pos, event_info=event_info
     xtickn = strarr(xticks+1)+' '
     
 
-;---Density panel.
-    tpos = poss[*,0]
+;;---Density panel.
+;    tpos = poss[*,0]
+;    
+;    yrange = [30,3e3]
+;    ylog = 1
+;    ytitle = 'Density (cm!U-3!N)'
+;    
+;    xticklen = uniform_ticklen/(tpos[3]-tpos[1])/fig_size[1]
+;    yticklen = uniform_ticklen/(tpos[2]-tpos[0])/fig_size[0]
+;    
+;    plot, xrange, yrange, $
+;        xstyle=5, ystyle=5, $
+;        nodata=1, noerase=1, position=tpos, ylog=ylog
+;    foreach mission_probe, saps_times.keys(), probe_id do begin
+;        probe_info = resolve_probe(mission_probe)
+;        prefix = probe_info['prefix']
+;        probe = probe_info['probe']
+;        lshell_var = prefix+'lshell'
+;        e_var = prefix+'edot0_fac'
+;        tr = time_double(saps_times[mission_probe])
+;        lshell = get_var_data(lshell_var, in=tr, times=times)
+;
+;        dens_var = rbsp_read_density_emfisis(tr+[-1,1]*600, probe=probe)
+;        dens = get_var_data(dens_var, at=times)
+;        
+;        plots, lshell, dens, color=colors[probe_id]
+;        
+;;        tx = tpos[0]+xchsz*0.5
+;;        ty = tpos[1]+ychsz*(1.5-probe_id)
+;;        msg = time_string(tr[0],tformat='YYYY-MM-DD ')+strjoin(time_string(tr,tformat='hh:mm'),'-')+' UT'
+;;        xyouts, tx,ty,msg, normal=1, color=colors[probe_id]
+;    endforeach
+;    
+;    plot, xrange, yrange, $
+;        xstyle=1, xtitle='', xtickv=xtickv, xminor=xminor, xticks=xticks, $
+;        ystyle=1, ytitle=ytitle, ytickv=ytickv, yminor=yminor, yticks=yticks, $
+;        nodata=1, noerase=1, position=tpos, $
+;        xticklen=xticklen, yticklen=yticklen, xtickn=xtickn, ylog=ylog
+;        
+;    tx = tpos[0]-xchsz*8
+;    ty = tpos[3]-ychsz*0.7
+;    msg = 'a)'
+;    xyouts, tx,ty,msg, normal=1
+;
+
+;---H+ panel.
     
-    yrange = [30,3e3]
-    ylog = 1
-    ytitle = 'Density (cm!U-3!N)'
-    
-    xticklen = uniform_ticklen/(tpos[3]-tpos[1])/fig_size[1]
-    yticklen = uniform_ticklen/(tpos[2]-tpos[0])/fig_size[0]
-    
-    plot, xrange, yrange, $
-        xstyle=5, ystyle=5, $
-        nodata=1, noerase=1, position=tpos, ylog=ylog
     foreach mission_probe, saps_times.keys(), probe_id do begin
         probe_info = resolve_probe(mission_probe)
         prefix = probe_info['prefix']
         probe = probe_info['probe']
+        if probe eq 'b' then continue
+        spec_vars = prefix+['p','e','o']+'_en_spec'
         lshell_var = prefix+'lshell'
-        e_var = prefix+'edot0_fac'
         tr = time_double(saps_times[mission_probe])
         lshell = get_var_data(lshell_var, in=tr, times=times)
+        dlshell = min(lshell[1:-1]-lshell[0:-2])
+        the_lshells = make_bins(lshell, dlshell, inner=1)
+        the_times = interpol(times,lshell,the_lshells)
 
-        dens_var = rbsp_read_density_emfisis(tr+[-1,1]*600, probe=probe)
-        dens = get_var_data(dens_var, at=times)
+        foreach spec_var, spec_vars do begin
+            new_var = spec_var+'_lshell'
+            copy_data, spec_var, new_var
+            interp_time, new_var, the_times
+        endforeach
+
+        tposs = poss[*,0:-2]
+        vars = prefix+['e','p']+'_en_spec'
+        options, vars, 'xstyle', 5
+        options, vars, 'ytitle', 'Energy!C(eV)'
+        options, vars, 'zticklen', -0.5
+        options, vars, 'zminor', 9
         
-        plots, lshell, dens, color=colors[probe_id]
+
+        the_vars = vars[0] 
+        ztickn = '10!U'+['4','5','6','7','8','9','10']
+        ztickn[1:*:2] = ' '       
+        options, the_vars, ytickname=['10!U2','10!U3','10!U4'], $
+            ytickv=[100,1000,10000], yticks=2, yminor=9, $
+            ztickv=10d^[4,5,6,7,8,9,10], zticks=6, ztickname=ztickn
+
+        the_vars = vars[1]
+        options, the_vars, ytickname=['10!U2','10!U3','10!U4'], $
+            ytickv=[100,1000,10000], yticks=2, yminor=9, $
+            yrange=[20,3e4]
+
         
-        tx = tpos[0]+xchsz*0.5
-        ty = tpos[1]+ychsz*(1.5-probe_id)
-        msg = time_string(tr[0],tformat='YYYY-MM-DD ')+strjoin(time_string(tr,tformat='hh:mm'),'-')+' UT'
-        xyouts, tx,ty,msg, normal=1, color=colors[probe_id]
+        tplot_options, 'tickinterval', 60
+        tplot, vars, trange=tr, position=tposs, noerase=1, nouttick=1
+        timebar, pp_time, linestyle=2, color=pp_color
+
+        ; Add label for plasmapause
+        tpos = tposs[*,0]
+        plot, tr, [0,1], xstyle=5, ystyle=5, nodata=1, noerase=1, position=tpos
+        tmp = convert_coord(pp_time,0,data=1,to_normal=1)
+        tx = tmp[0]-xchsz*0.5
+        ty = tpos[3]-ychsz
+        msg = 'Plasmapause'
+        xyouts, tx,ty,msg, normal=1, color=pp_color, charsize=label_size, alignment=1
+        msg = 'PS'
+        tx = tmp[0]+xchsz*0.5
+        xyouts, tx,ty,msg, normal=1, color=pp_color, charsize=label_size, alignment=0
+
+        ; Add label for ion nose
+        tpos = tposs[*,1]
+        plot, tr, [0,1], xstyle=5, ystyle=5, nodata=1, noerase=1, position=tpos
+        tmp = convert_coord(pp_time,0,data=1,to_normal=1)
+        tx = tmp[0]-xchsz*5
+        ty = tpos[3]-ychsz*2
+        msg = 'Ion nose'
+        xyouts, tx,ty,msg, normal=1, color=sgcolor('yellow'), charsize=label_size, alignment=0.5
+        txs = tx+[0,0.7]*xchsz
+        tys = ty+[0.7,1.5]*ychsz
+        plots, txs, tys, normal=1, color=sgcolor('yellow')
+        tmp = smkarthm(0,2*!dpi,20,'n')
+        circ_xs = cos(tmp)
+        circ_ys = sin(tmp)
+        usersym, circ_xs, circ_ys, fill=1
+        plots, txs[1],tys[1],normal=1, psym=8, symsize=0.5, color=sgcolor('yellow')
+
+
+        yrange = [0,1]
+        nvar = n_elements(vars)
+        fig_labels = letters(nvar)+') '+['e-','H+']+' EN'
+        foreach var, vars, pid do begin
+            tpos = tposs[*,pid]
+            xticklen = uniform_ticklen/(tpos[3]-tpos[1])/fig_size[1]
+            yticklen = uniform_ticklen/(tpos[2]-tpos[0])/fig_size[0]
+            
+            plot, xrange, yrange, $
+                xstyle=1, xtitle='', xtickv=xtickv, xminor=xminor, xticks=xticks, $
+                ystyle=5, ytitle=ytitle, ytickv=ytickv, yminor=yminor, yticks=yticks, $
+                nodata=1, noerase=1, position=tpos, $
+                xticklen=xticklen, yticklen=yticklen, xtickn=xtickn
+
+            tx = tpos[0]-xchsz*9
+            ty = tpos[3]-ychsz*0.7
+            msg = fig_labels[pid]
+            xyouts, tx,ty,msg, normal=1
+
+            msg = 'RBSP-'+strupcase(probe)
+            tx = tpos[0]+xchsz*0.5
+            ty = tpos[3]-ychsz*1
+            xyouts, tx,ty,msg, normal=1, alignment=0, color=sgcolor('white');, charsize=label_size
+        endforeach
     endforeach
-    
-    plot, xrange, yrange, $
-        xstyle=1, xtitle='', xtickv=xtickv, xminor=xminor, xticks=xticks, $
-        ystyle=1, ytitle=ytitle, ytickv=ytickv, yminor=yminor, yticks=yticks, $
-        nodata=1, noerase=1, position=tpos, $
-        xticklen=xticklen, yticklen=yticklen, xtickn=xtickn, ylog=ylog
-        
-    tx = tpos[0]-xchsz*6
-    ty = tpos[3]-ychsz*0.7
-    msg = 'a)'
-    xyouts, tx,ty,msg, normal=1
+
+
     
 
 ;---E field panel.
-    tpos = poss[*,1]
+    tpos = poss[*,-1]
 
     yrange = [-2,12]
     ystep = 5
     ytickv = make_bins(yrange, ystep, inner=1)
     yticks = n_elements(ytickv)-1
     yminor = 5
-    ytitle = 'E!D'+tex2str('perp')+',out!N (mV/m)'
+    ytitle = '(mV/m)'
 
 
     xticklen = uniform_ticklen/(tpos[3]-tpos[1])/fig_size[1]
@@ -113,6 +222,11 @@ function fig_saps_v01_rbsp_panel, rbsp_pos, event_info=event_info
 
         ;time_ticks = time_string(interpol(times, lshell, xtickv), tformat='hh:mm')
         ;xtickn = xtickn+'!C'+time_ticks
+
+        tx = tpos[0]+xchsz*0.5
+        ty = tpos[3]-ychsz*(1+probe_id)
+        msg = time_string(tr[0],tformat='YYYY-MM-DD ')+strjoin(time_string(tr,tformat='hh:mm'),'-')+' UT'
+        xyouts, tx,ty,msg, normal=1, color=colors[probe_id], charsize=label_size
     endforeach
 
 
@@ -122,9 +236,9 @@ function fig_saps_v01_rbsp_panel, rbsp_pos, event_info=event_info
         nodata=1, noerase=1, position=tpos, $
         xticklen=xticklen, yticklen=yticklen, xtickn=xtickn
     
-    tx = tpos[0]-xchsz*6
+    tx = tpos[0]-xchsz*9
     ty = tpos[3]-ychsz*0.7
-    msg = 'b)'
+    msg = 'c) E!D'+tex2str('perp')+',out'
     xyouts, tx,ty,msg, normal=1
     
     
@@ -171,7 +285,7 @@ function fig_saps_v01_rbsp_panel, rbsp_pos, event_info=event_info
 
 end
 
-function fig_saps_v01_ssusi_panel, my_poss, event_info=event_info
+function fig_saps_v02_ssusi_panel, my_poss, event_info=event_info
 
     label_size = 0.8
     fig_size = double([!d.x_size,!d.y_size])
@@ -427,7 +541,7 @@ function fig_saps_v01_ssusi_panel, my_poss, event_info=event_info
         mlat = get_var_data(mlat_var, at=ssusi_time)
         hem = (mlat ge 0)? 'North': 'South'
         msgs = [$
-            'c-'+string(pid+1,format='(I0)')+') '+hem,$
+            'd-'+string(pid+1,format='(I0)')+') '+hem,$
             'DMSP '+strupcase(probe)+' | '+strjoin(time_string(ssusi_time_range,tformat='hh:mm'),'-')+' UT']
         tx = tpos[0]+xchsz*0.5
         ty = tpos[1]+ychsz*0.2
@@ -485,7 +599,7 @@ function fig_saps_v01_ssusi_panel, my_poss, event_info=event_info
 
 end
 
-function fig_saps_v01_config_panel, my_pos, event_info=event_info, $
+function fig_saps_v02_config_panel, my_pos, event_info=event_info, $
     pos_xrange=pos_xrange, pos_yrange=pos_yrange, config_time=config_time, _extra=ex
 
 ;---SC position.
@@ -685,9 +799,9 @@ end
 
 
 
-function fig_saps_v01, plot_dir, event_info=event_info, test=test
+function fig_saps_v02, plot_dir, event_info=event_info, test=test
 
-    version = 'v01'
+    version = 'v02'
     id = '2015_0317'
     if n_elements(event_info) eq 0 then event_info = low_lshell_outflow_load_data(id)
     
@@ -718,13 +832,13 @@ function fig_saps_v01, plot_dir, event_info=event_info, test=test
     ssusi_xsize = 1.5
     ssusi_ysize = 3
     ssusi_margins = [1,1,6,1]
-    xpads = [4,1]
+    xpads = [7,1]
     rbsp_xsize = 3.5
     xpans = [rbsp_xsize,ssusi_xsize*[1,1]]
 
 
     if n_elements(plot_dir) eq 0 then plot_dir = event_info.plot_dir
-    plot_file = join_path([plot_dir,'fig_saps_v01.pdf'])
+    plot_file = join_path([plot_dir,'fig_saps_'+version+'.pdf'])
     if keyword_set(test) then plot_file = 0
     poss = panel_pos(plot_file, nxpan=3, nypan=1, $
         pansize=[rbsp_xsize,ssusi_ysize], xpans=xpans, xpad=xpads, margins=ssusi_margins, fig_size=fig_size)
@@ -733,10 +847,10 @@ function fig_saps_v01, plot_dir, event_info=event_info, test=test
 
     sgopen, plot_file, size=fig_size;, magnify=1.5
     ssusi_poss = poss[*,1:2]
-    ssusi_poss = fig_saps_v01_ssusi_panel(ssusi_poss, event_info=event_info)
+    ssusi_poss = fig_saps_v02_ssusi_panel(ssusi_poss, event_info=event_info)
     
     rbsp_pos = poss[*,0]
-    rbsp_poss = fig_saps_v01_rbsp_panel(rbsp_pos, event_info=event_info)
+    rbsp_poss = fig_saps_v02_rbsp_panel(rbsp_pos, event_info=event_info)
     
 
     
@@ -750,7 +864,7 @@ function fig_saps_v01, plot_dir, event_info=event_info, test=test
 ;    pos_xrange = [-0.5,-3.5]
 ;    pos_yrange = [-1,1]*1.5
 ;    config_time = time_double('2015-03-17/15:50')
-;    tpos = fig_saps_v01_config_panel(my_pos, event_info=event_info, config_time=config_time, pos_xrange=pos_xrange, pos_yrange=pos_yrange)
+;    tpos = fig_saps_v02_config_panel(my_pos, event_info=event_info, config_time=config_time, pos_xrange=pos_xrange, pos_yrange=pos_yrange)
 ;    
 ;    ; Plot DMSP data.
 ;    tr_list = list()
@@ -795,5 +909,5 @@ end
 
 
 
-print, fig_saps_v01(event_info=event_info, test=1)
+print, fig_saps_v02(event_info=event_info, test=1)
 end

@@ -124,6 +124,21 @@ function fig_2015_0416_0800_overview_v03_dmsp_panel, dmsp_poss, event_info=event
         'colors', sgcolor(['red','green','blue']), $
         'ytitle', '(mW/m!U2!N)' )
     
+    ; Check just pi.
+    eflux_map2 = fltarr(ntime,ndim)
+    eflux_map2[*,1] = eflux*!dpi*1.6e-19*1e4*1e3
+    store_data, var, times, eflux_map2
+    yrange = [2e-1,9e2]
+    constant = 10d^[0,1,2]
+    add_setting, var, smart=1, dictionary($
+        'ylog', 1, $
+        'yrange', yrange, $
+        'constant', constant, $
+        'display_type', 'stack', $
+        'labels', ['Aurora','e-'], $
+        'colors', sgcolor(['red','blue']), $
+        'ytitle', '(mW/m!U2!N)' )
+    
 
     ; convert dB from xyz to fac.
     db_xyz = get_var_data(db_xyz_var, times=times)
@@ -157,7 +172,7 @@ function fig_2015_0416_0800_overview_v03_dmsp_panel, dmsp_poss, event_info=event
 ;---Plot
     prefix = dmsp_info['prefix']
     dmsp_vars = prefix+['e_en_spec','e_eflux_map']
-    dmsp_labels = ['a) e-','b) KEflux']
+    dmsp_labels = ['a) e-','b) Eflux']
     ndmsp_var = n_elements(dmsp_vars)
     
     

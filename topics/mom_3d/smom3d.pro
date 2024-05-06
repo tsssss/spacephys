@@ -22,7 +22,7 @@ function smom3d, data, vsc=vsc, dmom=dmom, erange=erange
     if dat3d.valid eq 0 then return, mom3d
     
     ut0 = dat3d.time    ; ut in sec.
-    m_e = dat3d.mass    ; mass(kg) over qe*1e6 --> sqrt(m_e/E(eV)) in km/s.
+    m_e = dat3d.mass    ; mass(kg) over (qe*1e6), so that sqrt(E(eV)/m_e) in km/s.
     q0 = dat3d.charge   ; q/qe.
     bvec = dat3d.magf   ; 3D B field, in nT.
 

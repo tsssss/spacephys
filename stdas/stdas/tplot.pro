@@ -680,6 +680,7 @@ if ~keyword_set(novtitle) then begin                 ; finish var_labels
     if tmp le xlmarg*r then xlmarg = xlmarg*r  ; short vtitle.
     xlmarg = tmp  ; shortest possible.
   endif
+  
   xpos = pos[0,nd-1] - xlmarg * xspace
   if keyword_set(vlab_marg) then xpos = pos[0,nd-1] - vlab_marg * xspace    ; set vlable pos directly
   name = tplot_vars.options.varnames[nd-1]

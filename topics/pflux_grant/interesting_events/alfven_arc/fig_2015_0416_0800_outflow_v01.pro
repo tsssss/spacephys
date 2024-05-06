@@ -15,9 +15,8 @@ function get_mass0, species
     
 end
 
-function fig_2015_0416_0800_outflow_v01, event_info=event_info
+function fig_2015_0416_0800_outflow_v01, event_info=event_info, test=test
 
-test = 0
 
 ;---Load data and settings.
     version = 'v01'
@@ -183,9 +182,9 @@ test = 0
             endelse
     
             if model eq 'dip' or model eq 'dipole' or model eq 'igrf' then begin
-                dbx = -1
-                dby = -1
-                dbz = -1
+                dbx = 0
+                dby = 0
+                dbz = 0
             endif else begin
                 routine = 'geopack_'+model
                 if model eq 't04s' then routine = 'geopack_ts04'
@@ -483,33 +482,33 @@ test = 0
     ty = tpos[1]+ychsz*0.3
     xyouts, tx,ty,normal=1, msg, charsize=label_size
     
-    tx0 = max_target_time+60
-    txs = [min(target_times),tx0]
-    ty0 = tpos[1]+ychsz*1.3
-    foreach tx,txs,ii do begin
-        tmp = convert_coord(tx,10, data=1, to_normal=1)
-        txs[ii] = tmp[0]
-        plots, tmp[0]+[0,0], ty0+[-1,1]*ychsz*0.2, normal=1
-    endforeach
-    tys = ty0+[0,0]
-    plots, txs,tys, normal=1
-    msg = 'Para acc'
-    tx = mean(txs)
-    ty = tys[0]-ychsz*1
-    xyouts, tx,ty,msg, normal=1, charsize=label_size, alignment=0.5
-    
-    txs = [tx0,max(target_times)]
-    foreach tx,txs,ii do begin
-        tmp = convert_coord(tx,10, data=1, to_normal=1)
-        txs[ii] = tmp[0]
-        plots, tmp[0]+[0,0], ty0+[-1,1]*ychsz*0.2, normal=1
-    endforeach
-    tys = ty0+[0,0]
-    plots, txs,tys, normal=1
-    msg = 'Para acc or Perp heating'
-    tx = mean(txs)
-    ty = tys[0]-ychsz*1
-    xyouts, tx,ty,msg, normal=1, charsize=label_size, alignment=0.5
+;    tx0 = max_target_time+60
+;    txs = [min(target_times),tx0]
+;    ty0 = tpos[1]+ychsz*1.3
+;    foreach tx,txs,ii do begin
+;        tmp = convert_coord(tx,10, data=1, to_normal=1)
+;        txs[ii] = tmp[0]
+;        plots, tmp[0]+[0,0], ty0+[-1,1]*ychsz*0.2, normal=1
+;    endforeach
+;    tys = ty0+[0,0]
+;    plots, txs,tys, normal=1
+;    msg = 'Para acc'
+;    tx = mean(txs)
+;    ty = tys[0]-ychsz*1
+;    xyouts, tx,ty,msg, normal=1, charsize=label_size, alignment=0.5
+;    
+;    txs = [tx0,max(target_times)]
+;    foreach tx,txs,ii do begin
+;        tmp = convert_coord(tx,10, data=1, to_normal=1)
+;        txs[ii] = tmp[0]
+;        plots, tmp[0]+[0,0], ty0+[-1,1]*ychsz*0.2, normal=1
+;    endforeach
+;    tys = ty0+[0,0]
+;    plots, txs,tys, normal=1
+;    msg = 'Para acc or Perp heating'
+;    tx = mean(txs)
+;    ty = tys[0]-ychsz*1
+;    xyouts, tx,ty,msg, normal=1, charsize=label_size, alignment=0.5
 
     
 
@@ -559,5 +558,6 @@ test = 0
 
 end
 
-print, fig_2015_0416_0800_outflow_v01(event_info=event_info)
+test = 0
+print, fig_2015_0416_0800_outflow_v01(event_info=event_info, test=test)
 end

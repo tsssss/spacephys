@@ -343,7 +343,9 @@ function alfven_arc_load_themis_data_b0_gsm, event_info, time_var=time_var
     window = event_info['b0_window']
     if cdf_has_var(var, filename=data_file) then begin
         vatt = cdf_read_setting(var, filename=data_file)
-        if window ne vatt['window'] then cdf_del_var, var, filename=data_file
+        if vatt.haskey('window') then begin
+            if window ne vatt['window'] then cdf_del_var, var, filename=data_file
+        endif
     endif
     if ~cdf_has_var(var, filename=data_file) then begin
         b_gsm_var = alfven_arc_load_themis_data_b_gsm(event_info, time_var=time_var)
@@ -917,7 +919,7 @@ function alfven_arc_load_themis_data, input_time_range, probe=probe, filename=da
     e_dsl_var = alfven_arc_load_themis_data_e_dsl(event_info, time_var=field_time_var, _extra=ex)
 
     ; Seperate B0 and B1.
-    event_info['b0_window'] = 120.
+    event_info['b0_window'] = 1200.
     bmod_var = alfven_arc_load_themis_data_bmod_gsm(event_info)
     b0_gsm_var = alfven_arc_load_themis_data_b0_gsm(event_info, time_var=field_time_var)
     b0_dsl_var = alfven_arc_load_themis_data_b0_dsl(event_info, time_var=field_time_var)
@@ -932,6 +934,19 @@ function alfven_arc_load_themis_data, input_time_range, probe=probe, filename=da
     ; Calculae pflux.
     pf_vars = alfven_arc_load_themis_data_pflux(event_info, fac_vars)
 
+    ; Convert velocity to FAC.
+    prefix = event_info['prefix']
+    fac_labels = event_info['fac_labels']
 
+    q_gsm2fac_var = prefix+'q_gsm2fac'
+    vel_gsm_var = prefix+'p_vbulk_gsm'
+    vel_fac_var = prefix+'p_vbulk_fac'
+    to_fac, vel_gsm_var, to=vel_fac_var, q_var=q_gsm2fac_var
+    
+    ; Calc B spec.
+    scale_info =  {s0:3, s1:600, dj:1d/8, ns:0d}
+    b_spec_var = stplot_mor_new(prefix+'b_gsm', scale_info=scale_info)
+    e_spec_var = stplot_mor_new(prefix+'edot0_fac', scale_info=scale_info)
+    
     return, event_info
 end

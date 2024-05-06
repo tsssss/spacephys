@@ -13,9 +13,9 @@ function trace_ion_to_ionosphere, time, species=species, model=model, mod_time=m
     
     tmp = geopack_resolve_model(model)
     t89 = tmp.t89
-    t95 = tmp.t96
-    t00 = tmp.t01
-    ts03 = tmp.ts04
+    t96 = tmp.t96
+    t01 = tmp.t01
+    ts04 = tmp.ts04
     storm = tmp.storm
     
     if n_elements(model_time) eq -1 then model_time = time
@@ -62,7 +62,7 @@ function trace_ion_to_ionosphere, time, species=species, model=model, mod_time=m
                 dbz = -1
             endif else begin
                 routine = 'geopack_'+model
-                if model eq 't03s' then routine = 'geopack_ts04'
+                if model eq 't04s' then routine = 'geopack_ts04'
                 call_procedure, routine, par, rx,ry,rz, dbx,dby,dbz
             endelse
 

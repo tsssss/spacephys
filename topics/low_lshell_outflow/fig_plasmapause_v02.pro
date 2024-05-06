@@ -8,12 +8,13 @@ function scale_pp_time_to_zz, pp_time, time_range
     
 end
 
-function fig_plasmapause_v01_config_panel, config_pos, $
+function fig_plasmapause_v02_config_panel, config_pos, $
     pos_xrange=pos_xrange, pos_yrange=pos_yrange, event_info=event_info
 
     time_range = event_info.time_range
     pp_symsize = event_info.pp.symsize
     pp_psym = event_info.pp.psym
+
     if pp_psym eq 8 then begin
         tmp = smkarthm(0,2*!dpi,50,'n')
         circ_xs = cos(tmp)
@@ -208,7 +209,7 @@ end
 
 
 
-function fig_plasmapause_v01_right_panels, right_pos, event_info=event_info
+function fig_plasmapause_v02_right_panels, right_pos, event_info=event_info
 
     time_range = event_info.time_range
     dst_var = omni_read_symh(time_range, get_name=1)
@@ -354,9 +355,9 @@ end
 
 
 
-function fig_plasmapause_v01, plot_file, event_info=event_info, test=test
+function fig_plasmapause_v02, plot_file, event_info=event_info, test=test
 
-    version = 'v01'
+    version = 'v02'
     id = '2015_0317'
     event_info = low_lshell_outflow_load_data(id)
         
@@ -475,11 +476,8 @@ function fig_plasmapause_v01, plot_file, event_info=event_info, test=test
             pp_trs = pp_trs.toarray()
             pp_times = (pp_trs[*,0]+pp_trs[*,1])*0.5
             ; manual pp_times.
-;            if probe eq 'a' then begin
-;                pp_times = time_double([$
-;                    '2015-03-17/'+['03:38','07:48','13:58','15:52','23:07'],$
-;                    '2015-03-18/'+['00:56','07:50','09:50']])
-;            endif
+            pp_times = ((event_info['rbsp'])['rbsp'+probe])['pp_times']
+
             store_data, pp_var, pp_times, pp_trs, limits={dens_range:dens_range}
         endif
         
@@ -549,10 +547,10 @@ function fig_plasmapause_v01, plot_file, event_info=event_info, test=test
 
 ;---Pos.
     config_pos = all_poss[*,0]
-    tpos = fig_plasmapause_v01_config_panel(config_pos, $
+    tpos = fig_plasmapause_v02_config_panel(config_pos, $
         pos_xrange=pos_xrange, pos_yrange=pos_yrange, event_info=event_info)
     right_pos = all_poss[*,1]
-    poss = fig_plasmapause_v01_right_panels(right_pos, event_info=event_info)
+    poss = fig_plasmapause_v02_right_panels(right_pos, event_info=event_info)
     
     
     
@@ -564,5 +562,5 @@ function fig_plasmapause_v01, plot_file, event_info=event_info, test=test
 end
 
 
-print, fig_plasmapause_v01(test=0)
+print, fig_plasmapause_v02(test=0)
 end

@@ -1,12 +1,68 @@
 
-function fig_asi_movie_v01, movie_file, event_info=event_info
+function fig_asi_movie_v02, test=test, event_info=event_info
 
-
-;---Load data and settings.
-test = 0
-    id = '2015_0317'
     version = 'v02'
-    if n_elements(event_info) eq 0 then event_info = low_lshell_outflow_load_data(id)
+    id = '2013_0317'
+
+    if n_elements(event_info) eq 0 then event_info = saps_efield_load_data(id)
+
+    time_range = time_double(['2013-03-17/05:30','2013-03-17/09:30'])
+    mlt_image_var = 'thg_asf_mlt_image'
+
+
+;---RBSP fpt.
+    sc_list = list()
+    probes = ['a']
+    internal_model = 'igrf'
+    external_model = 't01'
+    sc_colors = sgcolor(['purple','blue'])
+    foreach probe, probes, probe_id do begin
+        prefix = 'rbsp'+probe+'_'
+        sc_name = strupcase('rbsp')
+        sc_color = sc_colors[probe_id]
+        probe_info = dictionary($
+            'prefix', prefix, $
+            'probe', probe, $
+            'sc_name', sc_name, $
+            'sc_color', sc_color, $
+            'internal_model', internal_model, $
+            'external_model', external_model )
+        sc_list.add, probe_info
+    endforeach
+    
+    update = 1
+    r_gsm_var = prefix+'r_gsm'
+    hemisphere = 'north'
+    suffix = '_'+internal_model+'_'+external_model+'_'+hemisphere+'_no_refine'
+    var_info = prefix+'f_gsm'+suffix
+    fpt_var = lets_trace_to_ionosphere(var_info=var_info, $
+        orbit_var=r_gsm_var, coord='gsm', time_var=orbit_time_var, $
+        internal_model=internal_model, external_model=external_model, hemisphere=hemisphere, refine=0, update=update)
+    print, 'Loading '+fpt_var+' ...'
+
+    ; The fmlat/fmlon/mlt of the footpoint.
+    var_info = dictionary($
+        'mlat', prefix+'fmlat'+suffix, $
+        'mlon', prefix+'fmlon'+suffix, $
+        'mlt', prefix+'fmlt'+suffix )
+    mlat_vars = lets_read_mlat_vars(orbit_var=fpt_var, time_var=orbit_time_var, var_info=var_info, update=update)
+    
+    
+    suffix = '_'+internal_model+'_'+external_model+'_'+hemisphere
+    var_info = prefix+'f_gsm'+suffix
+    fpt_var = lets_trace_to_ionosphere(var_info=var_info, $
+        orbit_var=r_gsm_var, coord='gsm', time_var=orbit_time_var, $
+        internal_model=internal_model, external_model=external_model, hemisphere=hemisphere, refine=1, update=update)
+    print, 'Loading '+fpt_var+' ...'
+
+    ; The fmlat/fmlon/mlt of the footpoint.
+    var_info = dictionary($
+        'mlat', prefix+'fmlat'+suffix, $
+        'mlon', prefix+'fmlon'+suffix, $
+        'mlt', prefix+'fmlt'+suffix )
+    mlat_vars = lets_read_mlat_vars(orbit_var=fpt_var, time_var=orbit_time_var, var_info=var_info, update=update)
+
+stop
 
 ;---Settings.
     add_jver = 0
@@ -15,32 +71,15 @@ test = 0
     if asi_zlog eq 0 then asi_zrange = [-1,1]*4e3 else asi_zrange = [5e1,1e4]
     asi_ct = 70
 
-
-;---SC setting.
-    sc_list = list()
-    sc_list.add, event_info.rbsp.rbspa
-    sc_list.add, event_info.rbsp.rbspb
-    nprobe = n_elements(sc_list)
-;    model_setting = event_info.rbsp.rbspa['model_setting']
-;    internal_model = event_info['internal_model']
-;    external_model = event_info['external_model']
-;    models = model_setting.models
-;    model_index = where(models eq external_model)
-
-
-;---Auto settings.
-    time_range = event_info.ground_time_range
     time_step = 3d
     common_times = make_bins(time_range, time_step)
     ntime = n_elements(common_times)
-
-    asi_setting = event_info['asi_setting']
-    asi_sites = sort_uniq(asi_setting.sites)
-
+    asi_sites = (event_info['asi_setting'])['sites']
+    
+    plot_dir = event_info['plot_dir']
     if n_elements(movie_file) eq 0 then begin
-        plot_dir = event_info['plot_dir']
         movie_file = join_path([plot_dir,$
-            'thg_asf_movie_'+event_info.id+'_'+version+'.mp4'])
+            'thg_asf_movie_'+id+'_'+version+'.mp4'])
     endif
 
     margins = [1,0.5,1,4]
@@ -53,7 +92,11 @@ test = 0
     endif else if mlt_type eq 'all_mlt' then begin
         pansize = [6,6]
     endif
-    sgopen, 0, size=[1,1], xchsz=abs_xchsz, ychsz=abs_ychsz
+
+    tmp = get_abs_chsz()
+    abs_xchsz = tmp[0]
+    abs_ychsz = tmp[1]
+
     uniform_ticklen = -abs_ychsz*0.15
     if add_jver then begin
         poss = panel_pos(nxpan=2, $
@@ -115,7 +158,7 @@ test = 0
     xtickn_pos = (90.-min_mlat)/(90.-min_mlat+6)
     xrange = mlt_range
     xstep = 6d
-    xtickv = smkarthm(xrange[0],xrange[1], 2, 'dx')
+    xtickv = smkarthm(xrange[0]+2,xrange[1]-2, 2, 'dx')
     xtick_minor = make_bins(xrange, 1, inner=1)
     xtickn = xtickv
     index = where(xtickv lt 0, count)
@@ -130,7 +173,6 @@ test = 0
     ytickv = make_bins(yrange, 10, inner=1)
     ytick_minor = make_bins(yrange, ystep, inner=1)
     ytickn = string(ytickv,format='(I0)')
-
 
 ;---asi.
     asi_var = 'thg_asf_mlt_image'
@@ -210,6 +252,7 @@ test = 0
     plot_files = []
     foreach time, common_times, time_id do begin
         if time_id mod 10 ne 0 then continue
+    
         plot_file = join_path([plot_dir,'thg_asf_mlt_image_'+version,$
             'thg_asf_mlt_image_'+time_string(time,tformat='YYYY_MMDD_hhmm_ss')+'_'+version+'.png'])
         plot_files = [plot_files, plot_file]
@@ -244,7 +287,7 @@ test = 0
     ;---Add axis, labels, etc.
         info_list = list()
         info_list.add, dictionary($
-            'msg', ['a-1) North | white light',strjoin(strupcase(asi_sites),' ')+' | '+$
+            'msg', ['a) North | white light',strjoin(strupcase(asi_sites),' ')+' | '+$
             time_string(time,tformat='hh:mm:ss')+' UT'], $
             'hemisphere', 'north', $
             'position', asi_tpos, $
@@ -347,31 +390,34 @@ test = 0
             endforeach
 
             ; add sc fpt.
-            foreach sc_info, sc_list do begin
-                prefix = sc_info['prefix']
-                probe = sc_info['probe']
-                sc_name = sc_info['sc_name']
-                sc_color = sc_info['sc_color']
-                internal_model = (sc_info.haskey('internal_model'))? sc_info['internal_model']: 'dipole'
-                external_model = (sc_info.haskey('external_model'))? sc_info['external_model']: 't89'
+            if n_elements(sc_list) ne 0 then begin
+                foreach sc_info, sc_list do begin
+                    prefix = sc_info['prefix']
+                    probe = sc_info['probe']
+                    sc_name = sc_info['sc_name']
+                    sc_color = sc_info['sc_color']
+                    internal_model = (sc_info.haskey('internal_model'))? sc_info['internal_model']: 'dipole'
+                    external_model = (sc_info.haskey('external_model'))? sc_info['external_model']: 'dipole'
 
-                suffix = '_'+internal_model+'_'+external_model+'_'+the_info.hemisphere
-                fmlt = get_var_data(prefix+'fmlt'+suffix, at=time)+24
-                fmlat = abs(get_var_data(prefix+'fmlat'+suffix, at=time))
+                    suffix = '_'+internal_model+'_'+external_model+'_north'
+                    fmlt = get_var_data(prefix+'fmlt'+suffix, at=time)+24
+                    fmlat = abs(get_var_data(prefix+'fmlat'+suffix, at=time))+5
 
-                tr = (90-fmlat)/(90-min_mlat)
-                tt = (fmlt*15-90)*!dtor
-                tx = tr*cos(tt)
-                ty = tr*sin(tt)
-                tmp = convert_coord(tx, ty, /data, /to_normal)
-                tx = tmp[0]
-                ty = tmp[1]
-                plots, tx,ty,normal=1, psym=6, symsize=label_size, color=sc_color
-                msg = strupcase(sc_name)+'-'+strupcase(probe)
-                ;msg = strupcase(probe)
-                xyouts, tx-xchsz*1.2,ty-ychsz*0.5, alignment=1,normal=1, $
-                    msg, color=sc_color, charsize=sc_label_size
-            endforeach
+                    tr = (90-fmlat)/(90-min_mlat)
+                    tt = (fmlt*15-90)*!dtor
+                    tx = tr*cos(tt)
+                    ty = tr*sin(tt)
+                    tmp = convert_coord(tx, ty, /data, /to_normal)
+                    tx = tmp[0]
+                    ty = tmp[1]
+                    plots, tx,ty,normal=1, psym=6, symsize=label_size, color=sc_color
+                    msg = strupcase(sc_name)+'-'+strupcase(probe)
+                    ;msg = strupcase(probe)
+                    xyouts, tx-xchsz*1.2,ty-ychsz*0.5, alignment=1,normal=1, $
+                        msg, color=sc_color, charsize=sc_label_size
+                endforeach
+            endif
+            
             
             
             ; Add panel label.
@@ -388,8 +434,9 @@ test = 0
 
     fig2movie, movie_file, fig_files=plot_files, fps=50
     return, movie_file
+
+
 end
 
-
-print, fig_asi_movie_v01(event_info=event_info)
+print, fig_asi_movie_v02(test=1, event_info=event_info)
 end

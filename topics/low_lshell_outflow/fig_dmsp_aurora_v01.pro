@@ -2,24 +2,14 @@
 ; Plot DMSP aurora over the storm.
 ;-
 
-function fig_dmsp_aurora_v01, plot_file, event_info=event_info
+function fig_dmsp_aurora_v01, plot_file, event_info=event_info, test=test
 
-    time_range = time_double(['2015-03-17','2015-03-18/12:00'])
-    rbsp_probes = ['a','b']
-    themis_probes = ['d','e']
-    mms_probes = ['1']
+
+    version = 'v01'
+    id = '2015_0317'
+    if n_elements(event_info) eq 0 then event_info = low_lshell_outflow_load_data(id)
+    time_range = event_info.time_range
     dmsp_probes = 'f'+['16','17','18','19']
-
-    event_info = dictionary($
-        'time_range', time_range, $
-        'rbsp_probes', rbsp_probes, $
-        'themis_probes', themis_probes, $
-        'dmsp_probes', dmsp_probes, $
-        ;'pp_ct', 67, $
-        'pp_ct', 63, $
-        'pp_psym', 8, $
-        'pp_symsize', 0.75 )
-
 
 
 ;---Load data.
@@ -88,10 +78,13 @@ function fig_dmsp_aurora_v01, plot_file, event_info=event_info
     nxpan = 4d
     pansize = 2.5
     nypan = ceil(npan/nxpan)
-    stop
+    
+    
 
     margins = [1,1,7,1]
-    plot_file = 0
+    if n_elements(plot_dir) eq 0 then plot_dir = event_info.plot_dir
+    plot_file = join_path([plot_dir,'fig_dmsp_aurora_v01.pdf'])
+    if keyword_set(test) then plot_file = 0
     all_poss = panel_pos(plot_file, nxpan=nxpan,nypan=nypan+1,pansize=[1,1]*pansize, $
         margins=margins, fig_size=fig_size, xpad=0, ypad=0)
     sgopen, plot_file, size=fig_size, xchsz=xchsz, ychsz=ychsz
@@ -309,12 +302,13 @@ function fig_dmsp_aurora_v01, plot_file, event_info=event_info
         
     endforeach
 
-
+    if keyword_set(test) then stop
+    sgclose
 
     return, plot_file
 
 end
 
 
-print, fig_dmsp_aurora_v01()
+print, fig_dmsp_aurora_v01(test=0, event_info=event_info)
 end

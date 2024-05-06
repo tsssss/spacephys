@@ -53,7 +53,7 @@ function rbsp_read_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
 
             short_name = species_name+' '+short_names[var_id]
             vatt = cdf_read_setting(vec_default_var, filename=files[0])
-            unit = vatt.units
+            unit = vatt['UNITS']
             add_setting, vec_coord_var, /smart, {$
                 display_type: 'vector', $
                 unit: unit, $
@@ -68,7 +68,7 @@ function rbsp_read_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
     foreach scalar_var, scalar_vars, var_id do begin
         short_name = species_name+' '+short_names[var_id]
         vatt = cdf_read_setting(vec_default_var, filename=files[0])
-        unit = vatt.units
+        unit = vatt['UNITS']
 
         add_setting, scalar_var, /smart, {$
             display_type: 'scalar', $

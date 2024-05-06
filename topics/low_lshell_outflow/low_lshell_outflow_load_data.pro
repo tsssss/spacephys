@@ -2,8 +2,8 @@ function low_lshell_outflow_load_data, id;, event_info=event_info
 
 ;    if n_elements(event_info) ne 0 then if event_info.id eq id then return, event_info
 
-    plot_dir = join_path([googledir(),'works','low_lshell_outflow','plot',id])
-    data_dir = join_path([googledir(),'works','low_lshell_outflow','data'])
+    plot_dir = join_path([googledir(),'works','2024_low_lshell_outflow','plot',id])
+    data_dir = join_path([googledir(),'works','2024_low_lshell_outflow','data'])
     version = 'v01'
 
     if id eq '2015_0317' then begin
@@ -43,14 +43,24 @@ function low_lshell_outflow_load_data, id;, event_info=event_info
         j_vars = event_study_read_weygand(weygand_setting, time_var='weygand_time')
         event_info['weygand_setting'] = weygand_setting
 
+        sites = ['inuv','whit','atha','fsim','fsmi','pina','kapu','snkq','gbay','nrsq']
+        nsite = n_elements(sites)
+        min_elevs = [10,5,5,10,10,5,5,10,5,5]/2
+        merge_method = 'merge_elev'
+        calibration_method = 'simple'
         asi_setting = dictionary($
             'data_file', ground_file, $
             'time_range', ground_time_range, $
-            'sites', ['inuv','whit','atha','fsim','fsmi','pina','kapu','snkq','gbay','nrsq'], $
-            'min_elevs', [10,5,5,10,10,5,5,10,5,5]/2, $
-            'merge_method', 'merge_elev', $
-            'calibration_method', 'simple' )
-        ;mlt_image_var = event_study_read_asi_mlt_image(asi_setting, time_var='asi_time')
+            'sites', sites, $
+            'min_elevs', min_elevs, $
+            'merge_method', merge_method, $
+            'calibration_method', calibration_method )
+        mlt_image_var = lets_read_this($
+            func='themis_asf_read_mlt_image', $
+            save_to=ground_file, $
+            ground_time_range, sites=sites, $
+            min_elev=min_elevs, merge_method=merge_method, calibration_method=calibration_method)
+
         event_info['asi_setting'] = asi_setting
 
 

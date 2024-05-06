@@ -2,41 +2,6 @@
 ; Read MLat, MLon, MLT, L-Shell, |R| bundle from orbit_var.
 ;-
 
-function calc_mlat, r_mag
-
-    deg = constant('deg')
-    return, asin(r_mag[*,2]/snorm(r_mag))*deg
-
-end
-
-
-function calc_mlon, r_mag
-
-    deg = constant('deg')
-    return, atan(r_mag[*,1],r_mag[*,0])*deg
-
-end
-
-
-function calc_mlt, times, mlon, r_mag=r_mag
-
-    if n_elements(mlon) eq 0 then mlon = calc_mlon(r_mag)
-    return, mlon2mlt(mlon, times)
-
-end
-
-
-function calc_lshell, mlat, dis, r_mag=r_mag
-
-    if n_elements(mlat) eq 0 then mlat = calc_mlat(r_mag)
-    if n_elements(dis) eq 0 then dis = snorm(r_mag)
-
-    ; https://en.wikipedia.org/wiki/L-shell
-    return, dis/cos(mlat*constant('rad'))^2
-
-end
-
-
 function lets_read_mlat_vars, var_info=var_info, orbit_var=orbit_var, $
     update=update, get_name=get_name, prefix=prefix, suffix=suffix, errmsg=errmsg, $
     save_to=data_file, time_var=time_var, $
@@ -102,12 +67,16 @@ function lets_read_mlat_vars, var_info=var_info, orbit_var=orbit_var, $
     scalar_settings['unit'] = 'Re'
     scalar_settings['short_name'] = '|R|'
     diss = snorm(r_vec)
-    var_info['dis'] = save_data_to_memory(var_info['dis'], times, diss, settings=scalar_settings)
+    if var_info.haskey('dis') then begin
+        var_info['dis'] = save_data_to_memory(var_info['dis'], times, diss, settings=scalar_settings)
+    endif
 
     scalar_settings['unit'] = '#'
     scalar_settings['short_name'] = 'L-Shell'
     lshells = calc_lshell(mlats, diss)
-    var_info['lshell'] = save_data_to_memory(var_info['lshell'], times, lshells, settings=scalar_settings)
+    if var_info.haskey('lshell') then begin
+        var_info['lshell'] = save_data_to_memory(var_info['lshell'], times, lshells, settings=scalar_settings)
+    endif
 
     ; Convert to the wanted coord.
     if n_elements(time_var) ne 0 then is_success = interp_var_to_time(var_info, time_var=time_var)

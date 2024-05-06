@@ -1,7 +1,7 @@
 
 
 function read_geopack_bfield, orbit_var, external_model=external_model, internal_model=internal_model, $
-    var_info=var_info, get_name=get_name, t89_use_kp=t89_use_kp, _extra=ex
+    var_info=var_info, get_name=get_name, t89_use_kp=t89_use_kp, update=update, _extra=ex
 
     prefix = get_prefix(orbit_var)
     coord_orig = 'gsm'
@@ -142,7 +142,7 @@ function lets_read_geopack_bfield, var_info=var_info, $
     if is_success then return, var_info
 
     ; Read var from routine.
-    vec_default_var = read_geopack_bfield(orbit_var, save_to=vec_default_var, $
+    vec_default_var = read_geopack_bfield(orbit_var, var_info=var_info, $
         external_model=external_model, internal_model=internal_model, t89_use_kp=t89_use_kp, update=update)
     
     ; Convert to the wanted coord.

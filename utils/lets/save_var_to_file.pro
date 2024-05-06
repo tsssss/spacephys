@@ -27,7 +27,7 @@ function save_var_to_file_per_var, var, file=data_file, time_var=time_var, errms
         settings['DEPEND_1'] = value_var
         if ~cdf_has_var(value_var, filename=data_file) then begin
             cdf_save_var, value_var, filename=data_file, value=vals
-            cdf_save_setting, value_var, filename=data_file, varname=value_var, dictionary($
+            cdf_save_setting, filename=data_file, varname=value_var, dictionary($
                 'var_type', 'support_data' )
         endif
     endif

@@ -1,7 +1,7 @@
-function trace_to_ionosphere, hemisphere=hemisphere, stop_altitude=h0, $
+function trace_to_ionosphere, var_info=var_info, hemisphere=hemisphere, stop_altitude=h0, $
     orbit_var=orbit_var, external_model=external_model, internal_model=internal_model, $
-    save_to=var_info, get_name=get_name, $
-    t89_use_kp=t89_use_kp, _extra=ex
+    get_name=get_name, $
+    t89_use_kp=t89_use_kp, refine=refine, _extra=ex
 
     if n_elements(orbit_var) eq 0 then begin
         errmsg = 'No input orbit_var ...'
@@ -17,7 +17,7 @@ function trace_to_ionosphere, hemisphere=hemisphere, stop_altitude=h0, $
     if n_elements(internal_model) eq 0 then internal_model = 'dipole'
     suffix = '_'+internal_model+'_'+external_model+'_'+hemisphere
 
-    var_info = prefix+'f_'+coord_orig+suffix
+    if n_elements(var_info) eq 0 then var_info = prefix+'f_'+coord_orig+suffix
     if keyword_set(get_name) then return, var_info
 
 
@@ -60,7 +60,7 @@ function trace_to_ionosphere, hemisphere=hemisphere, stop_altitude=h0, $
     ts04 = tmp.ts04
     storm = tmp.storm
     igrf = (internal_model eq 'igrf')? 1: 0
-    refine = 1
+    if ~keyword_set(refine) then refine = 1
 
     foreach time, times, time_id do begin
         ps = geopack_recalc(time)
@@ -128,7 +128,8 @@ function lets_trace_to_ionosphere, var_info=var_info, $
     if is_success then return, var_info
 
     ; Read var from routine.
-    vec_default_var = trace_to_ionosphere(orbit_var=orbit_var, $
+    vec_default_var = trace_to_ionosphere(var_info=var_info, $
+        orbit_var=orbit_var, $
         hemisphere=hemisphere, stop_altitude=h0, $
         external_model=external_model, internal_model=internal_model, t89_use_kp=t89_use_kp)
     

@@ -451,7 +451,7 @@ function _2013_0501_0850_load_data_load_dmsp_model_vars, event_info
                 cdf_load_var, var, filename=data_file
                 get_data, var, times, data
                 ndim = n_elements(data)/n_elements(times)
-                window = 600d
+                window = 60d
                 time_step = sdatarate(times)
                 width = window/time_step
                 if ndim eq 1 then begin
@@ -1317,8 +1317,10 @@ end
 
 function _2013_0501_0850_load_data, filename=data_file
 
+    root_dir = join_path([googledir(),'works','pflux_grant'])
+    root_dir = join_path([diskdir('Research'),'archives','works','2024_pflux_grant'])
     if n_elements(data_file) eq 0 then begin
-        data_file = join_path([googledir(),'works','pflux_grant','alfven_arc','data','2013_0501_0850_all_data_v02.cdf'])
+        data_file = join_path([root_dir,'alfven_arc','data','2013_0501_0850_all_data_v02.cdf'])
     endif
     
 
@@ -1357,7 +1359,7 @@ function _2013_0501_0850_load_data, filename=data_file
         'short_name', 'Cmap', $
         'unit', '#', $
         'text', 'Mapping coef to map flux to 100 km altitude' )
-    stop
+    
     
     
 ;---SECS.
@@ -1434,7 +1436,7 @@ function _2013_0501_0850_load_data, filename=data_file
 ;    param_vars = _2013_0501_0850_load_data_plasma_param(event_info)
 
 
-    plot_dir = join_path([googledir(),'works','pflux_grant','alfven_arc','plot'])
+    plot_dir = join_path([root_dir,'alfven_arc','plot'])
     event_info['plot_dir'] = plot_dir
 
 

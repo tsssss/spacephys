@@ -55,6 +55,7 @@ function ml_rbsp_read_pos, input_time_range, probe=probe, $
     endif
     add_setting, r_coord_var, smart=1, dictionary($
         'requested_time_range', time_range, $
+        'mission_probe', 'rbsp'+probe, $
         'display_type', 'vector', $
         'unit', 'Re', $
         'short_name', 'R', $

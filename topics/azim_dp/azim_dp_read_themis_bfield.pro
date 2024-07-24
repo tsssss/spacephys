@@ -13,7 +13,7 @@ pro azim_dp_read_themis_bfield, time_range, probe=probe, errmsg=errmsg
     prefix = 'th'+probe+'_'
     b_var = prefix+'b_gsm'
     flag_var = prefix+'fgm_fgs_quality'
-    rename_var, prefix+'fgs_gsm', to=b_var
+    b_var = rename_var(prefix+'fgs_gsm', output=b_var)
     uniform_time, b_var, common_time_step
     uniform_time, flag_var, common_time_step
     add_setting, b_var, /smart, {$

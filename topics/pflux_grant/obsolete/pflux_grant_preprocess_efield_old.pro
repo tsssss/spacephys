@@ -384,7 +384,7 @@ pro pflux_grant_preprocess_efield_load_data, date, probe=probe, project=project
     endelse
     datatype = (date ge time_double('2016-02-28'))? 'l2%vsvy-highres2': 'l2%vsvy-highres'
     rbsp_read_efw, date_time_range, id=datatype, probe=probe
-    rename_var, 'vsvy', to=vsvy_var
+    vsvy_var = rename_var('vsvy', output=vsvy_var)
     get_data, vsvy_var, times, vsvy
     if n_elements(vsvy) lt 6 then begin
         msg = strupcase(probe)+ ': no V data on '+time_string(date,tformat='YYYY/MM-DD')

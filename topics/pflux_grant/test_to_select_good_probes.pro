@@ -105,8 +105,7 @@ endforeach
         datatype = (date ge time_double('2016-02-28'))? 'l2%vsvy-highres2': 'l2%vsvy-highres'
         rbsp_read_efw, date_time_range, id=datatype, probe=probe
 
-        vsvy_var = prefix+'vsvy'
-        rename_var, 'vsvy', to=vsvy_var
+        vsvy_var = rename_var('vsvy', output=prefix+'vsvy')
         get_data, vsvy_var, times, vsvy
         if n_elements(vsvy) le 6 then continue
         vsvy = vsvy[*,0:3]

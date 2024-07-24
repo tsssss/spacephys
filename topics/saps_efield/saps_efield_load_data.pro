@@ -49,21 +49,33 @@ function saps_efield_load_data, id;, event_info=event_info
             'merge_method', merge_method, $
             'calibration_method', calibration_method )
         
-        mlt_image_var = lets_read_this($
-            func='themis_asf_read_mlt_image', $
-            save_to=ground_file, $
+        mlt_image_var = themis_asf_read_mlt_image($
             ground_time_range, sites=sites, $
             min_elev=min_elevs, merge_method=merge_method, calibration_method=calibration_method)
         event_info['asi_setting'] = asi_setting
 
         mlt_range = asi_setting['mlt_range']
         mlat_range = asi_setting['mlat_range']
-        mlt_image_rect_var = lets_read_this($
-            func='themis_asf_read_mlt_image_rect', $
-            save_to=ground_file, $
+        mlt_image_rect_var = themis_asf_read_mlt_image_rect($
             ground_time_range, sites=sites, $
             min_elev=min_elevs, merge_method=merge_method, calibration_method=calibration_method, $
             mlt_range=mlt_range, mlat_range=mlat_range)
+            
+;        mlt_image_var = lets_read_this($
+;            func='themis_asf_read_mlt_image', $
+;            save_to=ground_file, $
+;            ground_time_range, sites=sites, $
+;            min_elev=min_elevs, merge_method=merge_method, calibration_method=calibration_method)
+;        event_info['asi_setting'] = asi_setting
+;
+;        mlt_range = asi_setting['mlt_range']
+;        mlat_range = asi_setting['mlat_range']
+;        mlt_image_rect_var = lets_read_this($
+;            func='themis_asf_read_mlt_image_rect', $
+;            save_to=ground_file, $
+;            ground_time_range, sites=sites, $
+;            min_elev=min_elevs, merge_method=merge_method, calibration_method=calibration_method, $
+;            mlt_range=mlt_range, mlat_range=mlat_range)
 
     ;---RBSP.
         rbsp_time_range = ['2015-01-04/06:00','2015-01-04/16:00']

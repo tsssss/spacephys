@@ -1,9 +1,7 @@
 *.swo
 *.swp
 *.pdf
-*.cdf
 *.tplot
-*.sav
 *.png
 *.jpg
 .DS_Store

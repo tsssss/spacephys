@@ -132,6 +132,7 @@ function fig_rbsp_overview_v02, test=test, event_info=event_info
         store_data, e_spec_combo, data=[e_spec_var,fc_vars]
         options, e_spec_combo, 'yrange', get_setting(e_spec_var,'yrange')
         options, e_spec_combo, 'labels', ''
+        options, e_spec_combo, 'ztitle', 'E ((mV/m)!U2!N/Hz)'
 
 
         b_spec_var = prefix+'b_spec_hz'
@@ -215,20 +216,31 @@ function fig_rbsp_overview_v02, test=test, event_info=event_info
         theta_combo_var = prefix+'b_theta_combo'
         times = get_var_time(b_gsm_var)
         foreach var, b_theta_vars do interp_time, var, times
-        theta_combo_var = stplot_merge(b_theta_vars[1:*], output=theta_combo_var)
+        theta_combo_var = stplot_merge(b_theta_vars, output=theta_combo_var)
         add_setting, theta_combo_var, smart=1, dictionary($
             'display_type', 'stack', $
             'short_name', tex2str('theta'), $
             'unit', 'deg', $
             'constant', 0, $
-            'labels', strupcase(external_models), $
-            'colors', sgcolor(['blue','orange','green','purple']) )
-        b_theta_var = b_theta_vars[0]
-        theta_obs = get_var_data(b_theta_var, times=times)
-        theta_mod = get_var_data(theta_combo_var, times=times)
-        foreach tmp, external_models, ii do theta_mod[*,ii] -= theta_obs
-        store_data, theta_combo_var, times, theta_mod
-        set_ytick, theta_combo_var, yrange=[-4,12], ytickv=[0,5,10], yminor=5
+            'labels', ['Obs',strupcase(external_models)], $
+            'colors', sgcolor(['black','blue','orange','green','purple']) )
+        set_ytick, theta_combo_var, yrange=[30,45], ytickv=[30,40], yminor=5
+;        theta_combo_var = stplot_merge(b_theta_vars[1:*], output=theta_combo_var)
+;        add_setting, theta_combo_var, smart=1, dictionary($
+;            'display_type', 'stack', $
+;            'short_name', tex2str('theta'), $
+;            'unit', 'deg', $
+;            'constant', 0, $
+;            'labels', strupcase(external_models), $
+;            'colors', sgcolor(['blue','orange','green','purple']) )
+;        b_theta_var = b_theta_vars[0]
+;        theta_obs = get_var_data(b_theta_var, times=times)
+;        theta_mod = get_var_data(theta_combo_var, times=times)
+;        foreach tmp, external_models, ii do theta_mod[*,ii] -= theta_obs
+;        store_data, theta_combo_var, times, theta_mod
+;        set_ytick, theta_combo_var, yrange=[-4,12], ytickv=[0,5,10], yminor=5
+        
+        
         
         ; magnetic pressure.
         pmag_var = rbsp_read_magnetic_pressure(b_var=b_gsm_var)
@@ -481,12 +493,14 @@ function fig_rbsp_overview_v02, test=test, event_info=event_info
         nvar = n_elements(plot_vars)
         fig_letters = letters(nvar)
         fac_labels = ['||',tex2str('perp')+','+['out','west']]
-        fig_labels = fig_letters+') '+['Tilt','|B|','N','e-','H+','O+','E spec','Keo','Eu','E!Dspinfit']
+        fig_labels = fig_letters+') '+['Tilt','|B|!DObs-Mod!N','N','e-','H+','O+','E spec','Keo','Eu','E!Dspinfit']
         ypans = fltarr(nvar)+1.
         index = where(plot_vars eq e_spec_combo, count)
-        if count ne 0 then ypans[index] = 2
+        if count ne 0 then ypans[index] = 1.5
         index = where(plot_vars eq theta_combo_var, count)
-        if count ne 0 then ypans[index] = 1
+        if count ne 0 then ypans[index] = 1.1
+        index = where(plot_vars eq bmag_combo_var, count)
+        if count ne 0 then ypans[index] = 0.9
         index = where(plot_vars eq beta_var, count)
         if count ne 0 then ypans[index] = 0.8
         index = where(plot_vars eq mlat_var, count)
@@ -498,9 +512,9 @@ function fig_rbsp_overview_v02, test=test, event_info=event_info
         index = where(plot_vars eq fmlat_var, count)
         if count ne 0 then ypans[index] = 0.9
         index = where(plot_vars eq keo_var, count)
-        if count ne 0 then ypans[index] = 1.6  
+        if count ne 0 then ypans[index] = 1.3
         index = where(plot_vars eq ewo_var, count)
-        if count ne 0 then ypans[index] = 1.6
+        if count ne 0 then ypans[index] = 1.3
                 
         the_vars = [e_en_var,p_en_var,o_en_var]
         options, the_vars, 'ytitle', 'Energy!C(eV)'
@@ -672,5 +686,5 @@ function fig_rbsp_overview_v02, test=test, event_info=event_info
 
 end
 
-print, fig_rbsp_overview_v02(test=1, event_info=event_info)
+print, fig_rbsp_overview_v02(test=0, event_info=event_info)
 end

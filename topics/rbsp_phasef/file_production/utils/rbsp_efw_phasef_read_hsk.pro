@@ -152,8 +152,7 @@ pro rbsp_efw_phasef_read_hsk, date0, probe=probe, errmsg=errmsg, $
         old_vars = prefix+['bias_current','usher_voltage','guard_voltage']
         new_vars = prefix+['ibias','usher','guard']
         foreach old_var, old_vars, var_id do begin
-            new_var = new_vars[var_id]
-            rename_var, old_var, to=new_var
+            var = rename_var(old_var, output=new_vars[var_id])
         endforeach
     endif else begin
         rbsp_load_efw_hsk_beb, probe=probe, get_support_data=0, trange=time_range

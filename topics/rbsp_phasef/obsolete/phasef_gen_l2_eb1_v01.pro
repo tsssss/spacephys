@@ -32,7 +32,7 @@ pro phasef_gen_l2_eb1_v01, date, $
     rbspx = 'rbsp'+probe
 
     data_type = 'vb1'
-    valid_range = rbsp_efw_phasef_get_valid_range(data_type, probe=probe)
+    valid_range = phasef_get_valid_range(data_type, probe=probe)
     if n_elements(date) eq 0 then begin
         errmsg = 'No input date ...'
         lprmsg, errmsg, log_file

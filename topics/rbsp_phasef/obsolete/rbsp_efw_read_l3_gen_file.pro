@@ -54,7 +54,7 @@ pro rbsp_efw_read_l3_gen_file, date0, $
 
 ;---Load data, L4 and boom flag.
     rbsp_efw_read_l4, time_range, probe=probe
-    rbsp_efw_read_boom_flag, time_range, probe=probe
+    rbsp_read_boom_flag, time_range, probe=probe
 
 
 ;---Prepare flag and the used pair.

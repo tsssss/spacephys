@@ -52,7 +52,7 @@ pro rbsp_efw_phasef_read_spinaxis_gse, date, probe=probe, errmsg=errmsg, log_fil
 ;    store_data, spinaxis_gse_var, times, spinaxis_gse
     rbsp_read_spice_var, time_range, probe=probe
     spinaxis_gse_var = prefix+'spinaxis_gse'
-    rename_var, prefix+'wsc_gse', to=spinaxis_gse_var
+    spinaxis_gse_var = rename_var(prefix+'wsc_gse', output=spinaxis_gse_var)
     
 
 

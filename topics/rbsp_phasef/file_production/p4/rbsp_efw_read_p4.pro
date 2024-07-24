@@ -14,7 +14,7 @@ pro rbsp_efw_read_p4, tr, probe=probe, datatype=datatype, trange=trange, $
     vb = vb > !rbsp_efw.verbose
 
     if n_elements(probe) eq 0 then probe = 'a'
-    if n_elements(version) eq 0 then version = 'v04'
+    if n_elements(version) eq 0 then version = 'v05'
     if n_elements(trange) ne 0 then time_range = trange
     if n_elements(tr) ne 0 then time_range = tr
     if n_elements(time_range) eq 0 then time_range = timerange()

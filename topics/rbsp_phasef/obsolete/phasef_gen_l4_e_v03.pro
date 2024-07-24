@@ -32,7 +32,7 @@ pro phasef_gen_l4_e_v03_per_day, date, $
     rbspx = 'rbsp'+probe
 
     data_type = 'e_spinfit'
-    valid_range = rbsp_efw_phasef_get_valid_range(data_type, probe=probe)
+    valid_range = phasef_get_valid_range(data_type, probe=probe)
     if n_elements(date) eq 0 then begin
         errmsg = 'No input date ...'
         lprmsg, errmsg, log_file

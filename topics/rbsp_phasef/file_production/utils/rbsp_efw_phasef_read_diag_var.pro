@@ -55,7 +55,8 @@ pro rbsp_efw_phasef_read_diag_var, date, probe=probe, errmsg=errmsg, log_file=lo
     secofday = 86400d
     time_range = date+[0,secofday]
     rbsp_efw_read_l4, time_range, probe=probe
-    rename_var, 'diagBratio', to=prefix+'diag_bratio'
+    var = rename_var('diagBratio', output=prefix+'diag_bratio')
+
 end
 
 

@@ -33,7 +33,7 @@ pro phasef_gen_l3_e_v03_per_day, date, $
     rbspx = 'rbsp'+probe
 
     data_type = 'e_spinfit'
-    valid_range = rbsp_efw_phasef_get_valid_range(data_type, probe=probe)
+    valid_range = phasef_get_valid_range(data_type, probe=probe)
     if n_elements(date) eq 0 then begin
         errmsg = 'No input date ...'
         lprmsg, errmsg, log_file
@@ -130,8 +130,7 @@ pro phasef_gen_l3_e_v03_per_day, date, $
     old_vars = prefix+['bias_current']
     new_vars = prefix+['ibias']
     foreach old_var, old_vars, var_id do begin
-        new_var = new_vars[var_id]
-        rename_var, old_var, to=new_var
+        new_var = rename_var(old_var, output=new_vars[var_id])
     endforeach
 
 

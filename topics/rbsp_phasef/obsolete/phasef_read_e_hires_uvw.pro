@@ -76,7 +76,7 @@ pro phasef_read_e_hires_uvw, date, probe=probe, errmsg=errmsg, log_file=log_file
     rbspx = 'rbsp'+probe
 
     data_type = 'e_hires_uvw'
-    valid_range = rbsp_efw_phasef_get_valid_range(data_type, probe=probe)
+    valid_range = phasef_get_valid_range(data_type, probe=probe)
     if n_elements(date) eq 0 then begin
         errmsg = 'No input date ...'
         lprmsg, errmsg, log_file
@@ -101,9 +101,6 @@ pro phasef_read_e_hires_uvw, date, probe=probe, errmsg=errmsg, log_file=log_file
         lprmsg, errmsg, log_file
         return
     endif
-;test
-;rbsp_efw_phasef_read_e_uvw, time_range, probe=probe
-;rename_var, prefix+'e_uvw', to=e_uvw_raw_var
     get_data, e_uvw_raw_var, times, e_uvw_raw
 
     ; Remove NaNs. (ignore spin-axis data)
@@ -134,6 +131,5 @@ probe = 'a'
 date = '2012-01-01'
 date = '2012-09-25'
 ;date = '2019-10-13'
-date = '2013-06-07'
 phasef_read_e_hires_uvw, date, probe=probe
 end

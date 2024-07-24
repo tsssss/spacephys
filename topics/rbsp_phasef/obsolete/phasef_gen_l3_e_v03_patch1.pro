@@ -22,7 +22,6 @@ pro phasef_gen_l3_e_v03_patch1, file
 
 end
 
-
 ;stop
 probes = ['a','b']
 root_dir = join_path([default_local_root(),'rbsp'])

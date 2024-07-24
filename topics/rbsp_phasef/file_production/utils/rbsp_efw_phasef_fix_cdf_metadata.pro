@@ -21,7 +21,7 @@ pro rbsp_efw_phasef_fix_cdf_metadata, files, path=path
             if ~vatt.haskey('VAR_TYPE') then continue
             
             ; Only deal with metadata.
-            var_type = vatt.var_type
+            var_type = vatt['VAR_TYPE']
             if var_type ne 'metadata' then continue
             
             ; No need to fix if nrec=1

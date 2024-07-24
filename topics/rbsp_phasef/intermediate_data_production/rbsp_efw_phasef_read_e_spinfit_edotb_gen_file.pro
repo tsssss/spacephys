@@ -101,31 +101,38 @@ pro rbsp_efw_phasef_read_e_spinfit_edotb_gen_file, time, probe=probe, filename=f
 
 end
 
-probes = ['a','b']
-root_dir = join_path([homedir(),'data','rbsp'])
-foreach probe, probes do begin
-    prefix = 'rbsp'+probe+'_'
-    rbspx = 'rbsp'+probe
-    time_range = rbsp_efw_phasef_get_valid_range('e_spinfit', probe=probe)
-    days = make_bins(time_range+[0,-1], constant('secofday'))
-    foreach day, days do begin
-        str_year = time_string(day,tformat='YYYY')
-        path = join_path([root_dir,rbspx,'e_spinfit_edotb',str_year])
-        base = prefix+'efw_e_spinfit_edotb_mgse_'+time_string(day,tformat='YYYY_MMDD')+'_v01.cdf'
-        file = join_path([path,base])
-        if file_test(file) eq 1 then continue
-        rbsp_efw_phasef_read_e_spinfit_edotb_gen_file, day, probe=probe, filename=file
+test = 1
+if keyword_set(test) then begin
+    time = time_double('2012-11-29')
+    time = time_double('2015-03-17')
+    probe = 'a'
+    file = join_path([homedir(),'test.cdf'])
+    if file_test(file) eq 1 then file_delete, file
+    tic
+    rbsp_efw_phasef_read_e_spinfit_edotb_gen_file, time, probe=probe, filename=file
+    toc
+endif else begin
+    probes = ['a','b']
+    root_dir = join_path([homedir(),'data','rbsp'])
+    foreach probe, probes do begin
+        prefix = 'rbsp'+probe+'_'
+        rbspx = 'rbsp'+probe
+        time_range = rbsp_efw_phasef_get_valid_range('e_spinfit', probe=probe)
+        days = make_bins(time_range+[0,-1], constant('secofday'))
+        foreach day, days do begin
+            str_year = time_string(day,tformat='YYYY')
+            path = join_path([root_dir,rbspx,'e_spinfit_edotb',str_year])
+            base = prefix+'efw_e_spinfit_edotb_mgse_'+time_string(day,tformat='YYYY_MMDD')+'_v01.cdf'
+            file = join_path([path,base])
+            if file_test(file) eq 1 then continue
+            rbsp_efw_phasef_read_e_spinfit_edotb_gen_file, day, probe=probe, filename=file
+        endforeach
     endforeach
-endforeach
+endelse
+
 
 
 stop
 
-time = time_double('2012-11-29')
-probe = 'a'
-file = join_path([homedir(),'test.cdf'])
-if file_test(file) eq 1 then file_delete, file
-tic
-rbsp_efw_phasef_read_e_spinfit_edotb_gen_file, time, probe=probe, filename=file
-toc
+
 end

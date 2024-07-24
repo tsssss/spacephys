@@ -45,8 +45,7 @@ pro rbsp_efw_phasef_read_efw_qual, date, probe=probe, errmsg=errmsg, log_file=lo
     time_range = date+[0,secofday]
     boom_pair = rbsp_efw_phasef_get_boom_pair(date, probe=probe)
     rbsp_efw_phasef_read_flag_20, time_range, probe=probe, boom_pair=boom_pair
-    flag_var = prefix+'efw_qual'
-    rename_var, prefix+'flag_20', to=flag_var
+    flag_var = rename_var(prefix+'flag_20', output=prefix+'efw_qual')
     ; Look-up table for quality flags
     ;  0: global_flag
     ;  1: eclipse

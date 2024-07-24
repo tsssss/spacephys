@@ -14,7 +14,7 @@ pro rbsp_efw_phasef_read_e_diagonal_spinfit, time, probe=probe, pairs=pairs, rem
     if n_elements(probe) eq 0 then probe = 'x'
     if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'rbsp'])
     if n_elements(remote_root) eq 0 then remote_root = join_path([rbsp_efw_phasef_get_server()])
-    if n_elements(version) eq 0 then version = 'v02'
+    if n_elements(version) eq 0 then version = 'v03'
     if n_elements(datatype) eq 0 then datatype = 'e_uvw_diagonal'
 
 ;---Init settings.
@@ -22,8 +22,8 @@ pro rbsp_efw_phasef_read_e_diagonal_spinfit, time, probe=probe, pairs=pairs, rem
     valid_range = (probe eq 'a')? time_double(['2012-09-08','2019-10-15']): time_double(['2012-09-08','2019-07-17'])
     rbspx = 'rbsp'+probe
     base_name = rbspx+'_efw_e_diagonal_spinfit_mgse_%Y_%m%d_'+version+'.cdf'
-    local_path = [local_root,rbspx,'e_diagonal_spinfit','%Y']
-    remote_path = [remote_root,'e_diagonal_spinfit',rbspx,'%Y']
+    local_path = [local_root,'efw_phasef','e_spinfit_diagonal_'+version,rbspx,'%Y']
+    remote_path = [remote_root,'efw_phasef','e_spinfit_diagonal_'+version,rbspx,'%Y']
     if n_elements(pairs) eq 0 then pairs = ['13','14','23','24']
 
     type_dispatch['e_uvw_diagonal'] = dictionary($

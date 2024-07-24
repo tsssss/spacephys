@@ -42,3 +42,9 @@ pro rbsp_efw_read_spice_var, tr, probe=probe, datatype=datatype, trange=trange, 
         tplotnames=tns, convert_int1_to_int2=1, get_support_data=0, load_labels=1
 
 end
+
+
+tr = ['2013-05-01','2013-05-02']
+probe = 'a'
+rbsp_efw_read_spice_var, tr, probe=probe
+end

@@ -19,7 +19,10 @@ pro rbsp_efw_phasef_read_diagbratio, time_range, probe=probe
 
     var = prefix+'diagBratio'
     b_mgse_smoothed = get_var_data(b_smoothed_var)
-    b_ratio = b_mgse_smoothed[*,1:2]/b_mgse_smoothed[*,0]
+    b_ratio = b_mgse_smoothed[*,1:2]
+    bx1 = 1d/b_mgse_smoothed[*,0]
+    for ii=0,1 do b_ratio[*,ii] *= bx1
     store_data, var, times, b_ratio
+    options, var, labels=['By/Bx','Bz/Bx']
 
 end

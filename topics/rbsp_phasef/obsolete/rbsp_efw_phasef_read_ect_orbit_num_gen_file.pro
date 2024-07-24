@@ -40,8 +40,7 @@ pro rbsp_efw_phasef_read_ect_orbit_num_gen_file, time, probe=probe, filename=fil
     tr = time_range
     timespan, tr[0], total(tr*[-1,1]), /seconds
     rbsp_read_ect_mag_ephem, probe
-    orbnum_var = prefix+'orbit_num'
-    rename_var, prefix+'ME_orbitnumber', to=orbnum_var
+    orbnum_var = rename_var(prefix+'ME_orbitnumber', output=prefix+'orbit_num')
 
     ; In rare cases, this data is missing for the requested day.
     get_data, orbnum_var, data=dd
@@ -50,7 +49,7 @@ pro rbsp_efw_phasef_read_ect_orbit_num_gen_file, time, probe=probe, filename=fil
 
         rbsp_efw_phasef_read_orbit_num, tr[0], probe=probe
         orbit_num = get_var_data(orbnum_var, times=times)
-        rename_var, orbnum_var, to=prefix+'orbit_num1'
+        var = rename_var(orbnum_var, output=prefix+'orbit_num1')
 
         ;timespan, tr[0], secofday, /second
         ;rbsp_read_ect_mag_ephem, probe

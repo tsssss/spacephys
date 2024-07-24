@@ -1,6 +1,6 @@
 ;+
 ; Read orbit number.
-; Adopted fromrbsp_read_ect_mag_ephem.
+; Adopted from rbsp_read_ect_mag_ephem.
 ;
 ; date. A string or double (unix time) for the wanted date.
 ; probe=. A string 'a' or 'b'.
@@ -26,7 +26,7 @@ pro phasef_read_orbit_num, date, probe=probe, errmsg=errmsg, log_file=log_file
     rbspx = 'rbsp'+probe
 
     data_type = 'spice'
-    valid_range = rbsp_efw_phasef_get_valid_range(data_type, probe=probe)
+    valid_range = phasef_get_valid_range(data_type, probe=probe)
     if n_elements(date) eq 0 then begin
         errmsg = 'No input date ...'
         lprmsg, errmsg, log_file
@@ -51,17 +51,17 @@ pro phasef_read_orbit_num, date, probe=probe, errmsg=errmsg, log_file=log_file
         rename_var, var_name, to=prefix+var_name
         return
     endif
-
+    
 
     timespan, date, secofday, /second
     rbsp_read_ect_mag_ephem, probe
     rename_var, prefix+'ME_orbitnumber', to=prefix+'orbit_num'
-
+    
     ; In rare cases, this data is missing for some days.
     get_data, prefix+'orbit_num', data=dd
     if size(dd,/type) ne 8 then begin
         tr = time_range-secofday
-
+        
         phasef_read_orbit_num, tr[0], probe=probe
         orbit_num = get_var_data(prefix+'orbit_num', times=times)
         rename_var, prefix+'orbit_num', to=prefix+'orbit_num1'
@@ -69,7 +69,7 @@ pro phasef_read_orbit_num, date, probe=probe, errmsg=errmsg, log_file=log_file
         ;timespan, tr[0], secofday, /second
         ;rbsp_read_ect_mag_ephem, probe
         ;orbit_num = get_var_data(prefix+'ME_orbitnumber')
-
+        
         diff = orbit_num[1:-1]-orbit_num[0:-2]
         index = where(diff eq 1, count)
         if count eq 0 then begin
@@ -98,8 +98,8 @@ pro phasef_read_orbit_num, date, probe=probe, errmsg=errmsg, log_file=log_file
         max_time = max(perigee_times)
         index = where(perigee_uts ge max_time)
         perigee_uts = [max_time,perigee_uts[index]]
-
-
+        
+        
         time_step = sdatarate(times)
         common_times = make_bins(time_range, time_step)
         ncommon_time = n_elements(common_times)
@@ -113,7 +113,7 @@ pro phasef_read_orbit_num, date, probe=probe, errmsg=errmsg, log_file=log_file
         endfor
         store_data, prefix+'orbit_num', common_times, data
     endif
-
+    
 
 end
 

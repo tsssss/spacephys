@@ -30,7 +30,7 @@ pro rbsp_efw_phasef_read_b_model, time_range, probe=probe
     ntime = n_elements(common_times)
 
 ;---Load orbit.
-    rbsp_read_orbit, time_range, probe=probe
+    rbsp_efw_phasef_read_pos_var, time_range, probe=probe
     r_gse_var = prefix+'r_gse'
     interp_time, r_gse_var, common_times
     r_gse = get_var_data(r_gse_var)

@@ -6,30 +6,36 @@
 ; datatype=. Can be 'vb1' or 'mscb1'.
 ;-
 
-pro rbsp_efw_phasef_read_b1_time_rate, tr, probe=probe, datatype=datatype, trange=trange, $
+function rbsp_efw_phasef_read_b1_time_rate, time_range, probe=probe, datatype=datatype, $
+    get_name=get_name, $
     level=level, verbose=verbose, downloadonly=downloadonly, $
     cdf_data=cdf_data,get_support_data=get_support_data, $
     tplotnames=tns, make_multi_tplotvar=make_multi_tplotvar, $
     varformat=varformat, valid_names = valid_names, files=files, $
     type=type, _extra = _extra
 
+    retval = !null
+
+    if n_elements(probe) eq 0 then probe = 'a'
+    prefix = 'rbsp'+probe+'_'
+    if n_elements(datatype) eq 0 then datatype = 'vb1'
+    var_info = prefix+'efw_'+datatype+'_time_rate'
+    if keyword_set(get_name) then return, var_info
+
     rbsp_efw_init
     vb = keyword_set(verbose) ? verbose : 0
     vb = vb > !rbsp_efw.verbose
 
-    if n_elements(probe) eq 0 then probe = 'a'
     if n_elements(version) eq 0 then version = 'v*'
 ;    if n_elements(trange) ne 0 then time_range = trange
-;    if n_elements(tr) ne 0 then time_range = tr
 ;    if n_elements(time_range) eq 0 then time_range = timerange()
 ;    if size(time_range[0],/type) eq 7 then time_range = time_double(time_range)
 ;    timespan, time_range[0], total(time_range*[-1,1]), /seconds
-    if n_elements(datatype) eq 0 then datatype = 'vb1'
     data_types = ['vb1','mscb1']
     index = where(data_types eq datatype[0], count)
     if count eq 0 then begin
         dprint, 'Invalid datatype: '+datatype[0]+' ...', verbose=vb
-        return
+        return, retval
     endif
     datatype = 'vb1'    ; 'mscb1' is the same.
 
@@ -54,8 +60,10 @@ pro rbsp_efw_phasef_read_b1_time_rate, tr, probe=probe, datatype=datatype, trang
     time_ranges = cdf_read_var('time_range', filename=local_file)
     sample_rate = cdf_read_var('median_sample_rate', filename=local_file)
 
-    prefix = 'rbsp'+probe+'_'
-    store_data, prefix+'efw_'+datatype+'_time_rate', time_ranges[*,0], time_ranges, float(sample_rate)
+    store_data, var_info, time_ranges[*,0], time_ranges, float(sample_rate)
+    add_setting, var_info, dictionary($
+        'requested_time_range', time_range)
+    return, var_info
 
 end
 

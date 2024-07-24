@@ -72,9 +72,8 @@ pro rbsp_efw_phasef_gen_l2_e_spinfit_v03_per_day, date, probe=probe, filename=fi
     ; efield_spinfit_mgse -> rbspx_e_spinfit_mgse
     ; VxB_mgse -> rbspx_evxb_mgse
     ; efield_coro_mgse -> rbspx_ecoro_mgse
-    e_spinfit_var = prefix+'e_spinfit_mgse'
     old_var = prefix+'e_spinfit_mgse_v'+bp
-    rename_var, old_var, to=e_spinfit_var
+    e_spinfit_var = rename_var(old_var, output=prefix+'e_spinfit_mgse')
     get_data, e_spinfit_var, times
     foreach var, prefix+['evxb_mgse','ecoro_mgse'] do begin
         interp_time, var, times
@@ -92,7 +91,7 @@ pro rbsp_efw_phasef_gen_l2_e_spinfit_v03_per_day, date, probe=probe, filename=fi
     if count ne 0 then e_mgse[index,*] = fillval
     e_mgse[*,0] = fillval
     store_data, e_var, common_times, e_mgse
-    rename_var, flag_var, to=prefix+'flags_all'
+    flag_all_var = rename_var(flag_var, output=prefix+'flags_all')
 
 
     ; vars depend on epoch.

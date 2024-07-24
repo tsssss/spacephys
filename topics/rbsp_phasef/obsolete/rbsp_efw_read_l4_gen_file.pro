@@ -113,7 +113,7 @@ pro rbsp_efw_read_l4_gen_file, date0, $
 ;---Calc E dot B = 0.
     ; Load and preprocess B field data.
     smooth_window = 1800.   ; sec.
-    rbsp_efw_phasef_read_wobble_free_var, time_range+[-1,1]*smooth_window, probe=probe, id='b_mgse'
+    rbsp_efw_phasef_prepare_residue_removal, time_range+[-1,1]*smooth_window, probe=probe, id='b_mgse'
     b_var = rbx+'b_mgse'
     rbsp_detrend, b_var, smooth_window
     b_smoothed_var = rbx+'b_mgse_smoothed'
@@ -292,7 +292,7 @@ pro rbsp_efw_read_l4_gen_file, date0, $
 
 ;---Load SPICE and save data.
     ; Sheng: once/min cadence?
-	rbsp_read_spice_var, time_range, probe=sc
+	rbsp_load_spice_cdf_file, sc
 	spice_vars = rbx+['state_'+['pos_gse','vel_gse','mlt','mlat','lshell'],$
 	   'spinaxis_direction_gse']
     foreach var, spice_vars do begin

@@ -30,8 +30,7 @@ function trace_to_ionosphere, var_info=var_info, hemisphere=hemisphere, stop_alt
     endif else begin
         r_gsm = temporary(r_coord)
     endelse
-    if n_elements(time_range) eq 0 then time_range = minmax(times)
-    if n_elements(time_range) eq 1 then time_range = minmax(times)
+    time_range = get_var_setting(orbit_var, 'requested_time_range')
     if keyword_set(update) then is_success = delete_var_from_memory(var_info)
     if ~check_if_update_memory(var_info, time_range) then return, var_info
 
@@ -105,7 +104,8 @@ function lets_trace_to_ionosphere, var_info=var_info, $
     mission_probe = get_var_setting(orbit_var, 'mission_probe')
     probe_info = resolve_probe(mission_probe)
     prefix = probe_info['prefix']
-
+    time_range = get_var_setting(orbit_var, 'requested_time_range')
+    
     ; Get var_info.
     if n_elements(hemisphere) eq 0 then hemisphere = 'north'
     if n_elements(h0) eq 0 then h0 = 100d   ; km.

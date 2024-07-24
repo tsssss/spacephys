@@ -21,7 +21,7 @@ function lets_read_mlat_vars, var_info=var_info, orbit_var=orbit_var, $
         mission_probe = get_var_setting(orbit_var, 'mission_probe')
         probe_info = resolve_probe(mission_probe)
     endif
-
+    time_range = get_var_setting(orbit_var, 'requested_time_range')
 
     ; Get var_info.
     if n_elements(suffix) eq 0 then suffix = ''

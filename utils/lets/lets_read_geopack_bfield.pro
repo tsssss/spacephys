@@ -110,7 +110,7 @@ function lets_read_geopack_bfield, var_info=var_info, $
     mission_probe = get_var_setting(orbit_var, 'mission_probe')
     probe_info = resolve_probe(mission_probe)
     prefix = probe_info['prefix']
-
+    time_range = get_var_setting(orbit_var, 'requested_time_range')
 
     ; Get var_info.
     if n_elements(external_model) eq 0 then external_model = 't89'

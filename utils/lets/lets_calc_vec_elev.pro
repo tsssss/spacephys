@@ -12,6 +12,7 @@ function lets_calc_vec_elev, vec_var, coord=coord_need, $
     if n_elements(var_info) eq 0 then begin
         var_info = strlowcase(get_prefix(vec_var)+short_name+'_elev')
     endif
+    time_range = get_var_setting(vec_var, 'requested_time_range')
 
     ; Check if update in memory.
     if keyword_set(update) then tmp = delete_var_from_memory(var_info)
@@ -23,7 +24,7 @@ function lets_calc_vec_elev, vec_var, coord=coord_need, $
     if is_success then return, var_info
 
     the_vec = get_var_data(vec_var, times=times, settings=settings)
-    coord = settings['coord']
+    coord = strlowcase(settings['coord'])
     if n_elements(coord_need) eq 0 then coord_need = coord
     if coord ne coord_need then begin
         if settings.haskey('probe') then probe = settings['probe'] else probe = !null

@@ -12,6 +12,8 @@ function lets_calc_vec_azim, vec_var, coord=coord_need, $
     if n_elements(var_info) eq 0 then begin
         var_info = strlowcase(get_prefix(vec_var)+short_name+'_azim')
     endif
+    time_range = get_var_setting(vec_var, 'requested_time_range')
+
 
     ; Check if update in memory.
     if keyword_set(update) then tmp = delete_var_from_memory(var_info)

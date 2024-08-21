@@ -26,6 +26,7 @@ function lets_decompose_bfield, var_info=var_info, $
     mission_probe = get_var_setting(b_var, 'mission_probe')
     probe_info = resolve_probe(mission_probe)
     prefix = probe_info['prefix']
+    time_range = get_var_setting(b_var, 'requested_time_range')
 
     ; Get var_info.
     if n_elements(b0_window) eq 0 then b0_window = 20*60d   ; sec.

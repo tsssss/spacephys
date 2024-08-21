@@ -16,6 +16,7 @@ function lets_define_fac, b_var=b_var, r_var=r_var, $
     prefix = get_prefix(b_var)
     mission_probe = get_var_setting(r_var, 'mission_probe')
     probe_info = resolve_probe(mission_probe)
+    time_range = get_var_setting(r_var, 'requested_time_range')
 
     coord = strlowcase(get_setting(b_var,'coord'))
     r_coord = strlowcase(get_setting(r_var,'coord'))

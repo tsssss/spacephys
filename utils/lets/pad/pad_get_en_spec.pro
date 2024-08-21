@@ -1,7 +1,8 @@
 ;+
 ; Get en spec from pad_var.
 ;-
-function pad_get_en_spec, pad_var=pad_var, pitch_angle_range=pitch_angle_range
+function pad_get_en_spec, pad_var=pad_var, pitch_angle_range=pitch_angle_range, $
+    var_info=var_info
 
     if n_elements(var_info) eq 0 then var_info = streplace(pad_var,'pad','en_spec')
     pad_fluxs = get_var_data(pad_var, times=times, settings=settings)

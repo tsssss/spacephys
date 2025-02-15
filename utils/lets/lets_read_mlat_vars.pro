@@ -1,5 +1,8 @@
 ;+
 ; Read MLat, MLon, MLT, L-Shell, |R| bundle from orbit_var.
+; 
+; var_info=.
+; orbit_var=.
 ;-
 
 function lets_read_mlat_vars, var_info=var_info, orbit_var=orbit_var, $

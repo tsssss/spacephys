@@ -1,8 +1,14 @@
-
+;+
+; b_var=.
+; r_var=.
+; fac_coord=.
+; fac_labels=.
+;-
 function lets_define_fac, b_var=b_var, r_var=r_var, $
+    fac_coord=fac_coord, fac_labels=fac_labels, $
     update=update, get_name=get_name, suffix=suffix, errmsg=errmsg, $
     save_to=data_file, time_var=time_var, $
-    coord=coord, resolution=resolution, _extra=ex
+    _extra=ex
 
     errmsg = ''
     retval = !null
@@ -25,7 +31,11 @@ function lets_define_fac, b_var=b_var, r_var=r_var, $
         return, retval
     endif
     if n_elements(suffix) eq 0 then suffix = ''
-    var_info = prefix+'q_'+coord+'2fac'+suffix
+    ; need to use lets_read or lets_read_this to ensure have mission in setting.
+    mission = get_var_setting(b_var, 'mission', exist)
+    if n_elements(fac_coord) eq 0 then fac_coord = mission+'_fac'
+    if n_elements(fac_labels) ne 3 then fac_labels = ['b','w','o']
+    var_info = prefix+'q_'+coord+'2'+fac_coord+suffix
     if keyword_set(get_name) then return, var_info
 
     ; Check if update in memory.
@@ -56,19 +66,16 @@ function lets_define_fac, b_var=b_var, r_var=r_var, $
     m_xxx2fac[*,0,*] = bhat
     m_xxx2fac[*,1,*] = what
     m_xxx2fac[*,2,*] = ohat
-    q_xxx2fac = mtoq(m_xxx2fac)
+    q_xxx2fac = mtoq(m_xxx2fac)    
+    store_data, var_info, times, q_xxx2fac
 
-    pre0 = get_prefix(b_var)
-    q_var = pre0+'q_'+strlowcase(coord)+'2fac'
-    store_data, q_var, times, q_xxx2fac
-
-    coord_labels = get_setting(b_var, 'coord_labels')
+    coord_labels = get_var_setting(b_var, 'coord_labels')
     if n_elements(coord_labels) ne 3 then coord_labels = constant('xyz')
-    fac_labels = ['b','w','o']
     add_setting, var_info, {$
+        display_type: 'quaternion', $
         in_coord: coord, $
         in_coord_labels: coord_labels, $
-        out_coord: 'fac', $
+        out_coord: fac_coord, $
         out_coord_labels: fac_labels}
 
     ; Save to file.

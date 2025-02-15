@@ -26,7 +26,7 @@ function trace_to_ionosphere, var_info=var_info, hemisphere=hemisphere, stop_alt
     if strlowcase(coord_in) ne coord_orig then begin
         coord_msg = strlowcase([coord_in,coord_orig])
         probe = get_var_setting(orbit_var, 'probe')
-        r_gsm = cotran(r_coord, times, coord_msg=coord_msg, probe=probe, _extra=ex)
+        r_gsm = cotran_pro(r_coord, times, coord_msg=coord_msg, probe=probe, _extra=ex)
     endif else begin
         r_gsm = temporary(r_coord)
     endelse

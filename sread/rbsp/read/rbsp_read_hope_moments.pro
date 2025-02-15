@@ -11,12 +11,12 @@ function rbsp_read_hope_moments, input_time_range, probe=probe, errmsg=errmsg, $
     prefix = 'rbsp'+probe+'_'
 
     if n_elements(species) eq 0 then species = 'p'
-    index = where(species eq rbsp_hope_species(), count)
+    index = where(species eq rbsp_get_hope_species(), count)
     if count eq 0 then begin
         errmsg = 'Invalid species: '+species+' ...'
         return, retval
     endif
-    species_name = rbsp_hope_species_name(species)
+    species_name = rbsp_get_hope_species_name(species)
     if n_elements(coord) eq 0 then coord = 'gsm'
 
     vars = prefix+species+'_'+['n','t',['vbulk','nflux','eflux','enthalpy']+'_'+coord]

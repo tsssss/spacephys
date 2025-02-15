@@ -1,5 +1,10 @@
 ;+
 ; Read B0 and B1, which is B-B_model plus smoohting over a specific window.
+; 
+; var_info=.
+; b0_window=. in seconds.
+; b_var=.
+; bmod_var=.
 ;-
 
 function lets_decompose_bfield, var_info=var_info, $

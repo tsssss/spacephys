@@ -1,24 +1,22 @@
 
+function trace_to_equator, var_info=var_info, $
+    orbit_var=orbit_var, external_model=external_model, internal_model=internal_model, $
+    get_name=get_name, $
+    t89_use_kp=t89_use_kp, refine=refine, _extra=ex
 
-function read_geopack_bfield, orbit_var, external_model=external_model, internal_model=internal_model, $
-    var_info=var_info, get_name=get_name, t89_use_kp=t89_use_kp, update=update, _extra=ex
-
-    prefix = get_prefix(orbit_var)
+    if n_elements(orbit_var) eq 0 then begin
+        errmsg = 'No input orbit_var ...'
+        return, retval
+    endif
+    mission_probe = get_var_setting(orbit_var, 'mission_probe')
+    probe_info = resolve_probe(mission_probe)
+    prefix = probe_info['prefix']
     coord_orig = 'gsm'
     if n_elements(external_model) eq 0 then external_model = 't89'
     if n_elements(internal_model) eq 0 then internal_model = 'dipole'
-    if n_elements(suffix) eq 0 then begin
-        tmp = [internal_model,external_model]
-        index = where(tmp ne 'n/a', count)
-        if count eq 0 then begin
-            suffix = ''
-        endif else if count eq 1 then begin
-            suffix = '_'+tmp[index[0]]
-        endif else begin
-            suffix = '_'+internal_model+'_'+external_model
-        endelse
-    endif
-    if n_elements(var_info) eq 0 then var_info = prefix+'b_'+coord_orig+suffix
+    suffix = '_'+internal_model+'_'+external_model+'_equator'
+
+    if n_elements(var_info) eq 0 then var_info = prefix+'f_'+coord_orig+suffix
     if keyword_set(get_name) then return, var_info
 
 
@@ -31,14 +29,13 @@ function read_geopack_bfield, orbit_var, external_model=external_model, internal
     endif else begin
         r_gsm = temporary(r_coord)
     endelse
-    if n_elements(time_range) eq 0 then time_range = minmax(times)
-    if n_elements(time_range) eq 1 then time_range = minmax(times)
+    time_range = get_var_setting(orbit_var, 'requested_time_range')
     if keyword_set(update) then is_success = delete_var_from_memory(var_info)
     if ~check_if_update_memory(var_info, time_range) then return, var_info
 
     ndim = 3
     ntime = n_elements(times)
-
+    f_gsm = fltarr(ntime,ndim)
 
 ;---Prepare external model parameters.
     has_external_model = 0
@@ -52,47 +49,46 @@ function read_geopack_bfield, orbit_var, external_model=external_model, internal
         pars = get_var_data(par_var, at=times)
     endif
 
-;---Internal and external model.
-    b_internal = fltarr(ntime,ndim)
-    b_external = fltarr(ntime,ndim)
+    tmp = geopack_resolve_model(external_model)
+    t89 = tmp.t89
+    t96 = tmp.t96
+    t01 = tmp.t01
+    ts04 = tmp.ts04
+    storm = tmp.storm
+    igrf = (internal_model eq 'igrf')? 1: 0
+    if ~keyword_set(refine) then refine = 1
+
     foreach time, times, time_id do begin
         ps = geopack_recalc(time)
         rx = r_gsm[time_id,0]
         ry = r_gsm[time_id,1]
         rz = r_gsm[time_id,2]
 
-    ;---Internal model.
-        if internal_model eq 'dipole' or internal_model eq 'dip' then begin
-            geopack_dip, rx,ry,rz, bx,by,bz
-        endif else if internal_model eq 'igrf' then begin
-            geopack_igrf_gsm, rx,ry,rz, bx,by,bz
-        endif
-        b_internal[time_id,*] = [bx,by,bz]
-
-
-    ;---External model.
-        if ~has_external_model then continue
-        if external_model eq 't04s' then begin
-            routine = 'geopack_ts04'
-        endif else routine = 'geopack_'+external_model
-        par = reform(pars[time_id,*])
-        call_procedure, routine, par, rx,ry,rz, dbx,dby,dbz
-        b_external[time_id,*] = [dbx,dby,dbz]
+        ; -1 for parallel to B, 1 for anti-parallel.
+        trace_dir = (rz lt 0)? -1: 1
+        geopack_trace, rx,ry,rz, trace_dir, reform(pars[time_id,*]), $
+            fx,fy,fz, refine=refine, equator=1, $
+            t89=t89, t96=t96, t01=t01, ts04=ts04, storm=storm, igrf=igrf
+        f_gsm[time_id,*] = [fx,fy,fz]
     endforeach
 
-    b_model = b_internal+b_external
-    settings = get_var_setting(orbit_var)
-    settings['short_name'] = strupcase(internal_model)+'+'+strupcase(external_model)+' B'
-    settings['unit'] = 'nT'
+    settings = inherit_setting(get_var_setting(orbit_var),id='basic')
+    settings['short_name'] = 'R'
     settings['coord'] = coord_orig
     settings['internal_model'] = internal_model
     settings['external_model'] = external_model
-    return, save_data_to_memory(var_info, times, b_model, settings=settings)
+    return, save_data_to_memory(var_info, times, f_gsm, settings=settings)
 
 end
 
-
-function lets_read_geopack_bfield, var_info=var_info, $
+;+
+; var_info=.
+; orbit_var=.
+; external_model=.
+; internal_model=.
+; t89_use_kp=.
+;-
+function lets_trace_to_equator, var_info=var_info, $
     orbit_var=orbit_var, external_model=external_model, internal_model=internal_model, $
     t89_use_kp=t89_use_kp, $
     update=update, get_name=get_name, suffix=suffix, errmsg=errmsg, $
@@ -100,7 +96,7 @@ function lets_read_geopack_bfield, var_info=var_info, $
     coord=coord, _extra=ex
 
     errmsg = ''
-    retval = ''
+    retval = !null
 
     ; Need prefix
     if n_elements(orbit_var) eq 0 then begin
@@ -111,25 +107,15 @@ function lets_read_geopack_bfield, var_info=var_info, $
     probe_info = resolve_probe(mission_probe)
     prefix = probe_info['prefix']
     time_range = get_var_setting(orbit_var, 'requested_time_range')
-
+    
     ; Get var_info.
     if n_elements(external_model) eq 0 then external_model = 't89'
     if n_elements(internal_model) eq 0 then internal_model = 'dipole'
     igrf = internal_model eq 'igrf'
-    if n_elements(suffix) eq 0 then begin
-        tmp = [internal_model,external_model]
-        index = where(tmp ne 'n/a', count)
-        if count eq 0 then begin
-            suffix = ''
-        endif else if count eq 1 then begin
-            suffix = '_'+tmp[index[0]]
-        endif else begin
-            suffix = '_'+internal_model+'_'+external_model
-        endelse
-    endif
+    if n_elements(suffix) eq 0 then suffix = '_'+internal_model+'_'+external_model+'_equator'
     default_coord = 'gsm'
     if n_elements(coord) eq 0 then coord = default_coord
-    if n_elements(var_info) eq 0 then var_info = prefix+'b_'+coord+suffix
+    if n_elements(var_info) eq 0 then var_info = prefix+'f_'+coord+suffix
     if keyword_set(get_name) then return, var_info
 
     ; Check if update in memory.
@@ -142,13 +128,16 @@ function lets_read_geopack_bfield, var_info=var_info, $
     if is_success then return, var_info
 
     ; Read var from routine.
-    vec_default_var = read_geopack_bfield(orbit_var, var_info=var_info, $
-        external_model=external_model, internal_model=internal_model, t89_use_kp=t89_use_kp, update=update)
+    vec_default_var = trace_to_equator(var_info=var_info, $
+        orbit_var=orbit_var, $
+        external_model=external_model, internal_model=internal_model, t89_use_kp=t89_use_kp)
     
     ; Convert to the wanted coord.
-    if var_info ne vec_default_var then begin
+    if default_coord ne coord then begin
         coord_msg = [default_coord,coord]
-        var_info = lets_cotran(coord_msg, input=vec_default_var, output=var_info)
+        vec_default_var = prefix+'f_'+default_coord+suffix
+        vec_coord_var = var_info
+        var_info = lets_cotran(coord_msg, input=vec_default_var, output=vec_coord_var)
     endif
     if n_elements(time_var) ne 0 then is_success = interp_var_to_time(var_info, time_var=time_var)
     
@@ -161,16 +150,20 @@ function lets_read_geopack_bfield, var_info=var_info, $
 
 end
 
-
 time_range = ['2015-03-17','2015-03-18']
 probe = 'rbspb'
 data_file = join_path([homedir(),'test.cdf'])
 time_var = 'rbsp_orbit_time'
 ;if file_test(data_file) eq 1 then file_delete, data_file
 foreach probe, ['rbspa','rbspb'] do begin
-    print, lets_read_orbit(time_range, probe=probe, time_var=time_var, coord='gsm')
-    print, lets_read_geopack_bfield(time_range, probe=probe, save_to=data_file, time_var=time_var, coord='gsm', internal='igrf')
-    print, lets_read_bfield(time_range, probe=probe)
-    stop
+    orbit_var = lets_read_orbit(time_range, probe=probe, time_var=time_var, coord='gsm')
+    fpt_var = lets_trace_to_equator(orbit_var=orbit_var, coord='gsm', internal='igrf')
+    prefix = get_var_prefix(orbit_var)
+    fpt_mlat_vars = lets_read_mlat_vars(orbit_var=fpt_var, prefix=prefix+'f')
+    fb_var = lets_read_geopack_bfield(orbit_var=fpt_var, external_model='n/a', var_info=prefix+'fb_gsm')
+    b_var = lets_read_bfield(time_range, probe=probe)
+    bmod_var = lets_read_geopack_bfield(orbit_var=orbit_var)
+    b_vars = lets_decompose_bfield(b_var=b_var, bmod_var=bmod_var)
+    cmap_var = lets_read_cmap(b_var=b_vars['b0'], fb_var=fb_var, update=1)
 endforeach
 end

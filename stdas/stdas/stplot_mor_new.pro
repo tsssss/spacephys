@@ -5,6 +5,7 @@
 ; Parameters: vname, in, type = string, required. Signal varname in tplot.
 ; Keywords:
 ;   period, in, boolean. Set to make ytitle to be period. Default is frequency.
+;   pad=. Set to auto padding.
 ;   scale_info, in, struct, opt. Default is
 ;       {s0:4d*dr0, s1:0.5d*dur, dj:1d/8, ns:0d}.
 ;   tscale, in/out, dblarr[m], opt. Scales in time. Info used are
@@ -20,7 +21,7 @@
 ;   2023-09-22, Sheng Tian, change it to function, set frequency as default.
 ;-
 function stplot_mor_new, vname, $
-    period=period, $
+    period=period, no_pad=no_pad, $
     newname=newname, overwrite=overwrite, $
     tscale=tscales, scale_info=scale_info, $
     ytitle=ytitle, zrange=zrange
@@ -78,12 +79,13 @@ function stplot_mor_new, vname, $
     if keyword_set(overwrite) then newname = vname
     if ~keyword_set(newname) then newname = vname+'_mor'
     ztitle = stagexist(lim,'ytitle')? lim.ytitle: ''
+    if ~keyword_set(pad) then pad = 0   ; no padding by default.
 
 ;----wavelet analysis.
     ; wavelet transform, in X.
-    mor = wavelet(f0, dr0, pad=1, s0=s0, dj=dj, j=j1, $
+    mor = wavelet(f0, dr0, pad=pad, s0=s0, dj=dj, j=j1, $
         mother='Morlet', param=w0, $
-        period = ps, scale=ss, coi=coi)
+        period=ps, scale=ss, coi=coi)
     fs = 1d/ps
     
     ; power spectrogram, in X^2.
@@ -165,7 +167,7 @@ function stplot_mor_new, vname, $
     
     unit = ''
     var_unit = get_setting(vname, 'unit', exist)
-    if exist then unit = var_unit+'!U2!N'
+    if exist then unit = '['+var_unit+']!U2!N'
     if ~keyword_set(period) then begin
         val = fs
         yrange = minmax(1d/[s0,s1])
@@ -186,5 +188,18 @@ function stplot_mor_new, vname, $
         'color_table', 60 )
     options, newname, 'fft_info', fft_info
     options, newname, 'cwt_info', cwt_info
+    
+    ; Save CWT (complex).
+    mor_var = vname+'_cwt'
+    store_data, mor_var, uts, mor, val
+    add_setting, mor_var, smart=1, dictionary($
+        'spec', 1, $
+        'ytitle', ytitle, $
+        'yrange', yrange, $
+        'ylog', 1, $
+        'unit', var_unit, $
+        'zlog', 1, $
+        'color_table', 60 )
+    
     return, newname
 end

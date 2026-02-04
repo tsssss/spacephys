@@ -33,7 +33,7 @@
 
 pro draw_color_scale,range=range,brange=brange,log=log,yticks=yticks,$
          position=pos,offset=offset,charsize = charsize,title=title,$
-         color_table=ct, horizontal=zhorizontal, $  ; Sheng.
+         color_table=ct, reverse_ct=reverse_ct, horizontal=zhorizontal, $  ; Sheng.
          _extra=ex
 
 ;@colors_com
@@ -105,6 +105,7 @@ sg_colormode, decomposed=color_mode, depth=depth
 device, decomposed=0
 if keyword_set(ct) eq 0 then ct = 40
 loadct, ct
+if keyword_set(reverse_ct) then reverse_color_table
 tv,image,xposition,yposition,xsize=npx,ysize=npy
 sg_colormode, decomposed=color_mode, depth=depth, /set
 !p.color = sgcolor('black')

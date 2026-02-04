@@ -19,6 +19,14 @@ function lets_define_fac, b_var=b_var, r_var=r_var, $
         return, retval
     endif
 
+    if tnames(b_var) eq '' then begin
+        errmsg = 'No b_var ...'
+        return, retval
+    endif
+    if tnames(r_var) eq '' then begin
+        errmsg = 'No r_var ...'
+        return, retval
+    endif
     prefix = get_prefix(b_var)
     mission_probe = get_var_setting(r_var, 'mission_probe')
     probe_info = resolve_probe(mission_probe)

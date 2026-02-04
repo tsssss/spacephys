@@ -1,10 +1,20 @@
 ;+
 ; Get pa spec from pad_var.
+; pad_var=.
+; energy_range=.
+; var_info=.
 ;-
-function pad_get_pa_spec, pad_var=pad_var, energy_range=energy_range, var_info=var_info
+function pad_get_pa_spec, pad_var=pad_var, energy_range=energy_range, var_info=var_info, errmsg=errmsg
 
+    errmsg = ''
+    retval = !null
+    
     if n_elements(var_info) eq 0 then var_info = streplace(pad_var,'pad','pa_spec')
     pad_fluxs = get_var_data(pad_var, times=times, settings=settings)
+    if n_elements(settings) eq 0 then begin
+        errmsg = 'No data ...'
+        return, retval
+    endif
 
     pa_centers = settings.pa_centers
     en_centers = settings.en_centers
@@ -34,9 +44,10 @@ function pad_get_pa_spec, pad_var=pad_var, energy_range=energy_range, var_info=v
         ylog: 0, $
         zlog: 1, $
         yrange: [0,180], $
-        ytickv: [0,90,180], $
+        ytickv: [30,90,150], $
         yticks: 2, $
-        yminor: 3, $
+        yminor: 6, $
+        extend_y_edges: 1, $
         short_name: ''}
 
     return, var_info

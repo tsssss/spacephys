@@ -1,5 +1,5 @@
 
-function lets_add_earth, xrange=xr, yrange=yr, npoint=npoint
+function lets_add_earth, xrange=xr, yrange=yr, npoint=npoint, only_outline=only_outline
 
     ; Add earth.
     if n_elements(npoint) eq 0 then npoint = 40
@@ -17,10 +17,13 @@ function lets_add_earth, xrange=xr, yrange=yr, npoint=npoint
     if count eq 0 then return, -1
     tys = min(yr)>tys<max(yr)
 
-    index = where(txs ge 0, count)
-    if count ne 0 then polyfill, txs>0, tys, color=sgcolor('white')
-    index = where(txs le 0, count)
-    if count ne 0 then polyfill, txs<0, tys, color=sgcolor('grey')
+    if ~keyword_set(only_outline) then begin
+        index = where(txs ge 0, count)
+        if count ne 0 then polyfill, txs>0, tys, color=sgcolor('white')
+        index = where(txs le 0, count)
+        if count ne 0 then polyfill, txs<0, tys, color=sgcolor('grey')
+    endif
+
 
     plots, txs, tys
 

@@ -1,0 +1,317 @@
+;+
+; This is for interesting events.
+;-
+
+function micro_injection_gen_survey_plot_v02, input_time_range, probe=probe, $
+    plot_dir=plot_dir, position=full_pos, errmsg=errmsg, test=test, xpansize=xpansize, $
+    version=version, local_root=local_root, get_name=get_name
+
+    errmsg = ''
+    retval = !null
+    version = 'v02'
+    project_id = 'micro_injection'
+
+    time_range = time_double(input_time_range)
+    ; This is just to use the new disk for thg b/c /data is almost full.
+    if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'survey_plot',project_id+'_'+version])
+
+    if n_elements(plot_dir) eq 0 then plot_dir = join_path([local_root,'%Y'])
+    path = apply_time_to_pattern(plot_dir,time_range[0])
+    base = project_id+'_survey_plot_'+strjoin(time_string(time_range,tformat='YYYY_MMDD'),'_')+'_mms'+probe+'_'+version+'.pdf'
+    plot_file = join_path([path,base])
+    if keyword_set(get_name) then return, plot_file
+    print, plot_file
+    if keyword_set(test) then begin
+        plot_file = 0
+    endif else begin
+        if file_test(plot_file) eq 1 then begin
+            print, plot_file+' exists, skip ...'
+            return, plot_file
+        endif
+    endelse
+
+
+;---Load data.
+    prefix = 'mms'+probe+'_'
+    default_coord = 'gsm'
+    mission_probe = 'mms'+probe
+
+    
+    ; B field related vars.
+    field_time_range = time_range+[-1,1]*30.*60
+    b_gsm_var = lets_read_this(func='mms_read_bfield', $
+        field_time_range, probe=mission_probe, coord=default_coord, errmsg=errmsg)
+    if errmsg ne '' then begin
+        errmsg = 'Failed to load B field data ...'
+        return, retval
+    endif
+    e_gsm_var = lets_read_this(func='mms_read_efield', $
+        field_time_range, probe=mission_probe, coord=default_coord, errmsg=errmsg)
+    if errmsg ne '' then begin
+        errmsg = 'Failed to load E field data ...'
+        return, retval
+    endif
+
+
+    ; Orbit related vars.
+    orbit_time_range = time_range+[-1,1]*30*60
+    r_gsm_var = lets_read_this(func='mms_read_orbit', $
+        orbit_time_range, probe=mission_probe, coord=default_coord)
+    print, 'Loading '+r_gsm_var+' ...'
+    mlat_vars = lets_read_mlat_vars(orbit_var=r_gsm_var)
+    foreach var, mlat_vars.values() do print, 'Loading '+var+' ...'
+
+    ; Model related vars.
+    external_models = ['t89','t96','t01','t04s']
+    internal_models = ['dipole','igrf']
+    hemispheres = ['north','south']
+
+    foreach external_model, external_models do begin
+        foreach internal_model, internal_models do begin
+            ; The B at sc position.
+            suffix = '_'+internal_model+'_'+external_model
+            bmod_var = prefix+'bmod_gsm'+suffix
+            if tnames(bmod_var) ne '' then del_data, bmod_var
+            bmod_var = lets_read_geopack_bfield(var_info=bmod_var, $
+                orbit_var=r_gsm_var, time_var=orbit_time_var, $
+                internal_model=internal_model, external_model=external_model, save_to=data_file, update=update)
+            print, 'Loading '+bmod_var+' ...'
+        endforeach
+    endforeach
+    
+    
+    ; B model.
+    b0_window = 15.*60
+    bmod_var = prefix+'bmod_gsm_igrf_t89'
+    b_vars = lets_decompose_bfield(b0_window=b0_window, b_var=b_gsm_var, bmod_var=bmod_var)
+    b0_gsm_var = b_vars['b0']
+    b_elev_var = lets_calc_vec_elev(b_gsm_var, coord='sm')
+    bmod_elev_var = lets_calc_vec_elev(bmod_var, coord='sm', var_info=prefix+'bmod_elev')
+    db_elev_var = lets_subtract_vars(b_elev_var, bmod_elev_var, save_to=prefix+'db_elev')
+    options, db_elev_var, constant=0, yrange=[-1,1]*90
+    
+    
+
+    ; Particle related vars.
+    ele_en_spec_var = lets_read_this(func='mms_read_en_spec_ele', $
+        time_range, probe=mission_probe, id='thermal', errmsg=errmsg)
+    if errmsg ne '' then begin
+        errmsg = 'Failed to load e thermal data ...'
+        return, retval
+    endif
+    options, ele_en_spec_var, $
+        zrange=[1e4,1e7], zstyle=1, zlog=1, ztickv=[1e4,1e5,1e6,1e7], ztickname='10!U'+['4','5','6','7'], zticks=3, zminor=9, $
+        yrange=[1.1e1,2.6e4], ystyle=1, ylog=1, ytickv=[1e2,1e3,1e4], ytickname='10!U'+['2','3','4'], yticks=2, yminor=9
+    ele_kev_en_spec_var = lets_read_this(func='mms_read_en_spec_ele', $
+        time_range, probe=mission_probe, id='kev', errmsg=errmsg)
+    if errmsg ne '' then begin
+        errmsg = 'Failed to load e kev data ...'
+        return, retval
+    endif
+    options, ele_kev_en_spec_var, $
+        zrange=[1e1,1e5], zstyle=1, zlog=1, ztickv=[1e1,1e2,1e3,1e4,1e5], ztickname=['10!U1',' ','10!U3',' ','10!U5'], zticks=4, zminor=9, $
+        yrange=[4.7e4,5.2e5], ystyle=1, ylog=1, ytickv=[5e4,5e5], ytickname='10!U'+['4','5'], yticks=1, yminor=9
+
+
+    ion_en_spec_var = lets_read_this(func='mms_read_en_spec_ion', $
+        time_range, probe=mission_probe, id='thermal', errmsg=errmsg, instrument='fpi')
+    if errmsg ne '' then begin
+        errmsg = 'Failed to load ion thermal data ...'
+        return, retval
+    endif
+    ion_kev_en_spec_var = lets_read_this(func='mms_read_en_spec_ion', $
+        time_range, probe=mission_probe, id='kev', errmsg=errmsg)
+    if errmsg ne '' then begin
+        errmsg = 'Failed to load ion kev data ...'
+        return, retval
+    endif
+    ion_vel_var = lets_read_this(func='mms_read_ion_vel', $
+        time_range, probe=mission_probe, errmsg=errmsg)
+
+
+
+;---Make the plot.
+    index = where(get_var_data(prefix+'dis',times=times) ge 9, count)
+    if count eq 0 then return, retval
+    plot_tr = time_range
+    tickinterval = 10*60d
+    
+
+    ; Init plot_vars.
+    plot_info = orderedhash()
+    
+    
+    plot_info[ele_kev_en_spec_var] = dictionary($
+        'routine', 'plot_spec', $
+        'panel_label_text', 'Ele high', $
+        'ypan', 0.8, $
+        'setting', dictionary( ) )
+    plot_info[ele_en_spec_var] = dictionary($
+        'routine', 'plot_spec', $
+        'panel_label_text', 'Ele low', $
+        'setting', dictionary( ) )
+    plot_info[ion_kev_en_spec_var] = dictionary($
+        'routine', 'plot_spec', $
+        'panel_label_text', 'Ion high', $
+        'ypan', 0.8, $
+        'setting', dictionary( ) )
+    plot_info[ion_en_spec_var] = dictionary($
+        'routine', 'plot_spec', $
+        'panel_label_text', 'Ion low', $
+        'setting', dictionary( ) )
+    
+    plot_info[b_gsm_var] = dictionary($
+        'routine', 'plot_line', $
+        'panel_label_text', 'B GSM', $
+        'setting', dictionary($
+            'yrange', [0,1]*50, $
+            'tick_setting', dictionary($
+                'ytickv', [1,2]*20, $
+                'yminor', 2 ) $
+        ) $
+    )
+    
+    plot_info[e_gsm_var] = dictionary($
+        'routine', 'plot_linlog', $
+        'panel_label_text', 'E GSM', $
+        'setting', dictionary($
+            'yrange', [-1,1]*5, $
+            'tick_setting', dictionary($
+                'ytickv', [-1,0,1]*3, $
+                'yminor', 3 ) $
+            ) $
+        )
+    plot_info[ion_vel_var] = dictionary($
+        'routine', 'plot_line', $
+        'panel_label_text', 'Ion Vel', $
+        'setting', dictionary($
+            'yrange', [-1,1]*70, $
+            'tick_setting', dictionary($
+                'ytickv', [-1,0,1]*50, $
+                'yminor', 5 ) $
+            ) $
+        )
+    
+    plot_vars = plot_info.keys()
+    nplot_var = n_elements(plot_vars)
+    ; Default settings.
+    panel_letters = letters(nplot_var)
+    foreach plot_var, plot_vars, pid do begin
+        my_info = plot_info[plot_var]
+        if ~my_info.haskey('ypan') then my_info['ypan'] = 1d
+        if ~my_info.haskey('panel_label_text') then my_info['panel_label_text'] = ' '
+        if ~my_info.haskey('panel_letter') then my_info['panel_letter'] = panel_letters[pid]
+        if ~my_info.haskey('panel_label_msg') then my_info['panel_label_msg'] = my_info['panel_letter']+') '+my_info['panel_label_text']
+    endforeach
+    
+    var_labels = prefix+['mlat','dis','mlt']
+    nvar_label = n_elements(var_labels)
+    options, prefix+'mlat', ytitle='MLat (deg)'
+    options, prefix+'dis', ytitle='|R| (Re)'
+    options, prefix+'mlt', ytitle='MLT (h)'
+    var = prefix+'mlt'
+    get_data, var, times, data
+    index = where(data le 0, count)
+    if count ne 0 then begin
+        data[index] += 24
+        store_data, var, times, data
+    endif
+    
+    margins = [12,3.5+nvar_label,8,2]
+    ypans = []
+    foreach plot_var, plot_vars, pid do begin
+        ypans = [ypans,(plot_info[plot_var])['ypan']]
+    endforeach
+    plot_poss = panel_pos(plot_file, nypan=nplot_var, fig_size=fig_size, ypans=ypans, pansize=[12,1], margins=margins)
+    
+    ; Use positions to determine [x,y]ticklen.
+    abs_ticklen = 0.3
+    foreach plot_var, plot_vars, pid do begin
+        my_info = plot_info[plot_var]
+        my_info['position'] = plot_poss[*,pid]
+        my_info['abs_ticklen'] = abs_ticklen
+        ;plot_info[plot_var] = my_info
+    endforeach
+    
+    sgopen, plot_file, size=fig_size, xchsz=xchsz, ychsz=ychsz
+    
+    tplot_options, 'tickinterval', tickinterval
+    foreach plot_var, plot_vars, pid do begin
+        my_info = plot_info[plot_var]
+    
+        my_pos = my_info['position']
+        plot_routine = my_info['routine']
+        plot_setting = my_info['setting']
+        plot_setting['position'] = my_pos
+        plot_setting['noerase'] = (pid eq 0)? 0: 1
+        plot_setting['xtickformat'] = (pid eq nplot_var-1)? '': '(A1)'
+        plot_setting['novtitle'] = (pid eq nplot_var-1)? 0: 1
+        plot_setting['time_range'] = plot_tr
+        plot_setting['tickinterval'] = tickinterval
+        plot_setting['panel_label_pos'] = [xchsz*1,my_pos[3]-ychsz*0.7]
+        plot_setting['panel_label_msg'] = my_info['panel_label_msg']
+        plot_setting['var_labels'] = var_labels
+        plot_setting['vlab_margin'] = margins[0]-1
+        plot_setting['trange'] = plot_tr
+        foreach key, plot_setting.keys() do begin
+            index = strpos(key,'tick_setting')
+            if index[0] ne -1 then begin
+                tick_setting = plot_setting[key]
+                foreach comp, constant('xyz') do begin
+                    the_comp = comp+'tickv'
+                    if tick_setting.haskey(the_comp) then begin
+                        tick_setting[comp+'ticks'] = n_elements(tick_setting[the_comp])-1
+                    endif
+                endforeach
+            endif
+        endforeach
+
+        plot_setting = plot_setting.tostruct()        
+        tmp = call_function(plot_routine, plot_var, _extra=plot_setting)
+    endforeach
+
+    bar_times = time_double([$
+        '2015-09-01/11:38:20', $
+        '2015-09-01/11:41:50', $
+        '2015-09-01/11:44:10', $
+        '2015-09-01/11:49:10', $
+        '2015-09-01/11:56:15', $
+        '2015-09-01/11:58:25', $
+        '2015-09-01/12:00:50', $
+        '2015-09-01/12:03:50', $
+        '2015-09-01/12:06:10', $
+        '2015-09-01/12:08:30', $
+        '2015-09-01/12:12:25', $
+        '2015-09-01/12:15:00', $
+        '2015-09-01/12:29:40', $
+        '2015-09-01/12:34:50', $
+        '2015-09-01/12:39:40', $
+        '2015-09-01/12:46:05', $
+        '2015-09-01/12:50:55', $
+        '2015-09-01/12:56:10' ])
+    tpos = plot_poss[*,0]
+    tpos[1] = plot_poss[1,-1]
+    xrange = plot_tr
+    yrange = [0,1]
+    set_axis, xrange=xrange, yrange=yrange, position=tpos
+    color = sgcolor('red')
+    foreach bar_time, bar_times do begin
+        plots, bar_time+[0,0], yrange, linestyle=1, color=color
+    endforeach
+
+    if keyword_set(test) then stop
+    sgclose
+    
+
+    return, plot_file
+
+end
+
+
+trs = micro_injection_load_round1_event_list_time_range()
+tr = reform(trs[0,*])
+tr = ['2015-09-01/11:30','2015-09-01/13:30']
+probe = '1'
+
+print, micro_injection_gen_survey_plot_v02(tr, probe=probe, test=1)
+end

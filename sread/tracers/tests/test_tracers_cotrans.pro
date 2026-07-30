@@ -18,7 +18,7 @@ function test_tracers_cotrans, test=test
     ut0 = time_string(times[0],tformat='YYYY-MM-DDThh:mm:ss')
     cspice_str2et, ut0, et0
     ets = et0+times-ut0
-    uts = time_string(times,tformat='YYYY-MM-DDThh:mm:ss')
+    uts = time_string(times,tformat='YYYY-MM-DDThh:mm:ss.ffffff')
     cspice_str2et, uts, ets
     ntime = n_elements(times)
     ndim = 3

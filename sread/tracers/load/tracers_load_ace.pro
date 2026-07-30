@@ -1,4 +1,5 @@
-function tracers_load_efi, input_time_range, id=datatype, probe=probe, $
+
+function tracers_load_ace, input_time_range, id=datatype, probe=probe, $
     print_datatype=print_datatype, errmsg=errmsg, $
     local_files=files, file_times=file_times, version=version, $
     local_root=local_root, remote_root=remote_root
@@ -8,14 +9,11 @@ function tracers_load_efi, input_time_range, id=datatype, probe=probe, $
 
 ;---Check inputs.
     if n_elements(probe) eq 0 then probe = 'x'
-    if n_elements(datatype) eq 0 then datatype = 'l2%eac'
     if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'tracers'])
-    if n_elements(remote_root) eq 0 then begin
-        remote_root = tracers_get_remote_root()
-        input_level = strmid(datatype,0,2)
-        if input_level eq 'l2' then remote_root = 'https://tracers-portal.physics.uiowa.edu'
-    endif
+    if n_elements(remote_root) eq 0 then remote_root = tracers_get_remote_root()
     if n_elements(version) eq 0 then version = 'v[0-9.]+'
+    if n_elements(datatype) eq 0 then datatype = 'iowa%l3'
+
 
     if size(input_time_range[0],type=1) eq 7 then begin
         time_range = time_double(input_time_range)
@@ -25,39 +23,52 @@ function tracers_load_efi, input_time_range, id=datatype, probe=probe, $
 
 ;---Init settings.
     type_dispatch = hash()
-    instr_str = 'efi'
+    instr_str = 'ace'
     valid_range = tracers_get_valid_range(probe=probe, id=instr_str)
     probe_str = 'ts'+probe
+    prefix = 'ts'+probe+'_'
+
+    ; L3.
+    key = 'iowa%l3'
+    if datatype eq key then remote_root = 'https://tracers-portal.physics.uiowa.edu'
+    remote_path = join_path([remote_root,'L3',strupcase(probe_str),'%Y','%%m','%d'])
+    local_path = join_path([local_root,'L3',strupcase(probe_str),'%Y','%%m','%d'])
+    base = prefix+'l3_ace_pitch-angle-dist_%Y%m%d_'+version+'.cdf'
+    type_dispatch[key] = dictionary($
+        'pattern', dictionary($
+            'remote_file', join_path([remote_path,base]), $
+            'remote_index_file', join_path([remote_path,'']), $
+            'local_file', join_path([local_path,base]), $
+            'local_index_file', join_path([local_path,default_index_file(/sync)])), $
+        'valid_range', time_double(valid_range), $
+        'cadence', 'day', $
+        'extension', fgetext(base) )
+
 
     ; L2.
-    level_str = 'l2'
-    instr_str = 'efi'
-    type_strs = ['eac','ehf','hsk']
-    remote_path = join_path([remote_root,'L2',strupcase(probe_str),'%Y','%%m','%d'])
-    local_path = join_path([local_root,'L2',strupcase(probe_str),'%Y','%%m','%d'])
-    foreach type_str, type_strs do begin
-        key = level_str+'%'+type_str
-        base = probe_str+'_'+level_str+'_'+instr_str+'_'+type_str+'_%Y%m%d_'+version+'.cdf'
-        type_dispatch[key] = dictionary($
-            'username', tracers_get_remote_root('username'), $
-            'password', tracers_get_remote_root('password'), $
-            'pattern', dictionary($
-                'remote_file', join_path([remote_path,base]), $
-                'remote_index_file', join_path([remote_path,'']), $
-                'local_file', join_path([local_path,base]), $
-                'local_index_file', join_path([local_path,default_index_file(/sync)])), $
-            'valid_range', time_double(valid_range), $
-            'cadence', 'day', $
-            'extension', fgetext(base) )
-    endforeach
+    key = 'cdaweb%l2'
+    if datatype eq key then remote_root = 'https://cdaweb.gsfc.nasa.gov/pub/data/tracers'
+    remote_path = join_path([remote_root,'tracers'+probe,'ace_cusp-electrons','l2','def_diff-en-flux','%Y'])
+    local_path = join_path([local_root,'cdaweb','tracers'+probe,'ace_cusp-electrons','l2','def_diff-en-flux','%Y'])
+    base = prefix+'l2_ace_def_%Y%m%d_'+version+'.cdf'
+    type_dispatch[key] = dictionary($
+        'pattern', dictionary($
+            'remote_file', join_path([remote_path,base]), $
+            'remote_index_file', join_path([remote_path,'']), $
+            'local_file', join_path([local_path,base]), $
+            'local_index_file', join_path([local_path,default_index_file(/sync)])), $
+        'valid_range', time_double(valid_range), $
+        'cadence', 'day', $
+        'extension', fgetext(base) )
+
 
     ; L1.
-    type_strs = ['hsk_x261','edc-roi_x272','edc-bor_x273','vdc-roi_x274','vdc-bor_x275','eac_x276','ehf_x277']
+    type_strs = ['epd_x2b2','epd_x2b3']
     foreach type_str, type_strs do begin
         foreach level_str, ['l1a','l1b'] do begin
             key = level_str+'%'+type_str
-            remote_path = join_path([remote_root,'SOC',strupcase(probe_str),strupcase(level_str),'%Y','%%m','%d'])
-            local_path = join_path([local_root,'SOC',strupcase(probe_str),strupcase(level_str),'%Y','%%m','%d'])
+            remote_path = join_path([remote_root,'SOC',strupcase(probe_str),strupcase(level_str),strupcase(instr_str),'%Y','%%m','%d'])
+            local_path = join_path([local_root,'SOC',strupcase(probe_str),strupcase(level_str),strupcase(instr_str),'%Y','%%m','%d'])
             base = probe_str+'_'+level_str+'_'+instr_str+'_'+type_str+'_%Y%m%d_'+version+'.cdf'
             type_dispatch[key] = dictionary($
                 'username', tracers_get_remote_root('username'), $
@@ -72,6 +83,7 @@ function tracers_load_efi, input_time_range, id=datatype, probe=probe, $
                 'extension', fgetext(base) )
         endforeach
     endforeach
+
 
 ;---Dispatch patterns.
     if n_elements(datatype) eq 0 then begin
@@ -94,15 +106,9 @@ end
 
 compile_opt idl2
 
-; url = 'https://tracers-portal.physics.uiowa.edu/teams/flight/SOC/TS1/L1B/ACI/2025/11/22/'
+; url = 'https://tracers-portal.physics.uiowa.edu/teams/flight/SOC/TS1/L1B/ACE/2025/11/22/'
+url = 'https://tracers-portal.physics.uiowa.edu/teams/flight/SOC/TS2/L1B/ACE/2026/02/16/ts2_l1b_ace_epd_x2b2_20260216_v0.7.0.cdf'
 ; local_file = join_path([homedir(),'Downloads','tmp','tracers_url_test.html'])
-; username = tracers_get_remote_root('username')
-; password = tracers_get_remote_root('password')
-; download_file, local_file, url, username=username, password=password
-; stop
-; 
-; url = 'https://tracers-portal.physics.uiowa.edu/teams/flight/SOC/TS1/L1B/ACI/2025/11/22/ts1_l1b_aci_ipd_x282_20251122_v0.8.2.cdf'
-; local_file = join_path([homedir(),'Downloads','tmp','tracers_url_test.cdf'])
 ; username = tracers_get_remote_root('username')
 ; password = tracers_get_remote_root('password')
 ; download_file, local_file, url, username=username, password=password
@@ -110,12 +116,11 @@ compile_opt idl2
 
 time_range = ['2025-11-22','2025-11-23']
 probe = '2'
-; L2.
-files = tracers_load_efi(time_range, probe=probe, id='l2%eac')
+files = tracers_load_ace(time_range, probe=probe, id='iowa%l3')
 print, files
 stop
-; L1.
-files = tracers_load_efi(time_range, probe=probe, id='l1b%vdc-roi_x274')
-files = tracers_load_efi(time_range, probe=probe, id='l1b%edc-roi_x272')
+files = tracers_load_ace(time_range, probe=probe, id='l1b%ipd_x292')
+print, files
+files = tracers_load_ace(time_range, probe=probe, id='cdaweb%l2')
 print, files
 end

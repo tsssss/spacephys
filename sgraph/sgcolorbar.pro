@@ -3,9 +3,10 @@
 ; zrange=. Set zrange, linear always.
 ; position=.
 ; ct=.
+; rel_pos=. ['left','right','above','below']
 ;-
 pro sgcolorbar, colors, zrange = zr, ztitle = ztitle, position = pos, $
-    zcharsize = zcharsize, zticks = zticks, zminor = zminor, ztickv = ztickv, ztickname = ztickn, $
+    zcharsize = zcharsize, zticks = zticks, zminor = zminor, ztickv = ztickv, ztickname = ztickn, rel_pos=rel_pos, $
     horizontal = horizontal, log=log, zticklen=zticklen, ztickformat=ztickformat, $
     _extra = ex
 
@@ -17,13 +18,30 @@ pro sgcolorbar, colors, zrange = zr, ztitle = ztitle, position = pos, $
     if n_elements(ztitle) eq 0 then ztitle = ''
     if n_elements(zcharsize) eq 0 then zcharsize = 0.8
     
-    if n_elements(colors) eq 0 then colors = indgen(256)
-    ncolor = n_elements(colors)
+    if n_elements(colors) eq 0 then colors = indgen(255)
+
+    if n_elements(rel_pos) eq 0 then rel_pos = 'right'
+    if rel_pos eq 'right' then begin
+        horizontal = 0
+        the_axis = 1
+    endif else if rel_pos eq 'left' then begin
+        horizontal = 0
+        the_axis = 0
+    endif else if rel_pos eq 'above' then begin
+        horizontal = 1
+        the_axis = 1
+    endif else if rel_pos eq 'below' then begin
+        horizontal = 1
+        the_axis = 0
+    endif else begin
+        ; Treat everything else as right.
+        horizontal = 0
+        the_axis = 1
+    endelse
 
     p1 = convert_coord(pos[0], pos[1], /normal, /to_device)
     p2 = convert_coord(pos[2], pos[3], /normal, /to_device)
     
-    ;cb = [1d,1] # findgen(ncolor)
     cb = [1d,1] # colors
     if keyword_set(horizontal) then cb = transpose(cb)
 
@@ -32,19 +50,27 @@ pro sgcolorbar, colors, zrange = zr, ztitle = ztitle, position = pos, $
     if keyword_set(horizontal) then begin
         plot, zr, xr, position=pos, normal=1, nodata=1, noerase=1, $
             color=sgcolor('black'), background=sgcolor('white'), $
-            xstyle=9, xlog=log, xrange=zr, xticks=1, xminor=0, $
+            xstyle=1, xlog=log, xrange=zr, xticks=1, xminor=0, $
             ystyle=1, yminor=0, yticks=1, ytickformat='(A1)', xtickformat='(A1)', $
             xticklen=0, yticklen=0
-        axis, xaxis=1, save=1, xtitle=ztitle, xcharsize=zcharsize, $
+        axis, xaxis=1-the_axis, $
+            xstyle=1, xlog=log, xrange=zr, xticks=1, xminor=0, $
+            xtickformat='(A1)', xticklen=0, $
+            color = sgcolor('black')
+        axis, xaxis=the_axis, save=1, xtitle=ztitle, xcharsize=zcharsize, $
             xstyle=1, xlog=log, xrange=zr, xtickv=ztickv, xticks=zticks, xminor=zminor, $
             xtickname=ztickn, xtickformat=ztickformat, xticklen=zticklen, $
             color = sgcolor('black')
     endif else begin
         plot, xr, zr, position=pos, normal=1, nodata=1, noerase=1, $
             color=sgcolor('black'), background=sgcolor('white'), $
-            ystyle=9, ylog=log, yrange=zr, yticks=1, yminor=0, $
+            ystyle=1, ylog=log, yrange=zr, yticks=1, yminor=0, $
             xstyle=1, xminor=0, xticks=1, xtickformat='(A1)', ytickformat='(A1)'
-        axis, yaxis=1, sav=1, ytitle=ztitle, ycharsize=zcharsize, $
+        axis, yaxis=1-the_axis, $
+            ystyle=1, ylog=log, yrange=zr, yticks=1, yminor=0, $
+            ytickformat='(A1)', yticklen=0, $
+            color = sgcolor('black')
+        axis, yaxis=the_axis, sav=1, ytitle=ztitle, ycharsize=zcharsize, $
             ystyle=1, ylog=log, yrange=zr, ytickv=ztickv, yticks=zticks, yminor=zminor, $
             ytickname=ztickn, ytickformat=ztickformat, yticklen=zticklen, $
             color = sgcolor('black')

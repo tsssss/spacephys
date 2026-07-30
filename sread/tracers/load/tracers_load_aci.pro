@@ -12,6 +12,7 @@ function tracers_load_aci, input_time_range, id=datatype, probe=probe, $
     if n_elements(local_root) eq 0 then local_root = join_path([default_local_root(),'tracers'])
     if n_elements(remote_root) eq 0 then remote_root = tracers_get_remote_root()
     if n_elements(version) eq 0 then version = 'v[0-9.]+'
+    if n_elements(datatype) eq 0 then datatype = 'cdaweb%l2'
 
     if size(input_time_range[0],type=1) eq 7 then begin
         time_range = time_double(input_time_range)
@@ -24,25 +25,44 @@ function tracers_load_aci, input_time_range, id=datatype, probe=probe, $
     instr_str = 'aci'
     valid_range = tracers_get_valid_range(probe=probe, id=instr_str)
     probe_str = 'ts'+probe
+    prefix = 'ts'+probe+'_'
+
+    ; L2.
+    key = 'cdaweb%l2'
+    if datatype eq key then remote_root = 'https://cdaweb.gsfc.nasa.gov/pub/data/tracers'
+    remote_path = join_path([remote_root,'tracers'+probe,'aci_cusp-ions','l2','ipd_ion-dist','%Y'])
+    local_path = join_path([local_root,'cdaweb','tracers'+probe,'aci_cusp-ions','l2','ipd_ion-dist','%Y'])
+    base = prefix+'l2_aci_ipd_%Y%m%d_'+version+'.cdf'
+    type_dispatch[key] = dictionary($
+        'pattern', dictionary($
+            'remote_file', join_path([remote_path,base]), $
+            'remote_index_file', join_path([remote_path,'']), $
+            'local_file', join_path([local_path,base]), $
+            'local_index_file', join_path([local_path,default_index_file(/sync)])), $
+        'valid_range', time_double(valid_range), $
+        'cadence', 'day', $
+        'extension', fgetext(base) )
 
     ; L1.
-    type_str = 'ipd_x292'
-    foreach level_str, ['l1a','l1b'] do begin
-        key = level_str+'%'+type_str
-        remote_path = join_path([remote_root,'SOC',strupcase(probe_str),strupcase(level_str),strupcase(instr_str),'%Y','%%m','%d'])
-        local_path = join_path([local_root,'SOC',strupcase(probe_str),strupcase(level_str),strupcase(instr_str),'%Y','%%m','%d'])
-        base = probe_str+'_'+level_str+'_'+instr_str+'_'+type_str+'_%Y%m%d_'+version+'.cdf'
-        type_dispatch[key] = dictionary($
-            'username', tracers_get_remote_root('username'), $
-            'password', tracers_get_remote_root('password'), $
-            'pattern', dictionary($
-                'remote_file', join_path([remote_path,base]), $
-                'remote_index_file', join_path([remote_path,'']), $
-                'local_file', join_path([local_path,base]), $
-                'local_index_file', join_path([local_path,default_index_file(/sync)])), $
-            'valid_range', time_double(valid_range), $
-            'cadence', 'day', $
-            'extension', fgetext(base) )
+    type_strs = ['ipd_x292','ipd_x281']
+    foreach type_str, type_strs do begin
+        foreach level_str, ['l1a','l1b'] do begin
+            key = level_str+'%'+type_str
+            remote_path = join_path([remote_root,'SOC',strupcase(probe_str),strupcase(level_str),strupcase(instr_str),'%Y','%%m','%d'])
+            local_path = join_path([local_root,'SOC',strupcase(probe_str),strupcase(level_str),strupcase(instr_str),'%Y','%%m','%d'])
+            base = probe_str+'_'+level_str+'_'+instr_str+'_'+type_str+'_%Y%m%d_'+version+'.cdf'
+            type_dispatch[key] = dictionary($
+                'username', tracers_get_remote_root('username'), $
+                'password', tracers_get_remote_root('password'), $
+                'pattern', dictionary($
+                    'remote_file', join_path([remote_path,base]), $
+                    'remote_index_file', join_path([remote_path,'']), $
+                    'local_file', join_path([local_path,base]), $
+                    'local_index_file', join_path([local_path,default_index_file(/sync)])), $
+                'valid_range', time_double(valid_range), $
+                'cadence', 'day', $
+                'extension', fgetext(base) )
+        endforeach
     endforeach
 
 
@@ -84,5 +104,7 @@ compile_opt idl2
 time_range = ['2025-11-22','2025-11-23']
 probe = '2'
 files = tracers_load_aci(time_range, probe=probe, id='l1b%ipd_x292')
+print, files
+files = tracers_load_aci(time_range, probe=probe, id='cdaweb%l2')
 print, files
 end

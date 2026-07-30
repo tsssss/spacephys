@@ -1,5 +1,5 @@
 
-function tracers_read_efield, input_time_range, probe=probe, $
+function tracers_read_efield_l1, input_time_range, probe=probe, $
     update=update, get_name=get_name
     compile_opt idl2
 
@@ -23,7 +23,7 @@ function tracers_read_efield, input_time_range, probe=probe, $
     var_list.add, dictionary($
         'in_vars', in_vars, $
         'time_var_name', time_var, $
-        'time_var_type', 'tt2001' )
+        'time_var_type', 'tt2000' )
     read_vars, time_range, files=files, var_list=var_list, errmsg=errmsg
     if errmsg ne '' then return, retval
 
@@ -53,6 +53,47 @@ function tracers_read_efield, input_time_range, probe=probe, $
     return, var_info
 
 end
+function tracers_read_efield, input_time_range, probe=probe, $
+    update=update, get_name=get_name, errmsg=errmsg, _extra=extra
+    compile_opt idl2
+
+    errmsg = ''
+    retval = !null
+    prefix = 'ts'+probe+'_'
+
+    default_coord = 'ts_tscs'
+    var_info = prefix+'ex_spec_'+default_coord
+    if keyword_set(get_name) then return, var_info
+    if keyword_set(update) then del_data, var_info
+    time_range = time_double(input_time_range)
+    if ~check_if_update(var_info, time_range) then return, var_info
+
+    files = tracers_load_efi(time_range, probe=probe, errmsg=errmsg, id='l2%eac')
+    if errmsg ne '' then return, retval
+
+    time_var = 'Epoch'
+    time_var = prefix+'l2_eac_packet_start'
+    time_type = 'tt2000'
+    times = cdf_read_var(time_var, filename=files[0])
+    times = convert_time(times, from=time_type, to='unix')
+    in_var = prefix+'l2_eac_x_spec'
+    ex_spec = cdf_read_var(in_var, filename=files[0])
+    freqs = cdf_read_var('Frequency', filename=files[0])>1.
+
+    settings = dictionary($
+        'coord', default_coord, $
+        'requested_time_range', time_range, $
+        'display_type', 'spec', $
+        'ylog', 1, $
+        'ytitle', 'Freq!C(Hz)', $
+        'ztitle', strupcase(default_coord)+'!CEx (V/m)!U2!N/Hz', $
+        'zlog', 1 )
+    var_info = var_store(var_info, ex_spec, times, freqs)
+    add_setting, var_info, smart=1, settings
+    
+    return, var_info
+
+end
 
 compile_opt idl2
 time_range = ['2025-11-22','2025-11-23']
@@ -60,6 +101,9 @@ time_range = ['2025-12-22/15:24','2025-12-22/15:45']
 time_range = ['2025-12-22/15:24','2025-12-22/15:30']
 probe = '2'
 e_var = tracers_read_efield(time_range, probe=probe)
+tplot, e_var, trange=time_range
+stop
+
 b_var = tracers_read_bfield(time_range, probe=probe)
 spec_var = tracers_read_ion_en_spec(time_range, probe=probe)
 r_var = tracers_read_orbit(time_range, probe=probe)

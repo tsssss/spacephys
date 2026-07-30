@@ -19,7 +19,7 @@ function test_tracers_ephemeris_spice_and_l1b, time_range, probe=probe, test=tes
     ut0 = time_string(times[0],tformat='YYYY-MM-DDThh:mm:ss')
     cspice_str2et, ut0, et0
     ets = et0+times-ut0
-    uts = time_string(times,tformat='YYYY-MM-DDThh:mm:ss')
+    uts = time_string(times,tformat='YYYY-MM-DDThh:mm:ss.ffffff')
     cspice_str2et, uts, ets
     target = 'TS'+probe
     observer = 'EARTH'
@@ -43,7 +43,7 @@ function test_tracers_ephemeris_spice_and_l1b, time_range, probe=probe, test=tes
     var_list.add, dictionary($
         'in_vars', in_vars, $
         'time_var_name', time_var, $
-        'time_var_type', 'tt2001' )
+        'time_var_type', 'tt2000' )
     read_vars, time_range, files=files, var_list=var_list, errmsg=errmsg
 
     locs = var_get_data(in_vars, times=times)
@@ -192,12 +192,12 @@ end
 
 compile_opt idl2
 probe = '2'
-test = 0
+test = 1
 time_range = time_double(['2025-12-11/17:00','2025-12-11/21:00'])
 dates = ['2025-08-30','2025-12-01','2026-01-01']
 foreach date, dates do begin
     time_range = time_double(date+'/'+['00:00','02:00'])
-    print, test_tracers_spin_axis_pointing(time_range, probe=probe, test=test)
+    print, test_tracers_spin_axis_direction(time_range, probe=probe, test=test)
     stop
     print, test_tracers_ephemeris_spice_and_l1b(time_range, probe=probe, test=test)
 endforeach

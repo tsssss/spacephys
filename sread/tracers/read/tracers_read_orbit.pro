@@ -1,6 +1,6 @@
 
 function tracers_read_orbit, input_time_range, probe=probe, $
-    update=update, get_name=get_name
+    update=update, get_name=get_name, errmsg=errmsg, _extra=extra
     compile_opt idl2
 
     errmsg = ''
@@ -23,7 +23,7 @@ function tracers_read_orbit, input_time_range, probe=probe, $
     var_list.add, dictionary($
         'in_vars', in_vars, $
         'time_var_name', time_var, $
-        'time_var_type', 'tt2001' )
+        'time_var_type', 'tt2000' )
     read_vars, time_range, files=files, var_list=var_list, errmsg=errmsg
     if errmsg ne '' then return, retval
 
@@ -40,7 +40,8 @@ function tracers_read_orbit, input_time_range, probe=probe, $
     r_xys = diss*sin(colats)
     r_geos[*,0] = r_xys*cos(lons)
     r_geos[*,1] = r_xys*sin(lons)
-    settings = dictionary('coord',default_coord)
+    mission_probe = ['ts',probe]
+    settings = dictionary('coord',default_coord, 'mission_probe', mission_probe)
     var_info = var_store(var_info, r_geos, times, id='position', settings=settings)
 
     return, var_info

@@ -2,15 +2,16 @@
 ; 
 ;-
 
-function tracers_read_ion_en_spec, input_time_range, probe=probe, $
-    update=update, get_name=get_name
+function tracers_read_ion_en_spec_iowa, input_time_range, probe=probe, $
+    update=update, get_name=get_name, suffix=suffix, _extra=extra
     compile_opt idl2
 
     errmsg = ''
     retval = !null
     prefix = 'ts'+probe+'_'
 
-    var_info = prefix+'p_en_spec'
+    if n_elements(suffix) eq 0 then suffix = '_iowa'
+    var_info = prefix+'p_en_spec'+suffix
     if keyword_set(get_name) then return, var_info
     if keyword_set(update) then del_data, var_info
     time_range = time_double(input_time_range)
@@ -25,7 +26,7 @@ function tracers_read_ion_en_spec, input_time_range, probe=probe, $
     var_list.add, dictionary($
         'in_vars', in_vars, $
         'time_var_name', time_var, $
-        'time_var_type', 'tt2001' )
+        'time_var_type', 'tt2000' )
     read_vars, time_range, files=files, var_list=var_list, errmsg=errmsg
     if errmsg ne '' then return, retval
 
@@ -49,7 +50,8 @@ end
 compile_opt idl2
 time_range = ['2025-11-22','2025-11-23']
 time_range = ['2025-12-22','2025-12-23']
+time_range = ['2026-02-16/04:00','2026-02-16/04:05']
 probe = '2'
-var = tracers_read_ion_en_spec(time_range, probe=probe)
+var = tracers_read_ion_en_spec_iowa(time_range, probe=probe)
 tplot, var, trange=time_range
 end

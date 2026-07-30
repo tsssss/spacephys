@@ -17,12 +17,12 @@ function test_tracers_spin_axis_direction, input_time_range, probe=probe, test=t
   
 ;---Get the pointing of the axes in TSCS expressed in GSE.
     prefix = 'ts'+probe+'_'
-    time_step = 1d ; sec.
+    time_step = 0.1 ; sec.
     times = make_bins(time_range, time_step)
     ut0 = time_string(times[0],tformat='YYYY-MM-DDThh:mm:ss')
     cspice_str2et, ut0, et0
     ets = et0+times-ut0
-    uts = time_string(times,tformat='YYYY-MM-DDThh:mm:ss')
+    uts = time_string(times,tformat='YYYY-MM-DDThh:mm:ss.ffffff')
     cspice_str2et, uts, ets
     target = 'TS'+probe
     target_coord = 'tscs'
@@ -116,7 +116,9 @@ function test_tracers_spin_axis_direction, input_time_range, probe=probe, test=t
     tickinterval = 5
     tplot_options, version=3
     tplot_options, 'xtickinterval', tickinterval
-    tplot, plot_vars, trange=time_range, vlab_margin=10, position=plot_poss
+    plot_tr = time_range+[1,-1]*spin_period*1
+    plot_tr = time_range[0]+600+[0,3600*2]
+    tplot, plot_vars, trange=plot_tr, vlab_margin=10, position=plot_poss
     for pid=0,nplot_var-1 do begin
         tpos = plot_poss[*,pid]
         tx = tpos[0]-xchsz*10
@@ -142,6 +144,8 @@ compile_opt idl2
 probe = '2'
 test = 1
 time_range = time_double(['2026-01-01','2026-01-03'])
+date = '2026-01-01'
+time_range = time_double(date+'/'+['00:00','04:00'])
 print, test_tracers_spin_axis_direction(time_range, probe=probe, test=test)
 end
 

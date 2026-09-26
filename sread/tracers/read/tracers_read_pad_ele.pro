@@ -133,8 +133,8 @@ function tracers_read_pad_ele, input_time_range, probe=probe, $
 
     plot_vars = [pa_spec_var, en_spec_var]
     options, plot_vars, zrange=[1e4,1e10]
-;    tplot, plot_vars
-;    stop
+    tplot, plot_vars
+    stop
 
     return, var_info
 
@@ -143,6 +143,9 @@ end
 
 compile_opt idl2
 time_range = ['2026-02-16/04:00','2026-02-16/04:05']
+time_range = ['2026-02-16/04:00','2026-02-16/04:05']
+; Sergei's event.
+time_range = ['2026-04-01/03:08','2026-04-01/03:10']
 probe = '2'
 pad_var = tracers_read_pad_ele(time_range, probe=probe)
 print, pad_var

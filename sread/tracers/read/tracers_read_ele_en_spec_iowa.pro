@@ -51,6 +51,10 @@ compile_opt idl2
 time_range = ['2025-11-22','2025-11-23']
 time_range = ['2025-12-22','2025-12-23']
 time_range = ['2026-02-16/04:00','2026-02-16/04:05']
+
+; Sergei's event.
+time_range = ['2026-04-01/03:08','2026-04-01/03:10']
+
 probe = '2'
 e_var = tracers_read_ele_en_spec_iowa(time_range, probe=probe)
 i_var = tracers_read_ion_en_spec_iowa(time_range, probe=probe)

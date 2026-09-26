@@ -30,8 +30,6 @@ function tracers_read_ele_pa_spec, input_time_range, probe=probe, $
     en_bin_var = prefix+'l2_ace_energy'
     energy_bins = cdf_read_var(en_bin_var, filename=files[0])
     nenergy_bin = n_elements(energy_bins)
-    de = abs(energy_bins[1:nenergy_bin-1]-energy_bins[0:nenergy_bin-2])
-    de_e = mean(de/energy_bins[0:nenergy_bin-2])
 
 
 
@@ -44,7 +42,6 @@ function tracers_read_ele_pa_spec, input_time_range, probe=probe, $
     if errmsg ne '' then return, retval
 
     fluxs = var_get_data(flux_var, times=times)
-    fluxs *= de_e   ; Convert from 1/cm^2-s-sr to eV/cm^2-s-sr-eV.
     unit = 'eV/cm!U2!N-s-sr-eV'
     b_ts_mag = var_get_data(b_var, at=times, settings=settings)
     b_tscs = cotran_pro(b_ts_mag, probe=probe, coord_msg='ts_'+['mag','tscs'])
@@ -133,8 +130,8 @@ function tracers_read_ele_pa_spec, input_time_range, probe=probe, $
 
     plot_vars = [pa_spec_var, en_spec_var]
     options, plot_vars, zrange=[1e4,1e10]
-;    tplot, plot_vars
-;    stop
+    tplot, plot_vars
+    stop
 
     return, var_info
 
@@ -143,6 +140,8 @@ end
 
 compile_opt idl2
 time_range = ['2026-02-16/04:00','2026-02-16/04:05']
+; Sergei's event.
+time_range = ['2026-04-01/03:08','2026-04-01/03:10']
 probe = '2'
 pad_var = tracers_read_ele_pa_spec(time_range, probe=probe)
 print, pad_var
